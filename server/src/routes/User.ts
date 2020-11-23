@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
-import User, { IUser } from "../models/user";
+import User, { IUser } from "../models/User";
 
 const router = express.Router();
 
