@@ -1,0 +1,12 @@
+# base image
+FROM node:12-alpine as client
+
+WORKDIR /app
+
+# dependencies
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+# run 'npm run start' when the container starts
+CMD ["npm", "run", "test"]

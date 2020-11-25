@@ -8,10 +8,7 @@ COPY package.json .
 RUN npm install 
 COPY . .
 
-# build
-RUN npm run build
-
 EXPOSE 3001
 
-# run 'npm run start' when the container starts
-CMD ["npm", "run", "start"]
+# run 'npm run dev' when the container starts
+CMD ["npm", "run", "dev"]
