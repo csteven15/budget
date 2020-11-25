@@ -2,9 +2,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Request, Response, Application } from "express";
 import http from "http";
-import connect from "./connect";
+import connect from "./Connect";
 
-import userApi from "./routes/user"
+import userApi from "./routes/User"
 
 const db = `mongodb://mongo:27017`;
 
