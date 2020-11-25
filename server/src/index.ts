@@ -6,7 +6,7 @@ import connect from "./Connect";
 
 import userApi from "./routes/User"
 
-const db = `mongodb://localhost:27017/test`;
+const db = `mongodb://mongo:27017`;
 
 const app: Application = express();
 
