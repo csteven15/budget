@@ -26,15 +26,18 @@ services:
       context: ./server
       dockerfile: Dockerfile
     ports:
-      - "3001:3001" # remove after ngnx is set up
+      - "3003:3003"
     restart: on-failure
     volumes:
       - /app/node_modules # don't override folder inside container
   mongo:
     image: "mongo"
     container_name: "mongo"
+    command: mongod --port 27018
     ports:
-      - "27017-27019:27017-27019"
+      - "27018:27018"
     volumes:
       - ./db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - ./db/mongo-volume:/data/db
+    environment:
+      - PORT=27018

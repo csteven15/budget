@@ -6,7 +6,15 @@ import connect from "./Connect";
 
 import userApi from "./routes/User"
 
-const db = `mongodb://mongo:27017`;
+var environment = process.env.NODE_ENV;
+
+const isDevelopment = environment === "development"
+
+let dbPort = isDevelopment ? 27017 : 27018;
+
+let dbHost = isDevelopment ? "localhost" : "mongo";
+
+const db = `mongodb://${dbHost}:${dbPort}`;
 
 const app: Application = express();
 
@@ -21,6 +29,6 @@ app.use("/test", async (req : Request, res : Response) => {
 
 app.use("/v1", userApi);
 
-const port = process.env.PORT || 3001;
+const port = isDevelopment ? 3001 : 3003;
 const server = http.createServer(app);
-server.listen(port, () => console.log(`Server running on port ${port}`));
+server.listen(port, () => console.info(`Server running on port ${port}`));

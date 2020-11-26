@@ -13,6 +13,6 @@ RUN npm run build
 
 # pull and run nginx
 FROM nginx
-EXPOSE 3000
+EXPOSE 3002
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=client /app/build /usr/share/nginx/html
