@@ -16,7 +16,7 @@ export default ({db}: TInput) => {
         }
       )
       .then(() => {
-        return console.info(`Successfully connected to ${db}`);
+        console.info(`Successfully connected to ${db}`);
       })
       .catch(error => {
         console.error(`Error connecting to database: `, error);
