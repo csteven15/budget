@@ -11,7 +11,7 @@ COPY . .
 # build
 RUN npm run build
 
-EXPOSE 3003
+EXPOSE 3001
 
 # run 'npm run start' when the container starts
 CMD ["npm", "run", "start"]

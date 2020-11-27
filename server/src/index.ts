@@ -29,6 +29,6 @@ app.use("/test", async (req : Request, res : Response) => {
 
 app.use("/v1", userApi);
 
-const port = isDevelopment ? 3001 : 3003;
+const port = 3001;
 const server = http.createServer(app);
 server.listen(port, () => console.info(`Server running on port ${port}`));

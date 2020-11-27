@@ -10,6 +10,7 @@
     "@types/node": "^12.19.6",
     "@types/react": "^16.14.1",
     "@types/react-dom": "^16.9.10",
+    "axios": "^0.21.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-hook-form": "^6.11.5",
@@ -19,7 +20,7 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "rm -rf tsconfig.json && react-scripts start",
+    "start": "NODE_ENV=development rm -rf tsconfig.json && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
