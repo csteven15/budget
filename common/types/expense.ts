@@ -5,5 +5,5 @@ export interface Expense {
   amount: number;
   isFixedAmount: boolean;
   frequency: FrequencyEnum;
-  maxAmount?: number;
+  maxAmount: number;
 };
