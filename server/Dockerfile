@@ -5,13 +5,13 @@ WORKDIR /app
 
 # dependencies
 COPY package.json .
-RUN npm install 
+RUN yarn install 
 COPY . .
 
 # build
-RUN npm run build
+RUN yarn run build
 
 EXPOSE 3001
 
-# run 'npm run start' when the container starts
-CMD ["npm", "run", "start"]
+# run 'yarn run start' when the container starts
+CMD ["yarn", "run", "start"]
