@@ -9,7 +9,7 @@
     "devFrontEnd": "cd client && yarn run start",
     "devBackEnd": "cd server && yarn run dev",
     "removeAllImages": "docker images -a -q | xargs docker rmi -f",
-    "setup": "cd client && yarn install && cd ../server && yarn install",
+    "setup": "yarn install && cd client && yarn install && cd ../server && yarn install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
