@@ -1,14 +1,14 @@
 import React from 'react'
-import { useForm } from "react-hook-form";
-import { Button, TextField } from "@material-ui/core";
+import { useForm } from "react-hook-form"
+import { Button, TextField } from "@material-ui/core"
 
-import { Budget as IBudget} from "../../../../common/types/budget";
+import { Budget as IBudget } from "../../common/types/budget"
 
 export default function Budget() {
-  const { register, handleSubmit } = useForm<IBudget>();
+  const { register, handleSubmit } = useForm<IBudget>()
 
-  const onSubmit = (data : IBudget) => {
-    console.log(data);
+  const onSubmit = (data: IBudget) => {
+    console.log(data)
   }
 
   return (

@@ -1,8 +1,8 @@
 import React from 'react'
-import { Expense as ExpenseType } from '../../../../common/types/expense';
-import { useForm } from "react-hook-form";
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import { Button, TextField } from '@material-ui/core';
+import { Expense as ExpenseType } from '../../common/types/expense'
+import { useForm } from "react-hook-form"
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
+import { Button, TextField } from '@material-ui/core'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -13,15 +13,15 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
   }),
-);
+)
 
 export default function Expense() {
-  const classes = useStyles();
+  const classes = useStyles()
 
-  const { register, handleSubmit } = useForm<ExpenseType>();
+  const { register, handleSubmit } = useForm<ExpenseType>()
 
-  const onSubmit = (data : ExpenseType) => {
-    console.log(data);
+  const onSubmit = (data: ExpenseType) => {
+    console.log(data)
   }
 
   return (
