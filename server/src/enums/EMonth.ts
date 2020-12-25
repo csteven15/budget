@@ -11,4 +11,4 @@ export enum EMonth {
   october = "October",
   november = "November",
   december = "December"
-}
+};
