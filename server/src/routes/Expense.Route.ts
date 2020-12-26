@@ -10,12 +10,12 @@ router.get("/expense/test/:userId", ExpenseService.testExpense);
 router.get("/expenses", ExpenseService.getExpenses);
 
 // get expense by id
-router.get("/expenses/:id", ExpenseService.getExpenseByID);
+router.get("/expense/:id", ExpenseService.getExpenseByID);
 
 // add new expense
 router.post("/expense", ExpenseService.addExpense);
 
 // update expense
-router.put("/expense:id", ExpenseService.updateExpense);
+router.put("/expense/:id", ExpenseService.updateExpense);
 
 export default router;

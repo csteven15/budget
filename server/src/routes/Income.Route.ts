@@ -10,12 +10,12 @@ router.get("/income/test/:userId", IncomeService.testIncome);
 router.get("/incomes", IncomeService.getIncomes);
 
 // get income by id
-router.get("/incomes/:id", IncomeService.getIncomeByID);
+router.get("/income/:id", IncomeService.getIncomeByID);
 
 // add new income
 router.post("/income", IncomeService.addIncome);
 
 // update income
-router.put("/income:id", IncomeService.updateIncome);
+router.put("/income/:id", IncomeService.updateIncome);
 
 export default router;

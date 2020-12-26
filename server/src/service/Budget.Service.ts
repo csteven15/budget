@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Budget from "../models/Budget.Model";
+import BudgetModel from "../models/Budget.Model";
 import UtilsService from "./Utils.Service";
 
 const BudgetService = {
@@ -8,27 +8,29 @@ const BudgetService = {
 
     const userId = req.params.userId;
 
-    const newBudget = {
-      userId: userId,
-      year: req.body.year
-    };
+    const validUser = await UtilsService.validId(res, "User", userId);
+    if (!validUser) return;
 
     try {
-      const budget = await Budget.create(newBudget);
-      UtilsService.logInfoAndSend201(res, budget.toJSON());
+      const newBudget = {
+        userId: userId,
+        year: Math.floor(Math.random() * 100 + 2000)
+      };
 
+      const budget = await BudgetModel.create(newBudget);
+      UtilsService.logInfoAndSend201(res, budget.toJSON());
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Encountered an internal error when creating a test budget`);
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when creating a test budget: ${error}`);
     }
   },
   getBudgets: async (req: Request, res: Response) => {
     console.log("get /budgets");
 
     try {
-      const budgets = await Budget.find({});
+      const budgets = await BudgetModel.find({});
       UtilsService.logInfoAndSend200(res, budgets);
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting budgets`);
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting budgets: ${error}`);
     }
   },
   getBudgetByID: async (req: Request, res: Response) => {
@@ -37,14 +39,19 @@ const BudgetService = {
     const id = req.params.id;
 
     try {
-      const budget = await Budget.findById({ _id: id });
+      const budget = await BudgetModel.findById({ _id: id });
       UtilsService.logInfoAndSend200(res, budget?.toJSON());
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting a budget with ID ${id}`);
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting a budget with ID ${id}: ${error}`);
     }
   },
   addBudget: async (req: Request, res: Response) => {
     console.log("post /budget");
+
+    const userId = req.body.userId;
+
+    const validUser = await UtilsService.validId(res, "User", userId);
+    if (!validUser) return;
 
     const newBudget = {
       userId: req.body.userId,
@@ -52,27 +59,34 @@ const BudgetService = {
     };
 
     try {
-      const user = await Budget.create(newBudget);
+      await BudgetModel.create(newBudget);
       UtilsService.logInfoAndSend201(res, `Created budget with id: ${newBudget.userId}`);
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Encountered an internal error when creating a budget`);
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when creating a budget: ${error}`);
     }
   },
+  // Todo: add budget with all 12 months
   updateBudget: async (req: Request, res: Response) => {
     console.log("put /budget/:id");
 
     const id = req.params.id;
+    const userId = req.body.userId;
+
+    const validBudget = await UtilsService.validId(res, "Budget", id);
+    if (!validBudget) return;
+    const validUser = await UtilsService.validId(res, "User", userId);
+    if (!validUser) return;
 
     try {
       const updatedBudget = {
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password
+        userId: userId,
+        year: req.body.year
       };
-      await Budget.updateOne({ id: id }, updatedBudget);
+
+      await BudgetModel.updateOne({ _id: id }, updatedBudget, { runValidators: true });
       UtilsService.logInfoAndSend200(res, `Updated budget with id: ${id}`);
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Encountered an internal error when updating a budget`);
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when updating a budget: ${error}`);
     }
   }
 };

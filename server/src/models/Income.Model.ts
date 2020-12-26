@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { EFrequency } from "../enums/EFrequency";
 
 export interface IIncome extends Document {
   userId: string;
@@ -7,20 +6,23 @@ export interface IIncome extends Document {
   monthId: string;
   name: string;
   amount: number;
-  frequency: EFrequency;
+  frequency: string;
 }
 
 const incomeSchema: Schema = new mongoose.Schema({
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true
   },
   budgetId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Budget",
     required: true
   },
   monthId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Month",
     required: true
   },
   name: {
@@ -33,7 +35,6 @@ const incomeSchema: Schema = new mongoose.Schema({
   },
   frequency: {
     type: String,
-    enum: Object.values(EFrequency),
     required: true
   }
 });

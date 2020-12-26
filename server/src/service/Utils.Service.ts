@@ -1,4 +1,48 @@
 import { Response } from "express";
+import { Collection } from "mongoose";
+import BudgetModel from "../models/Budget.Model";
+import ExpenseModel from "../models/Expense.Model";
+import IncomeModel from "../models/Income.Model";
+import MonthModel from "../models/Month.Model";
+import UserModel from "../models/User.Model";
+
+// helper functions
+const modelIdExists = async (model: any & Collection, id: string) => {
+  const ref = await model.findOne({ _id: id });
+  if (ref === null) {
+    return false;
+  }
+  return true;
+};
+const findOneId = async (model: any & Collection) => {
+  return await model.findOne({});
+};
+
+const useModel = (modelType: string) => {
+  let model;
+  switch (modelType) {
+    case "User":
+      model = UserModel;
+      UserModel;
+      break;
+    case "Budget":
+      model = BudgetModel;
+      break;
+    case "Month":
+      model = MonthModel;
+      break;
+    case "Income":
+      model = IncomeModel;
+      break;
+    case "Expense":
+      model = ExpenseModel;
+      break;
+    default:
+      model = undefined;
+      break;
+  }
+  return model;
+};
 
 const UtilsService = {
   logInfoAndSend200: (res: Response, msg: any) => {
@@ -12,6 +56,28 @@ const UtilsService = {
   logErrorAndSend500: (res: Response, msg: string) => {
     console.error(msg);
     res.status(500).send(msg);
+  },
+  validId: async (res: Response, modelType: string, id: string) => {
+    let model = useModel(modelType);
+    if (model === undefined) return false;
+    const exists = await modelIdExists(model, id);
+    if (!exists) {
+      const msg = `Invalid ${modelType.toLowerCase()}Id`;
+      console.error(msg);
+      res.status(500).send(msg);
+      return false;
+    }
+    return true;
+  },
+  testFindOneIdByModel: async (modelType: string) => {
+    let model = useModel(modelType);
+    if (model === undefined) return -1;
+    const doc = await findOneId(model);
+    if (doc === null) return -1;
+    return doc.id;
+  },
+  enumKeys<O extends object, K extends keyof O = keyof O>(obj: O): K[] {
+    return Object.keys(obj).filter(k => Number.isNaN(+k)) as K[];
   }
 };
 

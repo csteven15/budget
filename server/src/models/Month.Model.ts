@@ -1,24 +1,25 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { EMonth } from "../enums/EMonth";
 
 export interface IMonth extends Document {
   userId: string;
   budgetId: string;
-  name: EMonth;
+  name: string;
 }
 
 const monthSchema: Schema = new mongoose.Schema({
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true
   },
   budgetId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Budget",
     required: true
   },
   name: {
     type: String,
-    enum: Object.values(EMonth)
+    required: true
   }
 });
 

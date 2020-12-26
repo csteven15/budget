@@ -10,12 +10,12 @@ router.get("/month/test/:userId", MonthService.testMonth);
 router.get("/months", MonthService.getMonths);
 
 // get month by id
-router.get("/months/:id", MonthService.getMonthsByID);
+router.get("/month/:id", MonthService.getMonthsByID);
 
 // add new month
 router.post("/month", MonthService.addMonth);
 
 // update month
-router.put("/month:id", MonthService.updateMonth);
+router.put("/month/:id", MonthService.updateMonth);
 
 export default router;

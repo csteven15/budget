@@ -5,6 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "NODE_ENV=development nodemon src/index.ts",
+    "devDocker": "NODE_ENV=docker_development nodemon src/index.ts",
     "build": "tsc --project .",
     "start": "yarn run build && node ./build/src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

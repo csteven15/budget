@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { EFrequency } from "../enums/EFrequency";
 
 export interface IExpense extends Document {
   userId: string;
@@ -8,21 +7,24 @@ export interface IExpense extends Document {
   name: string;
   amount: number;
   isFixedAmount: boolean;
-  frequency: EFrequency;
+  frequency: string;
   maxAmount: number;
 }
 
 const expenseSchema: Schema = new mongoose.Schema({
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true
   },
   budgetId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Budget",
     required: true
   },
   monthId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Month",
     required: true
   },
   name: {
@@ -39,7 +41,7 @@ const expenseSchema: Schema = new mongoose.Schema({
   },
   frequency: {
     type: String,
-    enum: Object.values(EFrequency)
+    default: undefined
   },
   maxAmount: Number
 });

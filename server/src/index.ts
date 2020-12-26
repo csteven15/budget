@@ -13,10 +13,11 @@ import expenseRoute from "./routes/Expense.Route";
 var environment = process.env.NODE_ENV;
 
 const isDevelopment = environment === "development";
+const isDockerDevelopment = environment === "docker_development";
 
 let dbPort = isDevelopment ? 27017 : 27018;
 
-let dbHost = isDevelopment ? "localhost" : "mongo";
+let dbHost = isDockerDevelopment || isDevelopment ? "localhost" : "mongo";
 
 const db = `mongodb://${dbHost}:${dbPort}/test`;
 
@@ -25,7 +26,7 @@ const app: Application = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-connect({ db });
+connect(db);
 
 app.use("/test", async (req: Request, res: Response) => {
   res.status(200).send("Hello World");
