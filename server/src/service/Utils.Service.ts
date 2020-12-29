@@ -7,15 +7,17 @@ import MonthModel from "../models/Month.Model";
 import UserModel from "../models/User.Model";
 
 // helper functions
-const modelIdExists = async (model: any & Collection, id: string) => {
-  const ref = await model.findOne({ _id: id });
-  if (ref === null) {
-    return false;
+const UtilsServiceHelper = {
+  modelIdExists: async (model: any & Collection, id: string) => {
+    const ref = await model.findOne({ _id: id });
+    if (ref === null) {
+      return false;
+    }
+    return true;
+  },
+  findOneId: async (model: any & Collection) => {
+    return await model.findOne({});
   }
-  return true;
-};
-const findOneId = async (model: any & Collection) => {
-  return await model.findOne({});
 };
 
 const useModel = (modelType: string) => {
@@ -57,10 +59,17 @@ const UtilsService = {
     console.error(msg);
     res.status(500).send(msg);
   },
-  validId: async (res: Response, modelType: string, id: string) => {
+  validId: async (modelType: string, id: string) => {
     let model = useModel(modelType);
     if (model === undefined) return false;
-    const exists = await modelIdExists(model, id);
+    const exists = await UtilsServiceHelper.modelIdExists(model, id);
+    if (!exists) return false;
+    return true;
+  },
+  validIdRes: async (res: Response, modelType: string, id: string) => {
+    let model = useModel(modelType);
+    if (model === undefined) return false;
+    const exists = await UtilsServiceHelper.modelIdExists(model, id);
     if (!exists) {
       const msg = `Invalid ${modelType.toLowerCase()}Id`;
       console.error(msg);
@@ -72,7 +81,7 @@ const UtilsService = {
   testFindOneIdByModel: async (modelType: string) => {
     let model = useModel(modelType);
     if (model === undefined) return -1;
-    const doc = await findOneId(model);
+    const doc = await UtilsServiceHelper.findOneId(model);
     if (doc === null) return -1;
     return doc.id;
   },

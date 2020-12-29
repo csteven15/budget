@@ -63,7 +63,7 @@ const UserService = {
 
     const id = req.params.id;
 
-    const validUser = await UtilsService.validId(res, "User", id);
+    const validUser = await UtilsService.validIdRes(res, "User", id);
     if (!validUser) return;
 
     try {
@@ -76,6 +76,14 @@ const UserService = {
       UtilsService.logInfoAndSend200(res, `Updated user with id: ${id}`);
     } catch (error) {
       UtilsService.logErrorAndSend500(res, `Encountered an internal error when updating a user: ${error}`);
+    }
+  },
+  deleteAllUser: async (req: Request, res: Response) => {
+    try {
+      await UserModel.collection.drop();
+      UtilsService.logInfoAndSend200(res, `Dropped user collection`);
+    } catch (error) {
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when deleting user collection: ${error}`);
     }
   }
 };

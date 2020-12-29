@@ -1,36 +1,64 @@
 import { Request, Response } from "express";
 import IncomeModel from "../models/Income.Model";
+import { randomWordArray } from "../test/random";
+import { MonthServiceHelper } from "./Month.Service";
 import UtilsService from "./Utils.Service";
+
+export const IncomeServiceHelper = {
+  getIncomeArrayFromMonthId: async (monthId: string) => {
+    const query = { monthId: monthId };
+    return await IncomeModel.find(query);
+  },
+  addIncomeToMonth: async (frequency: string, budgetId: string, monthId: string, incomeId: string) => {
+    if (frequency === "Monthly") {
+      await MonthServiceHelper.updateAllMonthIncome(budgetId, incomeId);
+    } else {
+      await MonthServiceHelper.updateOneMonthIncome(monthId, incomeId);
+    }
+  },
+  testAddIncome: async (budgetId: string, monthId: string) => {
+    const newIncome = {
+      budgetId: budgetId,
+      monthId: monthId,
+      name: randomWordArray[Math.floor(Math.random() * 100)],
+      amount: Math.floor(Math.random() * 50000) + 10000,
+      frequency: Math.random() > 0.5 ? "Monthly" : "Once"
+    };
+
+    const income = await IncomeModel.create(newIncome);
+
+    await IncomeServiceHelper.addIncomeToMonth(newIncome.frequency, budgetId, monthId, income.id!);
+  }
+};
 
 const IncomeService = {
   testIncome: async (req: Request, res: Response) => {
     console.log("get /income/:userId");
 
-    const userId = req.params.userId;
     const budgetId = await UtilsService.testFindOneIdByModel("Budget");
     const monthId = await UtilsService.testFindOneIdByModel("Month");
 
-    const validUser = await UtilsService.validId(res, "User", userId);
-    if (!validUser) return;
-    const validBudget = await UtilsService.validId(res, "Budget", budgetId);
+    const validBudget = await UtilsService.validIdRes(res, "Budget", budgetId);
     if (!validBudget) return;
-    const validMonth = await UtilsService.validId(res, "Month", monthId);
+    const validMonth = await UtilsService.validIdRes(res, "Month", monthId);
     if (!validMonth) return;
 
     try {
       const newIncome = {
-        userId: userId,
         budgetId: budgetId,
         monthId: monthId,
-        name: "Stonks",
+        name: randomWordArray[Math.floor(Math.random() * 100)],
         amount: Math.floor(Math.random() * 50000) + 10000,
-        frequency: "Once"
+        frequency: Math.random() > 0.5 ? "Monthly" : "Once"
       };
 
       const income = await IncomeModel.create(newIncome);
+
+      await IncomeServiceHelper.addIncomeToMonth(newIncome.frequency, budgetId, monthId, income.id!);
+
       UtilsService.logInfoAndSend201(res, income.toJSON());
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Error creating the income for user with userId ${userId}: ${error}`);
+      UtilsService.logErrorAndSend500(res, `Error creating the income: ${error}`);
       return undefined;
     }
   },
@@ -59,20 +87,17 @@ const IncomeService = {
   addIncome: async (req: Request, res: Response) => {
     console.log("post /income");
 
-    const userId = req.body.userId;
     const budgetId = req.body.budgetId;
     const monthId = req.body.monthId;
+    const frequency = req.body.frequency;
 
-    const validUser = await UtilsService.validId(res, "User", userId);
-    if (!validUser) return;
-    const validBudget = await UtilsService.validId(res, "Budget", budgetId);
+    const validBudget = await UtilsService.validIdRes(res, "Budget", budgetId);
     if (!validBudget) return;
-    const validMonth = await UtilsService.validId(res, "Month", monthId);
+    const validMonth = await UtilsService.validIdRes(res, "Month", monthId);
     if (!validMonth) return;
 
     try {
       const newIncome = {
-        userId: userId,
         budgetId: budgetId,
         monthId: monthId,
         name: req.body.name,
@@ -80,10 +105,12 @@ const IncomeService = {
         frequency: req.body.frequency
       };
 
-      // TODO: prevent duplicate names
+      const income = await IncomeModel.create(newIncome);
 
-      const user = await IncomeModel.create(newIncome);
-      UtilsService.logInfoAndSend201(res, `Created income with id: ${newIncome.userId}`);
+      await IncomeServiceHelper.addIncomeToMonth(frequency, budgetId, monthId, income.id!);
+
+      UtilsService.logInfoAndSend201(res, `Created income: ${income}`);
+
     } catch (error) {
       UtilsService.logErrorAndSend500(res, `Encountered an internal error when creating an income: ${error}`);
     }
@@ -92,22 +119,18 @@ const IncomeService = {
     console.log("put /income/:id");
 
     const id = req.params.id;
-    const userId = req.body.userId;
     const budgetId = req.body.budgetId;
     const monthId = req.body.monthId;
 
-    const validIncome = await UtilsService.validId(res, "Income", id);
-    if (!validIncome) return;
-    const validUser = await UtilsService.validId(res, "User", userId);
-    if (!validUser) return;
-    const validBudget = await UtilsService.validId(res, "Budget", budgetId);
+    const validBudget = await UtilsService.validIdRes(res, "Budget", budgetId);
     if (!validBudget) return;
-    const validMonth = await UtilsService.validId(res, "Month", monthId);
+    const validIncome = await UtilsService.validIdRes(res, "Income", id);
+    if (!validIncome) return;
+    const validMonth = await UtilsService.validIdRes(res, "Month", monthId);
     if (!validMonth) return;
 
     try {
       const updatedIncome = {
-        userId: userId,
         budgetId: budgetId,
         monthId: monthId,
         name: req.body.name,
@@ -119,6 +142,14 @@ const IncomeService = {
       UtilsService.logInfoAndSend200(res, `Updated income with id: ${id}`);
     } catch (error) {
       UtilsService.logErrorAndSend500(res, `Encountered an internal error when updating an income: ${error}`);
+    }
+  },
+  deleteAllIncome: async (req: Request, res: Response) => {
+    try {
+      await IncomeModel.collection.drop();
+      UtilsService.logInfoAndSend200(res, `Dropped income collection`);
+    } catch (error) {
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when deleting income collection: ${error}`);
     }
   }
 };

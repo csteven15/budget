@@ -18,4 +18,7 @@ router.post("/income", IncomeService.addIncome);
 // update income
 router.put("/income/:id", IncomeService.updateIncome);
 
+// delete all income
+router.delete("/incomes", IncomeService.deleteAllIncome);
+
 export default router;

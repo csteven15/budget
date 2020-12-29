@@ -10,12 +10,15 @@ router.get("/month/test/:userId", MonthService.testMonth);
 router.get("/months", MonthService.getMonths);
 
 // get month by id
-router.get("/month/:id", MonthService.getMonthsByID);
+router.get("/month/:id", MonthService.getMonthByID);
 
-// add new month
-router.post("/month", MonthService.addMonth);
+// get month by budgetId
+router.get("/month/budgetId/:budgetId", MonthService.getMonthsByBudgetId);
 
 // update month
 router.put("/month/:id", MonthService.updateMonth);
+
+// delete all months
+router.delete("/months", MonthService.deleteAllMonth);
 
 export default router;

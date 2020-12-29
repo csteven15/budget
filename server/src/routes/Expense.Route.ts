@@ -18,4 +18,7 @@ router.post("/expense", ExpenseService.addExpense);
 // update expense
 router.put("/expense/:id", ExpenseService.updateExpense);
 
+// delete all expenses
+router.delete("/expenses", ExpenseService.deleteAllExpense);
+
 export default router;

@@ -18,4 +18,7 @@ router.post("/budget", BudgetService.addBudget);
 // update budget
 router.put("/budget/:id", BudgetService.updateBudget);
 
+// delete all budgets
+router.delete("/budgets", BudgetService.deleteAllBudget);
+
 export default router;

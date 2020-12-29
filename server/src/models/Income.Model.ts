@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IIncome extends Document {
-  userId: string;
   budgetId: string;
   monthId: string;
   name: string;
@@ -10,11 +9,6 @@ export interface IIncome extends Document {
 }
 
 const incomeSchema: Schema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  },
   budgetId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Budget",

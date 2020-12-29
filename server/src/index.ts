@@ -9,6 +9,7 @@ import budgetRoute from "./routes/Budget.Route";
 import monthRoute from "./routes/Month.Route";
 import incomeRoute from "./routes/Income.Route";
 import expenseRoute from "./routes/Expense.Route";
+import testRoute from "./routes/Test.Route";
 
 var environment = process.env.NODE_ENV;
 
@@ -28,9 +29,7 @@ app.use(cors());
 
 connect(db);
 
-app.use("/test", async (req: Request, res: Response) => {
-  res.status(200).send("Hello World");
-});
+app.use("/v1", testRoute);
 
 app.use("/v1", userRoute);
 app.use("/v1", budgetRoute);

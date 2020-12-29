@@ -18,4 +18,7 @@ router.post("/user", UserService.addUser);
 // update user
 router.put("/user/:id", UserService.updateUser);
 
+// delete all users
+router.delete("/users", UserService.deleteAllUser);
+
 export default router;
