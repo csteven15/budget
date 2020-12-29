@@ -39,8 +39,7 @@ const BudgetService = {
 
       budget.save();
 
-      months?.forEach(async (monthId) => {
-        console.log(monthId);
+      months?.forEach(async (monthId: string) => {
         await IncomeServiceHelper.testAddIncome(budget.id!, monthId);
         await ExpenseServiceHelper.testAddExpense(budget.id!, monthId);
       });
