@@ -89,15 +89,15 @@ const MonthService = {
     }
   },
   getMonthByID: async (req: Request, res: Response) => {
-    console.log("get /month/:id");
+    console.log("get /month/:monthId");
 
-    const id = req.params.id;
+    const monthId = req.params.monthId;
 
     try {
-      const month = await MonthModel.findById({ _id: id });
+      const month = await MonthModel.findById({ _id: monthId });
       UtilsService.logInfoAndSend200(res, month!.toJSON());
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting a month with ID ${id}: ${error}`);
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting a month with ID ${monthId}: ${error}`);
     }
   },
   getMonths: async (req: Request, res: Response) => {
@@ -145,12 +145,12 @@ const MonthService = {
 
   },
   updateMonth: async (req: Request, res: Response) => {
-    console.log("put /month/:id");
+    console.log("put /month/:monthId");
 
-    const id = req.params.id;
+    const monthId = req.params.monthId;
     const budgetId = req.body.budgetId;
 
-    const validMonth = await UtilsService.validIdRes(res, "Month", id);
+    const validMonth = await UtilsService.validIdRes(res, "Month", monthId);
     if (!validMonth) return;
     const validBudget = await UtilsService.validIdRes(res, "Budget", budgetId);
     if (!validBudget) return;
@@ -161,8 +161,8 @@ const MonthService = {
         name: req.body.name
       };
 
-      await MonthModel.updateOne({ _id: id }, updatedMonth);
-      UtilsService.logInfoAndSend200(res, `Updated month with id: ${id}`);
+      await MonthModel.updateOne({ _id: monthId }, updatedMonth);
+      UtilsService.logInfoAndSend200(res, `Updated month with id: ${monthId}`);
     } catch (error) {
       UtilsService.logErrorAndSend500(res, `Encountered an internal error when updating a month: ${error}`);
     }

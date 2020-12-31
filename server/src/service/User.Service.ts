@@ -5,7 +5,7 @@ import UtilsService from "./Utils.Service";
 
 const UserService = {
   testUser: async (req: Request, res: Response) => {
-    console.log("get /user/test/:id");
+    console.log("get /user/test/:userId");
 
     const newUser = {
       name: `Test ${req.params.id}`,
@@ -31,15 +31,15 @@ const UserService = {
     }
   },
   getUserByID: async (req: Request, res: Response) => {
-    console.log("get /user/:id");
+    console.log("get /user/:userId");
 
-    const id = req.params.id;
+    const userId = req.params.userId;
 
     try {
-      const user = await UserModel.findById({ _id: id });
+      const user = await UserModel.findById({ _id: userId });
       UtilsService.logInfoAndSend200(res, user?.toJSON());
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting a user with ID ${id}: ${error}`);
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting a user with ID ${userId}: ${error}`);
     }
   },
   addUser: async (req: Request, res: Response) => {
@@ -59,11 +59,11 @@ const UserService = {
     }
   },
   updateUser: async (req: Request, res: Response) => {
-    console.log("put /user/:id");
+    console.log("put /user/:userId");
 
-    const id = req.params.id;
+    const userId = req.params.userId;
 
-    const validUser = await UtilsService.validIdRes(res, "User", id);
+    const validUser = await UtilsService.validIdRes(res, "User", userId);
     if (!validUser) return;
 
     try {
@@ -72,8 +72,8 @@ const UserService = {
         email: req.body.email,
         password: req.body.password
       };
-      await UserModel.updateOne({ _id: id }, updatedUser, { runValidators: true });
-      UtilsService.logInfoAndSend200(res, `Updated user with id: ${id}`);
+      await UserModel.updateOne({ _id: userId }, updatedUser, { runValidators: true });
+      UtilsService.logInfoAndSend200(res, `Updated user with id: ${userId}`);
     } catch (error) {
       UtilsService.logErrorAndSend500(res, `Encountered an internal error when updating a user: ${error}`);
     }

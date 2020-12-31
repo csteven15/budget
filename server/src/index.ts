@@ -1,7 +1,9 @@
 import bodyParser from "body-parser";
 import cors from "cors";
-import express, { Request, Response, Application } from "express";
+import express, { Application } from "express";
 import http from "http";
+import swaggerUI from "swagger-ui-express";
+import YAML from "yamljs";
 
 import connect from "./Connect";
 import userRoute from "./routes/User.Route";
@@ -29,8 +31,16 @@ app.use(cors());
 
 connect(db);
 
-app.use("/v1", testRoute);
+const swaggerDocument = YAML.load("./swagger.yaml");
 
+const options = {
+  swaggerOptions: {
+    authAction: { JWT: { name: "JWT", schema: { type: "apiKey", in: "header", name: "Authorization", description: "" }, value: "Bearer <JWT>" } }
+  }
+};
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument, options));
+app.use("/v1", testRoute);
 app.use("/v1", userRoute);
 app.use("/v1", budgetRoute);
 app.use("/v1", monthRoute);

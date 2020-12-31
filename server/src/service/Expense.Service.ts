@@ -77,15 +77,15 @@ const ExpenseService = {
     }
   },
   getExpenseByID: async (req: Request, res: Response) => {
-    console.log("get /expense/:id");
+    console.log("get /expense/:expenseId");
 
-    const id = req.params.id;
+    const expenseId = req.params.expenseId;
 
     try {
-      const expenses = await ExpenseModel.findById({ _id: id });
+      const expenses = await ExpenseModel.findById({ _id: expenseId });
       UtilsService.logInfoAndSend200(res, expenses?.toJSON());
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting an expense with ID ${id}: ${error}`);
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting an expense with ID ${expenseId}: ${error}`);
     }
   },
   addExpense: async (req: Request, res: Response) => {
@@ -121,13 +121,13 @@ const ExpenseService = {
     }
   },
   updateExpense: async (req: Request, res: Response) => {
-    console.log("put /expense/:id");
+    console.log("put /expense/:expenseId");
 
-    const id = req.params.id;
+    const expenseId = req.params.expenseId;
     const budgetId = req.body.budgetId;
     const monthId = req.body.monthId;
 
-    const validExpense = await UtilsService.validIdRes(res, "Expense", id);
+    const validExpense = await UtilsService.validIdRes(res, "Expense", expenseId);
     if (!validExpense) return;
     const validBudget = await UtilsService.validIdRes(res, "Budget", budgetId);
     if (!validBudget) return;
@@ -144,8 +144,8 @@ const ExpenseService = {
         frequency: req.body.frequency,
         maxAmount: req.body.maxAmount
       };
-      await ExpenseModel.updateOne({ id: id }, updatedBudget);
-      UtilsService.logInfoAndSend200(res, `Updated expense with id: ${id}`);
+      await ExpenseModel.updateOne({ id: expenseId }, updatedBudget);
+      UtilsService.logInfoAndSend200(res, `Updated expense with id: ${expenseId}`);
     } catch (error) {
       UtilsService.logErrorAndSend500(res, `Encountered an internal error when updating an expense`);
     }

@@ -73,15 +73,15 @@ const IncomeService = {
     }
   },
   getIncomeByID: async (req: Request, res: Response) => {
-    console.log("get /income/:id");
+    console.log("get /income/:incomeId");
 
-    const id = req.params.id;
+    const incomeId = req.params.incomeId;
 
     try {
-      const incomes = await IncomeModel.findById({ _id: id });
+      const incomes = await IncomeModel.findById({ _id: incomeId });
       UtilsService.logInfoAndSend200(res, incomes?.toJSON());
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting an income with ID ${id}: ${error}`);
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting an income with ID ${incomeId}: ${error}`);
     }
   },
   addIncome: async (req: Request, res: Response) => {
@@ -116,16 +116,16 @@ const IncomeService = {
     }
   },
   updateIncome: async (req: Request, res: Response) => {
-    console.log("put /income/:id");
+    console.log("put /income/:incomeId");
 
-    const id = req.params.id;
+    const incomeId = req.params.incomeId;
     const budgetId = req.body.budgetId;
     const monthId = req.body.monthId;
 
+    const validIncome = await UtilsService.validIdRes(res, "Income", incomeId);
+    if (!validIncome) return;
     const validBudget = await UtilsService.validIdRes(res, "Budget", budgetId);
     if (!validBudget) return;
-    const validIncome = await UtilsService.validIdRes(res, "Income", id);
-    if (!validIncome) return;
     const validMonth = await UtilsService.validIdRes(res, "Month", monthId);
     if (!validMonth) return;
 
@@ -138,8 +138,8 @@ const IncomeService = {
         frequency: req.body.frequency
       };
 
-      await IncomeModel.updateOne({ id: id }, updatedIncome);
-      UtilsService.logInfoAndSend200(res, `Updated income with id: ${id}`);
+      await IncomeModel.updateOne({ id: incomeId }, updatedIncome);
+      UtilsService.logInfoAndSend200(res, `Updated income with id: ${incomeId}`);
     } catch (error) {
       UtilsService.logErrorAndSend500(res, `Encountered an internal error when updating an income: ${error}`);
     }

@@ -60,15 +60,15 @@ const BudgetService = {
     }
   },
   getBudgetByID: async (req: Request, res: Response) => {
-    console.log("get /budget/:id");
+    console.log("get /budget/:budgetId");
 
-    const id = req.params.id;
+    const budgetId = req.params.budgetId;
 
     try {
-      const budget = await BudgetModel.findById({ _id: id });
+      const budget = await BudgetModel.findById({ _id: budgetId });
       UtilsService.logInfoAndSend200(res, budget?.toJSON());
     } catch (error) {
-      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting a budget with ID ${id}: ${error}`);
+      UtilsService.logErrorAndSend500(res, `Encountered an internal error when getting a budget with ID ${budgetId}: ${error}`);
     }
   },
   addBudget: async (req: Request, res: Response) => {
@@ -101,12 +101,12 @@ const BudgetService = {
     }
   },
   updateBudget: async (req: Request, res: Response) => {
-    console.log("put /budget/:id");
+    console.log("put /budget/:budgetId");
 
-    const id = req.params.id;
+    const budgetId = req.params.budgetId;
     const userId = req.body.userId;
 
-    const validBudget = await UtilsService.validIdRes(res, "Budget", id);
+    const validBudget = await UtilsService.validIdRes(res, "Budget", budgetId);
     if (!validBudget) return;
     const validUser = await UtilsService.validIdRes(res, "User", userId);
     if (!validUser) return;
@@ -117,8 +117,8 @@ const BudgetService = {
         year: req.body.year
       };
 
-      await BudgetModel.updateOne({ _id: id }, updatedBudget, { runValidators: true });
-      UtilsService.logInfoAndSend200(res, `Updated budget with id: ${id}`);
+      await BudgetModel.updateOne({ _id: budgetId }, updatedBudget, { runValidators: true });
+      UtilsService.logInfoAndSend200(res, `Updated budget with id: ${budgetId}`);
     } catch (error) {
       UtilsService.logErrorAndSend500(res, `Encountered an internal error when updating a budget: ${error}`);
     }

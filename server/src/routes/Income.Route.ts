@@ -10,13 +10,13 @@ router.get("/income/test/:userId", IncomeService.testIncome);
 router.get("/incomes", IncomeService.getIncomes);
 
 // get income by id
-router.get("/income/:id", IncomeService.getIncomeByID);
+router.get("/income/:incomeId", IncomeService.getIncomeByID);
 
 // add new income
 router.post("/income", IncomeService.addIncome);
 
 // update income
-router.put("/income/:id", IncomeService.updateIncome);
+router.put("/income/:incomeId", IncomeService.updateIncome);
 
 // delete all income
 router.delete("/incomes", IncomeService.deleteAllIncome);
