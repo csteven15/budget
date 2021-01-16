@@ -13,5 +13,5 @@ RUN yarn run build
 
 EXPOSE 3001
 
-# run 'yarn run start' when the container starts
-CMD ["yarn", "run", "start"]
+# run 'yarn run start:prod' when the container starts
+CMD ["yarn", "run", "start:prod"]

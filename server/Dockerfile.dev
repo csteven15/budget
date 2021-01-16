@@ -10,5 +10,5 @@ COPY . .
 
 EXPOSE 3001
 
-# run 'yarn run dev' when the container starts
-CMD ["yarn", "run", "dev"]
+# run 'yarn run start:dev' when the container starts
+CMD ["yarn", "run", "start:dev"]

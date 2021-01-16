@@ -7,8 +7,7 @@
     "dev": "concurrently --kill-others 'yarn run devFrontEnd' 'yarn run devBackEnd'",
     "devDocker": "docker-compose up --build --force-recreate --no-deps",
     "devFrontEnd": "cd client && yarn run start",
-    "devBackEnd": "cd server && yarn run dev",
-    "devDockerBackEnd": "cd server && yarn run devDocker",
+    "devBackEnd": "cd server && yarn run start:dev",
     "removeAllImages": "docker images -a -q | xargs docker rmi -f",
     "setup": "yarn install && cd client && yarn install && cd ../server && yarn install",
     "test": "echo \"Error: no test specified\" && exit 1"
