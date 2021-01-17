@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { UserModule } from './user/user.module';
 import { EntryModule } from './entry/entry.module';
 import { AuthModule } from './auth/auth.module';
+import { isDevelopment } from './util/environment';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,7 @@ async function bootstrap() {
     .setTitle('Budget API User')
     .setDescription('Budget API User')
     .setVersion('1.0')
+    .addServer(isDevelopment ? '' : '/backend/')
     .build();
 
   const document = SwaggerModule.createDocument(app, options, {
@@ -23,6 +25,8 @@ async function bootstrap() {
     ]
   });
   SwaggerModule.setup('api', app, document);
+
+  app.enableCors();
 
   await app.listen(3001);
 }

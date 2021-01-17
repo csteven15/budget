@@ -5,20 +5,11 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { EntryModule } from './entry/entry.module';
 import { UserModule } from './user/user.module';
-
-var environment = process.env.NODE_ENV;
-
-const isDevelopment = environment === "development";
-
-let dbPort = isDevelopment ? 27017 : 27018;
-
-let dbHost = isDevelopment ? "localhost" : "mongo";
-
-const db = `mongodb://${dbHost}:${dbPort}/test`;
+import { db, dbHost, dbPort } from './util/environment';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(db),
+    MongooseModule.forRoot(`mongodb://${dbHost}:${dbPort}/${db}`),
     UserModule,
     EntryModule,
     AuthModule

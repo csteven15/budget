@@ -12,6 +12,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
+    networks:
+      - budget
   client:
     container_name: client
     build:
@@ -20,6 +22,8 @@ services:
     volumes:
       - /app/node_modules # don't override folder inside container
     restart: on-failure
+    networks:
+      - budget
   backend:
     container_name: backend
     build:
@@ -28,6 +32,8 @@ services:
     restart: on-failure
     volumes:
       - /app/node_modules # don't override folder inside container
+    networks:
+      - budget
   mongo:
     image: "mongo"
     container_name: "mongo"
@@ -39,3 +45,8 @@ services:
       - ./db/mongo-volume:/data/db
     environment:
       - PORT=27018
+    networks:
+      - budget
+networks:
+  budget:
+    name: budget

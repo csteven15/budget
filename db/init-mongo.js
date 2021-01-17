@@ -9,7 +9,11 @@ db.createUser(
       },
       {
         role: "readWrite",
-        db: "test"
+        db: "prod"
+      },
+      {
+        role: "readWrite",
+        db: "dev"
       }
     ]
   }
