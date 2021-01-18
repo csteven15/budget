@@ -1,29 +1,39 @@
-import React, { ReactNode } from "react";
+import React, { FC } from "react";
 import { Link } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
 
-type Props = {
-  children: ReactNode;
-}
+const routes = [
+  {
+    path: "/register",
+    name: "Register"
+  },
+  {
+    path: "/login",
+    name: "Login"
+  }
+]
 
-export default function Navigation(props : Props) {
+const Navigation: FC = ({ children })  => {
+  const { user } = useUser();
   return (
     <div>
+      {JSON.stringify(user, null, 2)}
       <div>
         <ul>
-          <li>
-            <Link to="/budget">Budget</Link>
-          </li>
-          <li>
-            <Link to="/income">Income</Link>
-          </li>
-          <li>
-            <Link to="/expense">Expense</Link>
-          </li>
+          {
+            routes.map(route => (
+              <li key={route.name}>
+                <Link to={route.path}>{route.name}</Link>
+              </li>
+            ))
+          }
         </ul>
       </div>
       <div>
-        { props.children }
+        { children }
       </div>
     </div>
   )
 }
+
+export default Navigation;

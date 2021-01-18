@@ -1,22 +1,19 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { Switch, Route } from "react-router-dom";
+import Login from '../forms/Login';
+import Register from '../forms/Register';
 
-import Budget from "../forms/Budget";
-import Income from "../forms/Income";
-import Expense from "../forms/Expense";
-
-export default function Routes() {
+const Routes: FC = () => {
   return (
     <Switch>
-      <Route path="/budget">
-        <Budget />
+      <Route path="/login">
+        <Login />
       </Route>
-      <Route path="/income">
-        <Income />
-      </Route>
-      <Route path="/expense">
-        <Expense />
+      <Route path="/register">
+        <Register />
       </Route>
     </Switch>
   )
 }
+
+export default Routes;

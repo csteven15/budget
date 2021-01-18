@@ -6,12 +6,18 @@ if [ -d "node-modules" ]; then
   echo "Node modules already installed"
 else
   echo "Installing Node modules..."
-  cmd=yarn install && cd client && yarn install && cd ../server && yarn install
-  echo "$cmd" && $cmd
+  cmd="yarn install"
+  echo "$cmd" && eval "$cmd"
+  cmd="cd client && ls && yarn install && cd .."
+  echo "$cmd" && eval "$cmd"
+  cmd="cd server && yarn install && cd .."
+  echo "$cmd" && eval "$cmd"
 fi
 
+docker network create budget
+
 cmd="./database.sh"
-echo "$cmd" && $cmd
+echo "$cmd" && eval "$cmd"
 
 cmd="./mongo-express.sh dev"
 echo "$cmd" && $cmd

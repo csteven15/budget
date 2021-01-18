@@ -14,7 +14,7 @@ import { LoginDto } from './dtos';
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  @Post()
+  @Post("/login")
   @ApiTags('Auth')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Authorize user' })

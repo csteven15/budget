@@ -6,7 +6,7 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User {
-  @Prop({ required: true, minlength: 5, maxlength: 255 })
+  @Prop({ required: true, minlength: 2, maxlength: 255 })
   name: string;
 
   @Prop({ required: true, validate: isEmail })
