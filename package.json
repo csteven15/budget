@@ -1,15 +1,10 @@
 {
   "name": "budget",
   "version": "1.0.0",
-  "description": "### To run the application",
-  "main": "index.js",
   "scripts": {
-    "dev": "concurrently --kill-others 'yarn run devFrontEnd' 'yarn run devBackEnd'",
-    "devDocker": "docker-compose up --build --force-recreate --no-deps",
-    "devFrontEnd": "cd client && yarn run start",
-    "devBackEnd": "cd server && yarn run dev",
-    "removeAllImages": "docker images -a -q | xargs docker rmi -f",
-    "setup": "yarn install && cd client && yarn install && cd ../server && yarn install",
+    "dev": "concurrently --kill-others 'yarn run frontend' 'yarn run backend'",
+    "frontend": "cd client && yarn run start",
+    "backend": "cd server && yarn run start:debug",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

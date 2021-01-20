@@ -1,22 +1,31 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { Switch, Route } from "react-router-dom";
+import Dashboard from '../../pages/Dashboard';
+import SignIn from '../forms/SignIn';
 
-import Budget from "../forms/Budget";
-import Income from "../forms/Income";
-import Expense from "../forms/Expense";
+const routes = [
+  {
+    path: "/signin",
+    component: <SignIn />
+  },
+  {
+    path: "/dashboard",
+    component: <Dashboard />
+  }
+]
 
-export default function Routes() {
+const Routes: FC = () => {
   return (
     <Switch>
-      <Route path="/budget">
-        <Budget />
-      </Route>
-      <Route path="/income">
-        <Income />
-      </Route>
-      <Route path="/expense">
-        <Expense />
-      </Route>
+      {
+        routes.map(route => (
+          <Route key={route.path} path={route.path}>
+            {route.component}
+          </Route>
+        ))
+      }
     </Switch>
   )
 }
+
+export default Routes;

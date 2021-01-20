@@ -1,6 +1,6 @@
 db.createUser(
   {
-    user: "rowlf",
+    user: "budget",
     pwd: "pass",
     roles: [
       {
@@ -9,7 +9,11 @@ db.createUser(
       },
       {
         role: "readWrite",
-        db: "test"
+        db: "prod"
+      },
+      {
+        role: "readWrite",
+        db: "dev"
       }
     ]
   }
