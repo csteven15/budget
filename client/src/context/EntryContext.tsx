@@ -4,6 +4,7 @@ import React, {
   createContext,
   FC,
   useEffect,
+  useCallback,
 } from "react";
 import { AxiosResponse } from "axios";
 
@@ -35,32 +36,27 @@ const useProvideEntry = () => {
   const { user } = useAuth();
   const [state, setState] = useState(INITIAL_ENTRIES);
 
-  const getEntries = async () => {
+  const getEntries = useCallback(async () => {
     if (!user.isLoggedIn) {
       clearEntries();
       return;
     }
     let res: AxiosResponse<IEntry[]> = await Api.get(`/entry/${user.uid}`, {});
-    let entries = res.data.filter((entry) => entry.uid === user.uid);
-    setEntries(entries);
-  };
+    let entries: IEntry[] = res.data.filter((entry) => entry.uid === user.uid);
+    setState((oldState: IEntry[]) => [...oldState, ...entries]);
+  }, [user.isLoggedIn, user.uid]);
 
   useEffect(() => {
+    console.log("use effect");
     getEntries();
-  }, [user.isLoggedIn]);
+  }, [user.isLoggedIn, getEntries]);
 
   const clearEntries = () => {
     setState([]);
   };
 
-  const setEntries = (entries: IEntry[]) => {
-    let newState = [...state, ...entries];
-    setState(newState);
-  };
-
   const setEntry = (entry: IEntry) => {
-    let newState = [...state, entry];
-    setState(newState);
+    setState((oldState: IEntry[]) => [...oldState, entry]);
   };
 
   return {
