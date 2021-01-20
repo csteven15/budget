@@ -15,7 +15,7 @@ if [ $( docker ps -a -f name=$container_name | wc -l ) -eq 2 ]; then
 else
   docker run --name $container_name \
     -e MONGO_INITDB_DATABASE=$MONGO_DEV_CONTAINER_INITDB \
-    --network $DOCKER_PROD_NETWORK \
+    --network $DOCKER_DEV_NETWORK \
     -p 27017:$MONGO_DEV_CONTAINER_PORT \
     mongo
 fi

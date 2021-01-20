@@ -24,7 +24,7 @@ fi
 
 echo "Environment: $environment"
 
-if [ "$(docker container inspect -f '{{.Id}}' $container_name | wc -l)" -eq 2 ]; then
+if [ "$(docker ps -a -f name=$container_name | wc -l)" -eq 2 ]; then
   echo "Container $container_name exists. Restarting..."
   docker container stop $container_name || true
   docker container start $db_container_name
