@@ -13,7 +13,7 @@ services:
     ports:
       - "80:80"
     networks:
-      - budget
+      - network
   client:
     container_name: client
     build:
@@ -23,7 +23,7 @@ services:
       - /app/node_modules # don't override folder inside container
     restart: on-failure
     networks:
-      - budget
+      - network
   backend:
     container_name: backend
     build:
@@ -33,20 +33,18 @@ services:
     volumes:
       - /app/node_modules # don't override folder inside container
     networks:
-      - budget
+      - network
   mongo:
     image: "mongo"
     container_name: "mongo"
-    command: mongod --port 27018
+    command: mongod --port ${MONGO_PROD_CONTAINER_PORT}
     ports:
-      - "27018:27018"
+      - ${MONGO_PROD_CONTAINER_PORT}:${MONGO_PROD_CONTAINER_PORT}
     volumes:
       - ./db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - ./db/mongo-volume:/data/db
-    environment:
-      - PORT=27018
     networks:
-      - budget
+      - network
 networks:
-  budget:
-    name: budget
+  network:
+    name: ${DOCKER_PROD_NETWORK}
