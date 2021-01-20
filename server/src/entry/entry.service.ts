@@ -7,7 +7,9 @@ import { CreateEntryDto, UpdateEntryDto } from './dtos';
 
 @Injectable()
 export class EntryService {
-  constructor(@InjectModel(Entry.name) private entryModel: Model<EntryDocument>) { }
+  constructor(
+    @InjectModel(Entry.name) private entryModel: Model<EntryDocument>,
+  ) {}
 
   async createEntry(createEntryDto: CreateEntryDto): Promise<Entry> {
     const entry = new this.entryModel(createEntryDto);
@@ -18,20 +20,24 @@ export class EntryService {
     return this.entryModel.find().exec();
   }
 
-  async getAllEntriesForUser(userId: string): Promise<Entry[]> {
-    return this.entryModel.find({ user: userId }, null, {
-      sort: {
-        year: 1
-      }
-    }).exec();
+  async getAllEntriesForUser(uid: string): Promise<Entry[]> {
+    return this.entryModel
+      .find({ uid: uid }, null, {
+        sort: {
+          year: 1,
+        },
+      })
+      .exec();
   }
 
-  async updateEntry(id: string, updateEntryDto: UpdateEntryDto): Promise<Entry> {
+  async updateEntry(
+    id: string,
+    updateEntryDto: UpdateEntryDto,
+  ): Promise<Entry> {
     return this.entryModel.findByIdAndUpdate(id, updateEntryDto).exec();
   }
 
   async deleteEntry(id: string): Promise<Entry> {
     return this.entryModel.findByIdAndDelete(id).exec();
   }
-
 }

@@ -1,17 +1,28 @@
-import { Controller, Get, Query, Post, Body, Put, Param, Delete, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Post,
+  Body,
+  Put,
+  Param,
+  Delete,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiTags
+  ApiTags,
 } from '@nestjs/swagger';
 import { CreateEntryDto, UpdateEntryDto } from './dtos';
 import { EntryService } from './entry.service';
 
 @Controller('entry')
 export class EntryController {
-  constructor(private readonly entryService: EntryService) { }
+  constructor(private readonly entryService: EntryService) {}
 
   @Get()
   @ApiTags('Entry')
@@ -47,7 +58,10 @@ export class EntryController {
   @ApiOperation({ summary: 'Update a entry by id ( all params )' })
   @ApiParam({ name: 'id', description: 'id of entry' })
   @ApiOkResponse({})
-  async updateEntry(@Param('id') id: string, @Body() updateEntryDto: UpdateEntryDto) {
+  async updateEntry(
+    @Param('id') id: string,
+    @Body() updateEntryDto: UpdateEntryDto,
+  ) {
     return await this.entryService.updateEntry(id, updateEntryDto);
   }
 

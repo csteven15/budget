@@ -5,10 +5,11 @@ import { EntryService } from './entry.service';
 import { Entry, EntrySchema } from './schemas/entry.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Entry.name, schema: EntrySchema }])],
+  imports: [
+    MongooseModule.forFeature([{ name: Entry.name, schema: EntrySchema }]),
+  ],
   controllers: [EntryController],
   providers: [EntryService],
-  exports: [EntryModule]
+  exports: [EntryModule],
 })
-
-export class EntryModule { }
+export class EntryModule {}

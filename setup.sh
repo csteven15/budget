@@ -16,8 +16,8 @@ fi
 
 docker network create budget
 
-cmd="./database.sh"
+cmd="./database.sh &"
 echo "$cmd" && eval "$cmd"
 
-cmd="./mongo-express.sh dev"
-echo "$cmd" && $cmd
+cmd="./mongo-express.sh dev &"
+echo "$cmd" && eval "$cmd"

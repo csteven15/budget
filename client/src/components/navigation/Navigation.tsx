@@ -1,39 +1,80 @@
 import React, { FC } from "react";
 import { Link } from "react-router-dom";
-import { useUser } from "../../context/UserContext";
+import { months } from "../../common/enums/EMonths";
+import { useAuth } from "../../context/AuthContext";
+import { useEntry } from "../../context/EntryContext";
 
-const routes = [
+let routes = [
   {
-    path: "/register",
-    name: "Register"
+    path: "/",
+    name: "Home",
+  },
+];
+
+const unprotectedRoutes = [
+  {
+    path: "/signin",
+    name: "Sign In",
+  },
+];
+
+const protectedRoutes = [
+  {
+    path: "/dashboard",
+    name: "Dashboard",
   },
   {
-    path: "/login",
-    name: "Login"
-  }
-]
+    path: "/",
+    name: "Sign Out",
+  },
+];
 
-const Navigation: FC = ({ children })  => {
-  const { user } = useUser();
+const Navigation: FC = ({ children }) => {
+  const { user, signOut } = useAuth();
+  const { entries } = useEntry();
+
+  let combinedRoutes = routes;
+
+  if (user.isLoggedIn) {
+    combinedRoutes = combinedRoutes.concat(protectedRoutes);
+  } else {
+    combinedRoutes = combinedRoutes.concat(unprotectedRoutes);
+  }
+
   return (
     <div>
-      {JSON.stringify(user, null, 2)}
       <div>
         <ul>
-          {
-            routes.map(route => (
-              <li key={route.name}>
-                <Link to={route.path}>{route.name}</Link>
-              </li>
-            ))
-          }
+          {combinedRoutes.map((route) => (
+            <li
+              key={route.name}
+              onClick={route.name === "Sign Out" ? () => signOut() : undefined}
+            >
+              <Link to={route.path}>{route.name}</Link>
+            </li>
+          ))}
         </ul>
       </div>
-      <div>
-        { children }
-      </div>
+      <div>{children}</div>
+      <footer>
+        {entries?.map((entry) => (
+          <div key={entry._id}>
+            <h4>Owner: {entry.uid}</h4>
+            <p>Name: {entry.name}</p>
+            <p>Type: {entry.inputType ? "Expense" : "Income"}</p>
+            <p>Year: {entry.year}</p>
+            <p>Max Amount: {entry.maxAmount}</p>
+            <p>
+              Amount:{" "}
+              {entry.monthlyAmount.map(
+                (amount, i) => `${months[i]}: $${amount} `
+              )}
+            </p>
+          </div>
+        ))}
+      </footer>
     </div>
-  )
-}
+  );
+};
 
 export default Navigation;

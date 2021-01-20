@@ -1,17 +1,29 @@
 import React, { FC } from 'react'
 import { Switch, Route } from "react-router-dom";
-import Login from '../forms/Login';
-import Register from '../forms/Register';
+import Dashboard from '../../pages/Dashboard';
+import SignIn from '../forms/SignIn';
+
+const routes = [
+  {
+    path: "/signin",
+    component: <SignIn />
+  },
+  {
+    path: "/dashboard",
+    component: <Dashboard />
+  }
+]
 
 const Routes: FC = () => {
   return (
     <Switch>
-      <Route path="/login">
-        <Login />
-      </Route>
-      <Route path="/register">
-        <Register />
-      </Route>
+      {
+        routes.map(route => (
+          <Route key={route.path} path={route.path}>
+            {route.component}
+          </Route>
+        ))
+      }
     </Switch>
   )
 }

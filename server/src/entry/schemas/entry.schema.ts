@@ -6,7 +6,10 @@ export type EntryDocument = Entry & Document;
 @Schema()
 export class Entry {
   @Prop({ required: true })
-  user: string;
+  uid: string;
+
+  @Prop({ required: true })
+  name: string;
 
   @Prop({ required: true })
   year: number;
