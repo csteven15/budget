@@ -1,7 +1,8 @@
-import React, { FC } from 'react'
+import React, { FC } from 'react';
 import { Switch, Route } from "react-router-dom";
 import Dashboard from '../../pages/Dashboard';
 import SignIn from '../forms/SignIn';
+import ListView from '../../pages/ListView';
 
 const routes = [
   {
@@ -11,8 +12,12 @@ const routes = [
   {
     path: "/dashboard",
     component: <Dashboard />
+  },
+  {
+    path: "/table",
+    component: <ListView />
   }
-]
+];
 
 const Routes: FC = () => {
   return (
@@ -25,7 +30,7 @@ const Routes: FC = () => {
         ))
       }
     </Switch>
-  )
-}
+  );
+};
 
 export default Routes;

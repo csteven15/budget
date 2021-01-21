@@ -1,8 +1,6 @@
 import React, { FC } from "react";
 import { Link } from "react-router-dom";
-import { months } from "../../common/enums/EMonths";
 import { useAuth } from "../../context/AuthContext";
-import { useEntry } from "../../context/EntryContext";
 
 let routes = [
   {
@@ -24,6 +22,10 @@ const protectedRoutes = [
     name: "Dashboard",
   },
   {
+    path: "/table",
+    name: "Table",
+  },
+  {
     path: "/",
     name: "Sign Out",
   },
@@ -31,7 +33,6 @@ const protectedRoutes = [
 
 const Navigation: FC = ({ children }) => {
   const { user, signOut } = useAuth();
-  const { entries } = useEntry();
 
   let combinedRoutes = routes;
 
@@ -56,23 +57,6 @@ const Navigation: FC = ({ children }) => {
         </ul>
       </div>
       <div>{children}</div>
-      <footer>
-        {entries?.map((entry) => (
-          <div key={entry._id}>
-            <h4>Owner: {entry.uid}</h4>
-            <p>Name: {entry.name}</p>
-            <p>Type: {entry.inputType ? "Expense" : "Income"}</p>
-            <p>Year: {entry.year}</p>
-            <p>Max Amount: {entry.maxAmount}</p>
-            <p>
-              Amount:{" "}
-              {entry.monthlyAmount.map(
-                (amount, i) => `${months[i]}: $${amount} `
-              )}
-            </p>
-          </div>
-        ))}
-      </footer>
     </div>
   );
 };
