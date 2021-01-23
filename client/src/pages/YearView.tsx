@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 import {
   Table, TableHead, TableBody, TableCell,
   TableContainer, TableRow, Paper
@@ -13,39 +13,44 @@ const YearView: FC = () => {
   const sortedByInputTypeArray = entries.sort((a, b) => a.inputType - b.inputType);
   const sortedByIncomeName = sortedByInputTypeArray.filter(entry => entry.inputType === EInputType.Income).sort((a, b) => a.name.localeCompare(b.name));
   const sortedByExpenseName = sortedByInputTypeArray.filter(entry => entry.inputType === EInputType.Expense).sort((a, b) => a.name.localeCompare(b.name));
-  const sortedArray = [...sortedByIncomeName, ...sortedByExpenseName];
+  const sortedEntries = [...sortedByIncomeName, ...sortedByExpenseName];
 
   let incomeCount: number = sortedByIncomeName.length;
-  let incomeTotal: number = sortedByIncomeName.reduce((accumulator: number, { maxAmount }) => accumulator + maxAmount, 0);
 
-  let expenseCount: number = sortedByExpenseName.length;
-  let expenseTotal: number = sortedByExpenseName.reduce((accumulator: number, { maxAmount }) => accumulator + maxAmount, 0);
-
-  const renderTypeHeaders = (type: string, count: number) => {
-
-    const array = [...Array(count)].map((e, i) => {
-      if (i === 0) {
-        return (<TableCell key={i}>{type}</TableCell>);
+  const renderTableEntry = () => {
+    let tableBody: ReactNode[] = [];
+    sortedEntries.forEach((entry: IEntry, i: number) => {
+      let tableRow = [];
+      if (i === 0 || i === incomeCount) {
+        tableRow.push(<TableCell>{`${EInputType[entry.inputType]}`}</TableCell>);
+      } else {
+        tableRow.push(<TableCell></TableCell>);
       }
-      else {
-        return (<TableCell key={i}></TableCell>);
-      }
+      tableRow.push(<TableCell>{entry.name}</TableCell>);
+      const monthlyAmount = entry.monthlyAmount.map(monthlyAmount => <TableCell>{monthlyAmount}</TableCell>);
+      tableRow.push(monthlyAmount);
+      const totalAmount = entry.monthlyAmount.reduce((total: number, currentValue: any) => total + parseFloat(currentValue), 0.0);
+      tableRow.push(<TableCell>{totalAmount}</TableCell>);
+      tableBody.push(<TableRow>{tableRow}</TableRow>);
     });
-    return array;
+    return tableBody;
   };
 
-  const renderEntryNamesFromType = () => {
-    const entryNames = sortedArray.map((entry: IEntry, i: number) => (
-      <TableCell key={i}>{entry.name}</TableCell>
-    ));
-    return entryNames;
-  };
-
-  const renderEntryAmounts = (monthIndex: number) => {
-    const entryAmounts = sortedArray.map((entry: IEntry, i: number) => (
-      <TableCell key={i}>{entry.monthlyAmount[monthIndex]}</TableCell>
-    ));
-    return entryAmounts;
+  const renderTableBalance = () => {
+    let monthlyTotal: number[] = [];
+    console.log(sortedByIncomeName);
+    for (let i = 0; i < MonthArray.length; i++) {
+      let totalIncome = sortedByIncomeName.reduce((accumulator, { monthlyAmount }: { monthlyAmount: any; }) => accumulator + parseFloat(monthlyAmount[i]), 0);
+      let totalExpense = sortedByExpenseName.reduce((accumulator, { monthlyAmount }: { monthlyAmount: any; }) => accumulator + parseFloat(monthlyAmount[i]), 0);
+      monthlyTotal.push(totalIncome - totalExpense);
+    };
+    let tableRow = [];
+    tableRow.push(<TableCell>Balance</TableCell>);
+    tableRow.push(<TableCell></TableCell>);
+    const monthlyAmountCells = monthlyTotal.map(monthlyAmount => <TableCell>{monthlyAmount}</TableCell>);
+    tableRow.push(monthlyAmountCells);
+    tableRow.push(<TableCell></TableCell>);
+    return <TableRow>{tableRow}</TableRow>;
   };
 
   return (
@@ -54,26 +59,15 @@ const YearView: FC = () => {
         <Table size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell>Month</TableCell>
-              {renderTypeHeaders("Income", incomeCount)}
-              {renderTypeHeaders("Expenses", expenseCount)}
-              <TableCell>Balance</TableCell>
-            </TableRow>
-            <TableRow>
               <TableCell></TableCell>
-              {renderEntryNamesFromType()}
+              <TableCell>Name</TableCell>
+              {MonthArray.map(month => (<TableCell>{month}</TableCell>))}
+              <TableCell>Total</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {
-              MonthArray.map((month: string, i: number) => (
-                <TableRow key={month}>
-                  <TableCell>{month}</TableCell>
-                  {renderEntryAmounts(i)}
-                  <TableCell>{incomeTotal - expenseTotal}</TableCell>
-                </TableRow>
-              ))
-            }
+            {renderTableEntry()}
+            {renderTableBalance()}
           </TableBody>
         </Table>
       </TableContainer>
