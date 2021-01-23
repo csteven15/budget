@@ -9,26 +9,20 @@ import { IEntry } from '../common/types';
 
 const YearView: FC = () => {
   const { entries } = useEntry();
-  let incomeCount: number = 0;
-  let incomeTotal: number = 0;
-  let expenseCount: number = 0;
-  let expenseTotal: number = 0;
-
   // sort by InputType
   const sortedByInputTypeArray = entries.sort((a, b) => a.inputType - b.inputType);
+  const sortedByIncomeName = sortedByInputTypeArray.filter(entry => entry.inputType === EInputType.Income).sort((a, b) => a.name.localeCompare(b.name));
+  const sortedByExpenseName = sortedByInputTypeArray.filter(entry => entry.inputType === EInputType.Expense).sort((a, b) => a.name.localeCompare(b.name));
+  const sortedArray = [...sortedByIncomeName, ...sortedByExpenseName];
 
-  entries.forEach(entry => {
-    if (entry.inputType === EInputType.Income) {
-      incomeCount++;
-      incomeTotal += entry.maxAmount;
-    }
-    else {
-      expenseCount++;
-      expenseTotal += entry.maxAmount;
-    }
-  });
+  let incomeCount: number = sortedByIncomeName.length;
+  let incomeTotal: number = sortedByIncomeName.reduce((accumulator: number, { maxAmount }) => accumulator + maxAmount, 0);
+
+  let expenseCount: number = sortedByExpenseName.length;
+  let expenseTotal: number = sortedByExpenseName.reduce((accumulator: number, { maxAmount }) => accumulator + maxAmount, 0);
 
   const renderTypeHeaders = (type: string, count: number) => {
+
     const array = [...Array(count)].map((e, i) => {
       if (i === 0) {
         return (<TableCell key={i}>{type}</TableCell>);
@@ -41,14 +35,14 @@ const YearView: FC = () => {
   };
 
   const renderEntryNamesFromType = () => {
-    const entryNames = sortedByInputTypeArray.map((entry: IEntry, i: number) => (
+    const entryNames = sortedArray.map((entry: IEntry, i: number) => (
       <TableCell key={i}>{entry.name}</TableCell>
     ));
     return entryNames;
   };
 
   const renderEntryAmounts = (monthIndex: number) => {
-    const entryAmounts = sortedByInputTypeArray.map((entry: IEntry, i: number) => (
+    const entryAmounts = sortedArray.map((entry: IEntry, i: number) => (
       <TableCell key={i}>{entry.monthlyAmount[monthIndex]}</TableCell>
     ));
     return entryAmounts;
