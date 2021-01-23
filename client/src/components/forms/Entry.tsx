@@ -39,13 +39,19 @@ interface IFormDataFieldArray {
   name: number;
 }
 
-const EntryForm: FC = () => {
+interface Props {
+  entry?: IEntry;
+  isEditing?: boolean;
+}
+
+const EntryForm: FC<Props> = ({ entry, isEditing }) => {
   const {
     register,
     watch,
     control,
     getValues,
     errors,
+    setValue,
     handleSubmit,
   } = useForm<IEntry>();
   const { fields, append, remove } = useFieldArray({
@@ -60,6 +66,24 @@ const EntryForm: FC = () => {
   const [formError, setFormError] = useState(false);
 
   const watchIsFixed = watch("isFixed", true);
+
+  console.log(entry);
+  if (isEditing) {
+    setValue("name", entry!.name);
+    setValue("year", entry!.year);
+    setValue("inputType", entry!.inputType);
+    setValue("maxAmount", entry!.maxAmount.toFixed(2));
+    const isFixed = entry!.monthlyAmount.every(amount => amount === entry!.monthlyAmount[0]);
+    if (isFixed) {
+      setValue("amount", entry!.monthlyAmount[0]);
+    }
+    else {
+      setValue("isFixed", true);
+      entry!.monthlyAmount.forEach((amount, i) => {
+        setValue(`monthlyAmount[${i}].name`, amount);
+      });
+    }
+  }
 
   const onSubmit = async (formData: IFormData) => {
     let transformedMonthlyAmount = new Array<number>(12);
