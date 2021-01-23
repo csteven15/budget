@@ -1,16 +1,19 @@
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+const totalMonths = 12;
 
-export {months};
+enum EMonth {
+  January,
+  February,
+  March,
+  April,
+  May,
+  June,
+  July,
+  August,
+  September,
+  October,
+  November,
+  December
+}
+const MonthArray = Object.keys(EMonth).splice(totalMonths);
+
+export { EMonth, MonthArray };

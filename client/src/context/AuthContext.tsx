@@ -7,7 +7,7 @@ import React, {
 } from "react";
 
 import fire from "../util/fire";
-import { IUser } from "../common/types/IUser";
+import { IUser } from "../common/types";
 
 interface IContextProps {
   user: IUser;

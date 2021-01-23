@@ -5,7 +5,7 @@ import {
 } from "@material-ui/core";
 import { useEntry } from "../context/EntryContext";
 import { useTable } from 'react-table';
-import { IEntry } from '../common/types/IEntry';
+import { IEntry } from '../common/types';
 
 
 const ListView: FC = () => {

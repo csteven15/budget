@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { AxiosResponse } from "axios";
 
-import { IEntry } from "../common/types/IEntry";
+import { IEntry } from "../common/types";
 import Api from "../util/Api";
 import { useAuth } from "./AuthContext";
 

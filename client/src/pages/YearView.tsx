@@ -4,7 +4,8 @@ import {
   TableContainer, TableRow, Paper
 } from "@material-ui/core";
 import { useEntry } from "../context/EntryContext";
-import { months } from '../common/enums/EMonths';
+import { EInputType, MonthArray } from '../common/enums';
+import { IEntry } from '../common/types';
 
 const YearView: FC = () => {
   const { entries } = useEntry();
@@ -12,8 +13,12 @@ const YearView: FC = () => {
   let incomeTotal: number = 0;
   let expenseCount: number = 0;
   let expenseTotal: number = 0;
+
+  // sort by InputType
+  const sortedByInputTypeArray = entries.sort((a, b) => a.inputType - b.inputType);
+
   entries.forEach(entry => {
-    if (entry.inputType === 0) {
+    if (entry.inputType === EInputType.Income) {
       incomeCount++;
       incomeTotal += entry.maxAmount;
     }
@@ -35,25 +40,18 @@ const YearView: FC = () => {
     return array;
   };
 
-  const renderEntryNamesFromType = (inputType: number) => {
-    const array = entries.map((entry, i) => {
-      if (entry.inputType === inputType) {
-        return (
-          <TableCell key={i}>{entry.name}</TableCell>
-        );
-      }
-      return (null);
-    });
-    return array;
+  const renderEntryNamesFromType = () => {
+    const entryNames = sortedByInputTypeArray.map((entry: IEntry, i: number) => (
+      <TableCell key={i}>{entry.name}</TableCell>
+    ));
+    return entryNames;
   };
 
-  const renderEntryAmounts = () => {
-    const array = entries.map((entry, i) => {
-      return (
-        <TableCell key={i}>{entry.maxAmount}</TableCell>
-      );
-    });
-    return array;
+  const renderEntryAmounts = (monthIndex: number) => {
+    const entryAmounts = sortedByInputTypeArray.map((entry: IEntry, i: number) => (
+      <TableCell key={i}>{entry.monthlyAmount[monthIndex]}</TableCell>
+    ));
+    return entryAmounts;
   };
 
   return (
@@ -69,21 +67,18 @@ const YearView: FC = () => {
             </TableRow>
             <TableRow>
               <TableCell></TableCell>
-              {renderEntryNamesFromType(0)}
-              {renderEntryNamesFromType(1)}
+              {renderEntryNamesFromType()}
             </TableRow>
           </TableHead>
           <TableBody>
             {
-              months.map(month => {
-                return (
-                  <TableRow key={month}>
-                    <TableCell>{month}</TableCell>
-                    {renderEntryAmounts()}
-                    <TableCell>{incomeTotal - expenseTotal}</TableCell>
-                  </TableRow>
-                );
-              })
+              MonthArray.map((month: string, i: number) => (
+                <TableRow key={month}>
+                  <TableCell>{month}</TableCell>
+                  {renderEntryAmounts(i)}
+                  <TableCell>{incomeTotal - expenseTotal}</TableCell>
+                </TableRow>
+              ))
             }
           </TableBody>
         </Table>
