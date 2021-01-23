@@ -1,5 +1,8 @@
 import React, { FC, useMemo } from 'react';
-import { Table, TableHead, TableBody, TableCell, TableContainer, TableRow, Paper } from "@material-ui/core";
+import {
+  Table, TableHead, TableBody, TableCell,
+  TableContainer, TableRow, Paper
+} from "@material-ui/core";
 import { useEntry } from "../context/EntryContext";
 import { useTable } from 'react-table';
 import { IEntry } from '../common/types/IEntry';
