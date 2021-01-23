@@ -15,6 +15,7 @@ import { useAuth } from "./AuthContext";
 interface IContextProps {
   entries: IEntry[];
   setEntry: (entry: IEntry) => void;
+  deleteEntry: (id: string) => void;
 }
 
 const EntryContext = createContext({} as IContextProps);
@@ -54,6 +55,12 @@ const useProvideEntry = () => {
     setState([]);
   };
 
+  const deleteEntry = (id: string) => {
+    Api.delete(`/entry/${id}`);
+    setState((oldState: IEntry[]) =>
+      oldState.filter(entry => entry._id !== id));
+  };
+
   const setEntry = (entry: IEntry) => {
     setState((oldState: IEntry[]) => [...oldState, entry]);
   };
@@ -61,5 +68,6 @@ const useProvideEntry = () => {
   return {
     entries: state,
     setEntry,
+    deleteEntry
   };
 };

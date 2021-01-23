@@ -3,12 +3,12 @@ import {
   Table, TableHead, TableBody, TableCell,
   TableContainer, TableRow, Paper
 } from "@material-ui/core";
-import { useEntry } from "../context/EntryContext";
+import { useEntry, } from "../context/EntryContext";
 import { EInputType, MonthArray } from '../common/enums';
 import { IEntry } from '../common/types';
 
 const YearView: FC = () => {
-  const { entries } = useEntry();
+  const { entries, deleteEntry } = useEntry();
   // sort by InputType
   const sortedByInputTypeArray = entries.sort((a, b) => a.inputType - b.inputType);
   const sortedByIncomeName = sortedByInputTypeArray.filter(entry => entry.inputType === EInputType.Income).sort((a, b) => a.name.localeCompare(b.name));
@@ -31,14 +31,13 @@ const YearView: FC = () => {
       tableRow.push(monthlyAmount);
       const totalAmount = entry.monthlyAmount.reduce((total: number, currentValue: any) => total + parseFloat(currentValue), 0.0);
       tableRow.push(<TableCell>{totalAmount}</TableCell>);
-      tableBody.push(<TableRow>{tableRow}</TableRow>);
+      tableBody.push(<TableRow onClick={() => deleteEntry(entries[i]._id as string)}>{tableRow}</TableRow>);
     });
     return tableBody;
   };
 
   const renderTableBalance = () => {
     let monthlyTotal: number[] = [];
-    console.log(sortedByIncomeName);
     for (let i = 0; i < MonthArray.length; i++) {
       let totalIncome = sortedByIncomeName.reduce((accumulator, { monthlyAmount }: { monthlyAmount: any; }) => accumulator + parseFloat(monthlyAmount[i]), 0);
       let totalExpense = sortedByExpenseName.reduce((accumulator, { monthlyAmount }: { monthlyAmount: any; }) => accumulator + parseFloat(monthlyAmount[i]), 0);
