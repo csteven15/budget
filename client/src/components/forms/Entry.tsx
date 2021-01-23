@@ -11,21 +11,32 @@ import {
 } from "@material-ui/core";
 import Api from "../../util/Api";
 import { useEntry } from "../../context/EntryContext";
-import { IEntry } from "../../common/types/IEntry";
+import { IEntry } from "../../common/types";
 import ReactHookFormSelect from "./ReactHookFormSelect";
 import { useAuth } from "../../context/AuthContext";
 import SimpleSnackbar from "../SnackBar";
 import { AxiosResponse } from "axios";
-import { months } from "../../common/enums/EMonths";
+import { EMonth } from "../../common/enums";
 
 const inputType = [
   { value: 0, text: "Income" },
   { value: 1, text: "Expense" },
 ];
 
-interface IFormData extends IEntry {
+interface IFormData {
+  _id?: string;
+  uid: string;
+  name: string;
+  year: number;
+  inputType: number;
+  monthlyAmount: IFormDataFieldArray[];
+  maxAmount: number;
   isFixed: boolean;
   amount: number;
+}
+
+interface IFormDataFieldArray {
+  name: number;
 }
 
 const EntryForm: FC = () => {
@@ -55,7 +66,8 @@ const EntryForm: FC = () => {
     if (formData.isFixed) {
       transformedMonthlyAmount.fill(formData.amount);
     } else {
-      transformedMonthlyAmount = formData.monthlyAmount;
+      // each monthly value is stored in an object with the name key due to react-form-hooks api
+      transformedMonthlyAmount = formData.monthlyAmount.map((month: IFormDataFieldArray) => month.name);
     }
     let inputEntry: IEntry = {
       uid: user.uid as string,
@@ -177,35 +189,35 @@ const EntryForm: FC = () => {
               />
             </Grid>
           ) : (
-            fields.map((field, index) => (
-              <Grid item xs={6} key={field.id}>
-                <Controller
-                  as={
-                    <TextField
-                      id="standard-adornment-amount"
-                      name="monthlyAmount"
-                      label={`${months[index]} Amount`}
-                      inputRef={register({
-                        pattern: {
-                          value: /^[0-9]+\.[0-9][0-9]/i,
-                          message: "Example format: 1.00",
-                        },
-                      })}
-                      // defaultValue={getValues("maxAmount")}
-                      // @ts-ignore
-                      // error={!!errors.monthlyAmount[index].names.message}
-                      // @ts-ignore
-                      helperText={"Example format: 1.00"}
-                      fullWidth
-                    />
-                  }
-                  name={`monthlyAmount[${index}].name`}
-                  control={control}
-                  defaultValue={getValues("maxAmount")}
-                />
-              </Grid>
-            ))
-          )}
+              fields.map((field, index) => (
+                <Grid item xs={6} key={field.id}>
+                  <Controller
+                    as={
+                      <TextField
+                        id="standard-adornment-amount"
+                        name="monthlyAmount"
+                        label={`${EMonth[index]} Amount`}
+                        inputRef={register({
+                          pattern: {
+                            value: /^[0-9]+\.[0-9][0-9]/i,
+                            message: "Example format: 1.00",
+                          },
+                        })}
+                        // defaultValue={getValues("maxAmount")}
+                        // @ts-ignore
+                        // error={!!errors.monthlyAmount[index].names.message}
+                        // @ts-ignore
+                        helperText={"Example format: 1.00"}
+                        fullWidth
+                      />
+                    }
+                    name={`monthlyAmount[${index}].name`}
+                    control={control}
+                    defaultValue={getValues("maxAmount")}
+                  />
+                </Grid>
+              ))
+            )}
           <Grid item xs={12}>
             <Button
               color="primary"

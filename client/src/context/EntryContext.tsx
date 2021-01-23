@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { AxiosResponse } from "axios";
 
-import { IEntry } from "../common/types/IEntry";
+import { IEntry } from "../common/types";
 import Api from "../util/Api";
 import { useAuth } from "./AuthContext";
 
@@ -42,12 +42,11 @@ const useProvideEntry = () => {
       return;
     }
     let res: AxiosResponse<IEntry[]> = await Api.get(`/entry/${user.uid}`, {});
-    let entries: IEntry[] = res.data.filter((entry) => entry.uid === user.uid);
+    let entries: IEntry[] = res.data;
     setState((oldState: IEntry[]) => [...oldState, ...entries]);
   }, [user.isLoggedIn, user.uid]);
 
   useEffect(() => {
-    console.log("use effect");
     getEntries();
   }, [user.isLoggedIn, getEntries]);
 

@@ -17,7 +17,7 @@ export class Entry {
   // 0 = income
   // 1 = expense
   @Prop({ required: true })
-  inputType: number;
+  inputType: Number;
 
   @Prop({ required: true })
   monthlyAmount: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];

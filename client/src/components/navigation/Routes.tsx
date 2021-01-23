@@ -3,6 +3,7 @@ import { Switch, Route } from "react-router-dom";
 import Dashboard from '../../pages/Dashboard';
 import SignIn from '../forms/SignIn';
 import ListView from '../../pages/ListView';
+import YearView from '../../pages/YearView';
 
 const routes = [
   {
@@ -14,8 +15,12 @@ const routes = [
     component: <Dashboard />
   },
   {
-    path: "/table",
+    path: "/listview",
     component: <ListView />
+  },
+  {
+    path: "/yearview",
+    component: <YearView />
   }
 ];
 

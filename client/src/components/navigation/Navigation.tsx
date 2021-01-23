@@ -22,8 +22,12 @@ const protectedRoutes = [
     name: "Dashboard",
   },
   {
-    path: "/table",
-    name: "Table",
+    path: "/listview",
+    name: "List View",
+  },
+  {
+    path: "/yearview",
+    name: "Year View",
   },
   {
     path: "/",
