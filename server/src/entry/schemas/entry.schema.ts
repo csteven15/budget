@@ -1,29 +1,29 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import mongoose, { Document } from 'mongoose'
 
-export type EntryDocument = Entry & Document;
+export type EntryDocument = Entry & Document
 
 @Schema()
 export class Entry {
   @Prop({ required: true })
-  uid: string;
+  uid: string
 
   @Prop({ required: true })
-  name: string;
+  name: string
 
   @Prop({ required: true })
-  year: number;
+  year: number
 
   // 0 = income
   // 1 = expense
   @Prop({ required: true })
-  inputType: Number;
+  inputType: number
 
   @Prop({ required: true })
   monthlyAmount: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   @Prop()
-  maxAmount: number;
+  maxAmount: number
 }
 
-export const EntrySchema = SchemaFactory.createForClass(Entry);
+export const EntrySchema = SchemaFactory.createForClass(Entry)

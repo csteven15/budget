@@ -1,14 +1,14 @@
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import { FC } from "react";
-import { Control, Controller } from "react-hook-form";
+import FormControl from '@material-ui/core/FormControl'
+import InputLabel from '@material-ui/core/InputLabel'
+import Select from '@material-ui/core/Select'
+import { FC } from 'react'
+import { Control, Controller } from 'react-hook-form'
 
 interface IProps {
-  name: string;
-  label: string;
-  control: Control;
-  defaultValue: number;
+  name: string
+  label: string
+  control: Control
+  defaultValue: number
 }
 
 const ReactHookFormSelect: FC<IProps> = ({
@@ -19,7 +19,7 @@ const ReactHookFormSelect: FC<IProps> = ({
   children,
   ...props
 }) => {
-  const labelId = `${name}`;
+  const labelId = `${name}`
   return (
     <FormControl {...props} fullWidth>
       <InputLabel id={labelId}>{label}</InputLabel>
@@ -34,6 +34,6 @@ const ReactHookFormSelect: FC<IProps> = ({
         defaultValue={defaultValue}
       />
     </FormControl>
-  );
-};
-export default ReactHookFormSelect;
+  )
+}
+export default ReactHookFormSelect

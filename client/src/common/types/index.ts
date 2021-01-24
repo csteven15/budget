@@ -1,2 +1,2 @@
-export type { IEntry } from "./IEntry";
-export type { IUser } from "./IUser";
+export type { IEntry } from './IEntry'
+export type { IUser } from './IUser'

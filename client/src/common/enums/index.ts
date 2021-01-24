@@ -1,2 +1,2 @@
-export { EInputType } from "./EInputType";
-export { EMonth, MonthArray } from "./EMonths";
+export { EInputType } from './EInputType'
+export { EMonth, MonthArray } from './EMonths'
