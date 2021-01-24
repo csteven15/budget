@@ -30,6 +30,10 @@ const protectedRoutes = [
     name: "Year View",
   },
   {
+    path: "/totalview",
+    name: "Total View",
+  },
+  {
     path: "/",
     name: "Sign Out",
   },

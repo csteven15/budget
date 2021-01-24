@@ -4,6 +4,7 @@ import Dashboard from '../../pages/Dashboard';
 import SignIn from '../forms/SignIn';
 import ListView from '../../pages/ListView';
 import YearView from '../../pages/YearView';
+import TotalView from '../../pages/TotalView';
 
 const routes = [
   {
@@ -21,6 +22,10 @@ const routes = [
   {
     path: "/yearview",
     component: <YearView />
+  },
+  {
+    path: "/totalView",
+    component: <TotalView />
   }
 ];
 
