@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
@@ -107,7 +107,7 @@ const EntryForm: FC<Props> = ({ entry, isEditing }) => {
   const [formError, setFormError] = useState(false)
   const watchIsFixed = watch('isFixed', true)
 
-  if (isEditing) {
+  useEffect(() => {
     setValue('name', entry?.name)
     setValue('year', entry?.year)
     setValue('inputType', entry?.inputType)
@@ -123,7 +123,7 @@ const EntryForm: FC<Props> = ({ entry, isEditing }) => {
         setValue(`monthlyAmount[${i}].name`, amount)
       })
     }
-  }
+  }, [setValue, isEditing])
 
   const onSubmit = async (formData: IFormData) => {
     console.log(formData)
