@@ -76,9 +76,7 @@ const YearView: FC = () => {
       )
       tableRow.push(<TableCell>{totalAmount}</TableCell>)
       tableBody.push(
-        <TableRow onClick={() => handleModalOpen(entries[i])}>
-          {tableRow}
-        </TableRow>
+        <TableRow onClick={() => handleModalOpen(entry)}>{tableRow}</TableRow>
       )
     })
     return tableBody
