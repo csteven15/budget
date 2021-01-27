@@ -9,13 +9,28 @@ import {
   Paper,
   Button,
 } from '@material-ui/core'
+import {
+  Chart,
+  PieSeries,
+  Title,
+  Legend,
+} from '@devexpress/dx-react-chart-material-ui'
+import { Animation } from '@devexpress/dx-react-chart'
+
 import { useEntry } from '../context/EntryContext'
 import { EInputType } from '../common/enums'
 import { IEntry } from '../common/types'
 
+interface chartType {
+  name: string
+  value: number
+}
+
+const defaultChartState: chartType[] = []
 const TotalView: FC = () => {
   const { entries } = useEntry()
   const [showPercent, setShowPercent] = useState(false)
+  let chartData: chartType[] = defaultChartState
 
   const setOfYears = new Set<number>()
   entries.forEach((entry) => {
@@ -59,28 +74,38 @@ const TotalView: FC = () => {
       const totalExpensesForYear = getTotalFromInputType(
         expensesForEntryForYear
       )
+
+      const incomeTotal = togglePercentsFromIncome(
+        totalIncomeForYear,
+        totalIncomeForYear
+      )
+      const expenseTotal = togglePercentsFromIncome(
+        totalIncomeForYear,
+        totalExpensesForYear
+      )
+      const savingsTotal = togglePercentsFromIncome(
+        totalIncomeForYear,
+        totalIncomeForYear - totalExpensesForYear
+      )
+
+      const expenseLabel = year + ' Expenses'
+      const savingsLabel = year + ' Savings'
+      chartData = [...chartData, { name: expenseLabel, value: expenseTotal }]
+      chartData = [...chartData, { name: savingsLabel, value: savingsTotal }]
+
       return (
         <TableRow key={year}>
           <TableCell>{year}</TableCell>
           <TableCell>
-            {togglePercentsFromIncome(
-              totalIncomeForYear,
-              totalIncomeForYear
-            ).toFixed(2)}
+            {incomeTotal.toFixed(2)}
             {showPercent ? '%' : ''}
           </TableCell>
           <TableCell>
-            {togglePercentsFromIncome(
-              totalIncomeForYear,
-              totalExpensesForYear
-            ).toFixed(2)}
+            {expenseTotal.toFixed(2)}
             {showPercent ? '%' : ''}
           </TableCell>
           <TableCell>
-            {togglePercentsFromIncome(
-              totalIncomeForYear,
-              totalIncomeForYear - totalExpensesForYear
-            ).toFixed(2)}
+            {savingsTotal.toFixed(2)}
             {showPercent ? '%' : ''}
           </TableCell>
           <TableCell>-</TableCell>
@@ -96,7 +121,7 @@ const TotalView: FC = () => {
         variant="contained"
         onClick={() => setShowPercent(!showPercent)}
       >
-        Show Percentages from Income
+        Show Percentages
       </Button>
       <TableContainer>
         <Table>
@@ -112,6 +137,13 @@ const TotalView: FC = () => {
           <TableBody>{renderRows()}</TableBody>
         </Table>
       </TableContainer>
+      <Chart data={chartData}>
+        <PieSeries name="Pie" valueField="value" argumentField="name">
+          <Title text="Pie Chart"></Title>
+        </PieSeries>
+        <Animation />
+        <Legend position="left" />
+      </Chart>
     </Paper>
   )
 }

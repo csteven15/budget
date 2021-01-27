@@ -51,6 +51,9 @@
     ]
   },
   "devDependencies": {
+    "@devexpress/dx-react-chart": "^2.7.4",
+    "@devexpress/dx-react-chart-material-ui": "^2.7.4",
+    "@devexpress/dx-react-core": "^2.7.4",
     "@types/react-table": "^7.0.27",
     "@typescript-eslint/eslint-plugin": "^4.14.0",
     "@typescript-eslint/parser": "^4.14.0",

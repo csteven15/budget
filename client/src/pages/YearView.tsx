@@ -41,6 +41,9 @@ const YearView: FC = () => {
     .filter((entry) => entry.inputType === EInputType.Expense)
     .sort((a, b) => a.name.localeCompare(b.name))
   const sortedEntries = [...sortedByIncomeName, ...sortedByExpenseName]
+  const sortedEntriesForCurrentYear = sortedEntries.filter(
+    (entry) => entry.year === date.getFullYear()
+  )
 
   const incomeCount: number = sortedByIncomeName.length
 
@@ -54,7 +57,7 @@ const YearView: FC = () => {
 
   const renderTableEntry = () => {
     const tableBody: ReactNode[] = []
-    sortedEntries.forEach((entry: IEntry, i: number) => {
+    sortedEntriesForCurrentYear.forEach((entry: IEntry, i: number) => {
       const tableRow = []
       if (i === 0 || i === incomeCount) {
         tableRow.push(
