@@ -108,7 +108,8 @@ const useProvideEntry = () => {
   const addEntry = async (newEntry: IEntry) => {
     try {
       const res: AxiosResponse<IEntry> = await Api.post('/entry', newEntry)
-      if (res.status === EResponse.OK) {
+      console.log('status: ', res.status)
+      if (res.status === EResponse.Created) {
         const entry = res.data
         setState((oldState: IEntry[]) => [...oldState, entry])
       }

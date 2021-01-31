@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { FC, useState, useEffect, useReducer } from 'react'
 import {
   Paper,
   Button,
@@ -6,97 +6,131 @@ import {
   Typography,
   List,
   ListItem,
+  ListSubheader,
+  Checkbox,
+  createStyles,
+  makeStyles,
+  Theme,
 } from '@material-ui/core'
+import EditIcon from '@material-ui/icons/Edit'
 import { EInputType, MonthArray } from '../common/enums'
 import { useEntry } from '../context/EntryContext'
+import {
+  IMonthViewState,
+  monthViewReducer,
+  nextMonthAction,
+  prevMonthAction,
+  setYearAction,
+} from '../store/MonthViewStore'
+
+const date = new Date()
+
+const INITIAL_STATE: IMonthViewState = {
+  monthIndex: date.getMonth(),
+  year: date.getFullYear(),
+  monthlyIncome: [],
+  monthlyExpense: [],
+}
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    header: {
+      display: 'flex',
+      justifyContent: 'space-between',
+    },
+    listSection: {
+      overflow: 'auto',
+      backgroundColor: theme.palette.background.paper,
+    },
+    ul: {
+      backgroundColor: 'inherit',
+      padding: 0,
+    },
+    li: {
+      backgroundColor: 'inherit',
+    },
+  })
+)
 
 const MonthView: FC = () => {
+  const [state, dispatch] = useReducer(monthViewReducer, INITIAL_STATE)
   const { entries } = useEntry()
-  const [monthIndex, setMonthIndex] = useState(0)
-  const [yearShown, setYearShown] = useState(0)
+  const classes = useStyles()
 
-  const date = new Date()
-  // do once
   useEffect(() => {
-    setMonth(date.getMonth())
-    setYearShown(date.getFullYear())
+    dispatch(setYearAction(date.getFullYear(), entries))
   }, [])
 
   const getMonthAndYearString = () => {
-    return MonthArray[monthIndex] + ' ' + yearShown.toString()
-  }
-
-  const setMonth = (index: number) => {
-    setMonthIndex(index)
-    date.setMonth(index)
-  }
-
-  const getNextMonthIndex = () => {
-    let index = monthIndex + 1
-    if (index > 11) {
-      setYearShown(yearShown + 1)
-      index = 0
-    }
-    return index
-  }
-
-  const getPreviousMonthIndex = () => {
-    let index = monthIndex - 1
-    if (index < 0) {
-      setYearShown(yearShown - 1)
-      index = 11
-    }
-    return index
+    return MonthArray[state.monthIndex] + ' ' + state.year.toString()
   }
 
   const renderListOfEntriesPerType = (inputType: EInputType) => {
-    return entries
-      .filter((entry) => entry.inputType === inputType)
-      .filter((entry) => entry.year === yearShown)
-      .map((entry, i) => {
-        return (
-          <ListItem key={i}>
+    const entriesToRender =
+      inputType === EInputType.Income
+        ? state.monthlyIncome
+        : state.monthlyExpense
+    return (
+      <li className={classes.li}>
+        <ul className={classes.ul}>
+          <ListSubheader>
             <Grid container>
-              <Grid item xs={2} sm={3} md={6}>
-                {entry.name}
+              <Grid item xs={4} md={4}>
+                {inputType === EInputType.Income ? 'Income' : 'Expense'}
               </Grid>
-              <Grid item xs={2} sm={3} md={6}>
-                {entry.monthlyAmount[monthIndex]}
+              <Grid item xs={4} md={4}>
+                Month
+              </Grid>
+              <Grid item xs={2} md={2}>
+                Paid
+              </Grid>
+              <Grid item xs={2} md={2}>
+                Edit
               </Grid>
             </Grid>
-          </ListItem>
-        )
-      })
+          </ListSubheader>
+          {entriesToRender.map((entry, i) => (
+            <ListItem key={i}>
+              <Grid container>
+                <Grid item xs={4} md={4}>
+                  {entry.name}
+                </Grid>
+                <Grid item xs={4} md={4}>
+                  {entry.monthlyAmount[state.monthIndex]}
+                </Grid>
+                <Grid item xs={2} md={2}>
+                  <Checkbox />
+                </Grid>
+                <Grid item xs={2} md={2}>
+                  <EditIcon />
+                </Grid>
+              </Grid>
+            </ListItem>
+          ))}
+        </ul>
+      </li>
+    )
   }
 
   return (
     <Paper>
-      <Typography align="center">{getMonthAndYearString()}</Typography>
-      <Grid
-        container
-        direction="row"
-        justify="space-between"
-        alignItems="center"
-      >
+      <div className={classes.header}>
         <Button
-          color="primary"
-          variant="contained"
-          onClick={() => setMonth(getPreviousMonthIndex())}
+          color="secondary"
+          onClick={() => dispatch(prevMonthAction(entries))}
         >
-          Previous Month
+          Prev Month
         </Button>
+        <Typography align="center">{getMonthAndYearString()}</Typography>
         <Button
           color="primary"
-          variant="contained"
-          onClick={() => setMonth(getNextMonthIndex())}
+          onClick={() => dispatch(nextMonthAction(entries))}
         >
           Next Month
         </Button>
-      </Grid>
-      <List>
-        <Typography align="center">Income</Typography>
+      </div>
+      <List className={classes.listSection} subheader={<li />}>
         {renderListOfEntriesPerType(EInputType.Income)}
-        <Typography align="center">Expenses</Typography>
         {renderListOfEntriesPerType(EInputType.Expense)}
       </List>
     </Paper>

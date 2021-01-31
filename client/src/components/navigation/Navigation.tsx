@@ -1,3 +1,4 @@
+import { makeStyles, Theme, createStyles } from '@material-ui/core'
 import React, { FC } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -39,8 +40,24 @@ const protectedRoutes = [
   },
 ]
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      flex: '1 100%',
+      width: '100%',
+      height: '20vh',
+      backgroundColor: theme.palette.background.paper,
+    },
+    children: {
+      flex: '1 100%',
+      backgroundColor: theme.palette.background.paper,
+    },
+  })
+)
+
 const Navigation: FC = ({ children }) => {
   const { user, signOut } = useAuth()
+  const classes = useStyles()
 
   let combinedRoutes = routes
 
@@ -51,7 +68,7 @@ const Navigation: FC = ({ children }) => {
   }
 
   return (
-    <div>
+    <div className={classes.root}>
       <div>
         <ul>
           {combinedRoutes.map((route) => (
@@ -64,7 +81,7 @@ const Navigation: FC = ({ children }) => {
           ))}
         </ul>
       </div>
-      <div>{children}</div>
+      <div className={classes.children}>{children}</div>
     </div>
   )
 }
