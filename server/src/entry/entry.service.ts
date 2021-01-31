@@ -1,9 +1,11 @@
 import { Model } from 'mongoose';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import * as faker from 'faker';
 
 import { Entry, EntryDocument } from './schemas/entry.schema';
 import { CreateEntryDto, UpdateEntryDto } from './dtos';
+import { IEntry } from './interfaces/entry.interface';
 
 @Injectable()
 export class EntryService {
@@ -50,5 +52,44 @@ export class EntryService {
     return this.entryModel
       .findByIdAndDelete(id, { useFindAndModify: false })
       .exec();
+  }
+
+  async fakeEntries(
+    uid: string,
+    entries: number,
+    inputType: number,
+  ): Promise<void> {
+    if (entries > 200) {
+      entries = 200;
+    }
+    const entryType = inputType === 0 ? 'income' : 'expense';
+    this.logger.log(`making ${entries} ${entryType} entries for uid ${uid}`);
+    const today = new Date();
+    const past = new Date(today.getFullYear() - 2, today.getMonth(), today.getDate());
+    const future = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
+    const numEntries = entries;
+    const randomEntries = Array<IEntry>(numEntries);
+    for (let i = 0; i < numEntries; i++) {
+      const maxAmount = Math.floor(Math.random() * (500000 - 1) + 1);
+      const monthlyAmount: Array<number> = new Array<number>(12);
+      for (let j = 0; j < 12; j++) {
+        monthlyAmount[j] = Number.parseFloat(
+          faker.finance.amount(1, maxAmount, 2),
+        );
+      }
+
+      const randomEntry: IEntry = {
+        uid: uid,
+        inputType: inputType,
+        name: inputType === 0 ? faker.name.jobTitle() : faker.commerce.productName(),
+        year: faker.date
+          .between(past, future)
+          .getFullYear(),
+        monthlyAmount: monthlyAmount,
+        maxAmount: Number.parseFloat(maxAmount.toFixed(2)),
+      };
+      randomEntries[i] = randomEntry;
+    }
+    this.entryModel.insertMany(randomEntries);
   }
 }
