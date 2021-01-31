@@ -37,17 +37,21 @@ const useStyles = makeStyles((theme: Theme) =>
     header: {
       display: 'flex',
       justifyContent: 'space-between',
+      maxHeight: '10vh',
     },
     listSection: {
+      position: 'relative',
       overflow: 'auto',
+      maxHeight: '70vh',
       backgroundColor: theme.palette.background.paper,
     },
     ul: {
       backgroundColor: 'inherit',
-      padding: 0,
+      // padding: 0,
     },
     li: {
       backgroundColor: 'inherit',
+      // padding: 0,
     },
   })
 )
@@ -64,6 +68,8 @@ const MonthView: FC = () => {
   const getMonthAndYearString = () => {
     return MonthArray[state.monthIndex] + ' ' + state.year.toString()
   }
+
+  console.log(state.monthIndex)
 
   const renderListOfEntriesPerType = (inputType: EInputType) => {
     const entriesToRender =

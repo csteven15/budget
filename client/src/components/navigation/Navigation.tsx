@@ -42,14 +42,15 @@ const protectedRoutes = [
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
+    navigation: {
       flex: '1 100%',
-      width: '100%',
       height: '20vh',
+      overflow: 'auto',
       backgroundColor: theme.palette.background.paper,
     },
     children: {
       flex: '1 100%',
+      maxHeight: '100vh',
       backgroundColor: theme.palette.background.paper,
     },
   })
@@ -68,8 +69,8 @@ const Navigation: FC = ({ children }) => {
   }
 
   return (
-    <div className={classes.root}>
-      <div>
+    <div>
+      <div className={classes.navigation}>
         <ul>
           {combinedRoutes.map((route) => (
             <li
