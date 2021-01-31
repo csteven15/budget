@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Query,
   Post,
   Body,
   Put,
@@ -22,7 +21,7 @@ import { EntryService } from './entry.service';
 
 @Controller('entry')
 export class EntryController {
-  constructor(private readonly entryService: EntryService) { }
+  constructor(private readonly entryService: EntryService) {}
 
   @Get()
   @ApiTags('Entry')

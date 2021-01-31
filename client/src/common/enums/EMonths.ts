@@ -14,6 +14,7 @@ enum EMonth {
   November,
   December,
 }
-const MonthArray = Object.keys(EMonth).splice(totalMonths)
+
+const MonthArray: string[] = Object.keys(EMonth).splice(totalMonths)
 
 export { EMonth, MonthArray }

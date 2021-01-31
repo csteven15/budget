@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { FC, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
@@ -12,13 +12,11 @@ import {
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 
-import Api from '../../util/Api'
 import { useEntry } from '../../context/EntryContext'
 import { IEntry } from '../../common/types'
 import ReactHookFormSelect from './ReactHookFormSelect'
 import { useAuth } from '../../context/AuthContext'
 import SimpleSnackbar from '../SnackBar'
-import { AxiosResponse } from 'axios'
 import { MonthArray } from '../../common/enums'
 
 const inputType = [
@@ -26,36 +24,10 @@ const inputType = [
   { value: 1, text: 'Expense' },
 ]
 
-interface IObjectKeys {
-  [key: string]: string | number | undefined | boolean
-}
-
-interface IFormData extends IObjectKeys {
-  _id?: string
-  uid: string
-  name: string
-  year: number
-  inputType: number
-  maxAmount: number
-  isFixed: boolean
-  amount?: number
-  January?: number
-  February?: number
-  March?: number
-  April?: number
-  May?: number
-  June?: number
-  July?: number
-  August?: number
-  September?: number
-  October?: number
-  November?: number
-  December?: number
-}
-
-interface Props {
+interface IProps {
   entry?: IEntry
   isEditing?: boolean
+  handleModalClose?: () => void
 }
 
 const EntrySchema = Joi.object({
@@ -63,7 +35,6 @@ const EntrySchema = Joi.object({
     'any.required': 'Name for entry cannot be empty',
   }),
   year: Joi.number().positive().required().messages({
-    // 'number.required': 'Year for entry is required',
     'number.positive': 'Year for entry must be positive',
   }),
   inputType: Joi.number().required(),
@@ -87,57 +58,48 @@ const EntrySchema = Joi.object({
   December: Joi.number().positive().max(Joi.ref('maxAmount')),
 })
 
-const EntryForm: FC<Props> = ({ entry, isEditing }) => {
+const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
   const {
     register,
     watch,
     control,
     getValues,
     errors,
-    setValue,
     handleSubmit,
-  } = useForm<IFormData>({
+  } = useForm<IEntry>({
     resolver: joiResolver(EntrySchema),
   })
 
   const { user } = useAuth()
-  const { setEntry } = useEntry()
+  const { addEntry, deleteEntry, updateEntry } = useEntry()
 
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [formError, setFormError] = useState(false)
-  const watchIsFixed = watch('isFixed', true)
+  let watchIsFixed = watch('isFixed', true)
 
-  useEffect(() => {
-    setValue('name', entry?.name)
-    setValue('year', entry?.year)
-    setValue('inputType', entry?.inputType)
-    setValue('maxAmount', entry?.maxAmount.toFixed(2))
-    const isFixed = entry?.monthlyAmount.every(
+  let isFixed = false
+
+  if (isEditing) {
+    isFixed = entry!.monthlyAmount.every(
       (amount) => amount === entry?.monthlyAmount[0]
-    )
-    if (isFixed) {
-      setValue('amount', entry?.monthlyAmount[0])
-    } else {
-      setValue('isFixed', true)
-      entry?.monthlyAmount.forEach((amount, i) => {
-        setValue(`monthlyAmount[${i}].name`, amount)
-      })
+    )!
+    if (!isFixed) {
+      watchIsFixed = false
     }
-  }, [setValue, isEditing])
+  }
 
-  const onSubmit = async (formData: IFormData) => {
-    console.log(formData)
-    const transformedMonthlyAmount = new Array<number>(12)
+  const onSubmit = async (formData: IEntry) => {
+    let transformedMonthlyAmount: number[] = new Array<number>(12)
     if (formData.isFixed) {
-      transformedMonthlyAmount.fill(formData?.amount as number)
+      transformedMonthlyAmount.fill(formData!.amount!)
     } else {
-      MonthArray.map((month, i) => {
-        transformedMonthlyAmount[i] = formData[month] as number
-      })
       // each monthly value is stored in an object with the name key due to react-form-hooks api
-      // transformedMonthlyAmount = MonthArray.map(month => formData[month as string]);
+      transformedMonthlyAmount = MonthArray.map(
+        (month: string) => formData[month as keyof IEntry] as number
+      )
     }
     const inputEntry: IEntry = {
+      _id: isEditing ? entry?._id : undefined,
       uid: user.uid as string,
       name: formData.name,
       year: formData.year,
@@ -146,20 +108,32 @@ const EntryForm: FC<Props> = ({ entry, isEditing }) => {
       maxAmount: formData.maxAmount,
     }
     try {
-      const res: AxiosResponse<IEntry> = await Api.post('/entry', inputEntry)
-      const entry = res.data
+      if (isEditing) {
+        updateEntry(inputEntry)
+        if (handleModalClose) {
+          handleModalClose()
+        }
+      } else {
+        addEntry(inputEntry)
+      }
       setFormSubmitted(true)
       // reset after 5 seconds
       setTimeout(() => {
         setFormSubmitted(false)
       }, 5000)
-      setEntry(entry)
     } catch (error) {
       setFormError(true)
       // reset after 5 seconds
       setTimeout(() => {
         setFormError(false)
       }, 5000)
+    }
+  }
+
+  const onDelete = () => {
+    deleteEntry(entry?._id as string)
+    if (handleModalClose) {
+      handleModalClose()
     }
   }
 
@@ -180,6 +154,7 @@ const EntryForm: FC<Props> = ({ entry, isEditing }) => {
               id="standard-basic"
               label="Name"
               name="name"
+              defaultValue={isEditing && entry?.name}
               inputRef={register()}
               error={!!errors?.name?.message}
               helperText={errors?.name?.message}
@@ -191,6 +166,7 @@ const EntryForm: FC<Props> = ({ entry, isEditing }) => {
               id="standard-basic"
               label="Year"
               name="year"
+              defaultValue={isEditing && entry?.year}
               inputRef={register()}
               error={!!errors?.name?.message}
               helperText={errors?.name?.message}
@@ -201,7 +177,9 @@ const EntryForm: FC<Props> = ({ entry, isEditing }) => {
             <ReactHookFormSelect
               name="inputType"
               label="Choose type of input"
-              defaultValue={inputType[0].value}
+              defaultValue={
+                isEditing ? (entry?.inputType as number) : inputType[0].value
+              }
               control={control}
             >
               {inputType.map((input) => (
@@ -215,6 +193,7 @@ const EntryForm: FC<Props> = ({ entry, isEditing }) => {
             <TextField
               label="Max Amount"
               name="maxAmount"
+              defaultValue={isEditing && entry?.maxAmount}
               inputRef={register}
               error={!!errors.maxAmount?.message}
               helperText={errors.maxAmount?.message}
@@ -223,10 +202,14 @@ const EntryForm: FC<Props> = ({ entry, isEditing }) => {
           </Grid>
           <Grid item xs={12}>
             <FormControlLabel
-              control={<Checkbox defaultChecked={true} />}
-              inputRef={register}
               name="isFixed"
               label="Fixed Amount"
+              control={
+                <Checkbox
+                  defaultChecked={isEditing ? (isFixed ? true : false) : true}
+                />
+              }
+              inputRef={register}
             />
           </Grid>
           {watchIsFixed === true ? (
@@ -234,6 +217,7 @@ const EntryForm: FC<Props> = ({ entry, isEditing }) => {
               <TextField
                 label="Amount"
                 name="amount"
+                defaultValue={isEditing && entry?.monthlyAmount[0]}
                 inputRef={register}
                 error={!!errors?.amount?.message}
                 helperText={errors?.amount?.message}
@@ -248,24 +232,44 @@ const EntryForm: FC<Props> = ({ entry, isEditing }) => {
                     label={`${MonthArray[i]} Amount`}
                     name={`${MonthArray[i]}`}
                     inputRef={register}
-                    defaultValue={getValues('maxAmount')}
+                    defaultValue={
+                      isEditing
+                        ? entry!.monthlyAmount[i]
+                        : getValues('maxAmount')
+                    }
+                    // @ts-ignore
                     error={!!errors[month]?.message}
+                    // @ts-ignore
                     helperText={errors[month]?.message}
                     fullWidth
                   />
                 </Grid>
               ))
             : null}
-          <Grid item xs={12}>
+        </Grid>
+        <br />
+        <Grid container>
+          <Grid item md={6}>
             <Button
               color="primary"
               variant="contained"
               onClick={handleSubmit(onSubmit)}
               type="submit"
             >
-              Add Entry
+              {isEditing ? 'Update Entry' : 'Add Entry'}
             </Button>
           </Grid>
+          {isEditing ? (
+            <Grid item md={6}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => onDelete()}
+              >
+                Delete Entry
+              </Button>
+            </Grid>
+          ) : null}
         </Grid>
       </form>
     </Paper>

@@ -11,11 +11,13 @@ import { AxiosResponse } from 'axios'
 import { IEntry } from '../common/types'
 import Api from '../util/Api'
 import { useAuth } from './AuthContext'
+import { EResponse } from '../common/enums'
 
 interface IContextProps {
   entries: IEntry[]
-  setEntry: (entry: IEntry) => void
+  addEntry: (newEntry: IEntry) => void
   deleteEntry: (id: string) => void
+  updateEntry: (updatedEntry: IEntry) => void
 }
 
 const EntryContext = createContext({} as IContextProps)
@@ -43,8 +45,10 @@ const useProvideEntry = () => {
       return
     }
     const res: AxiosResponse<IEntry[]> = await Api.get(`/entry/${user.uid}`, {})
-    const entries: IEntry[] = res.data
-    setState((oldState: IEntry[]) => [...oldState, ...entries])
+    if (res.status === EResponse.OK) {
+      const entries: IEntry[] = res.data
+      setState((oldState: IEntry[]) => [...oldState, ...entries])
+    }
   }, [user.isLoggedIn, user.uid])
 
   useEffect(() => {
@@ -55,20 +59,68 @@ const useProvideEntry = () => {
     setState([])
   }
 
-  const deleteEntry = (id: string) => {
-    Api.delete(`/entry/${id}`)
-    setState((oldState: IEntry[]) =>
-      oldState.filter((entry) => entry._id !== id)
-    )
+  const deleteEntry = async (id: string) => {
+    try {
+      const res: AxiosResponse<IEntry> = await Api.delete(`/entry/${id}`)
+      if (res.status === EResponse.OK) {
+        setState((oldState: IEntry[]) =>
+          oldState.filter((entry) => entry._id !== id)
+        )
+      }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  const setEntry = (entry: IEntry) => {
-    setState((oldState: IEntry[]) => [...oldState, entry])
+  const updateEntry = async (updatedEntry: IEntry) => {
+    let found = false
+    const newEntries = state.map((entry) => {
+      if (entry._id === updatedEntry._id) {
+        found = true
+        return {
+          ...entry,
+          _id: updatedEntry._id,
+          uid: updatedEntry.uid,
+          name: updatedEntry.name,
+          year: updatedEntry.year,
+          inputType: updatedEntry.inputType,
+          maxAmount: updatedEntry.maxAmount,
+          monthlyAmount: updatedEntry.monthlyAmount,
+        }
+      }
+      return entry
+    })
+    if (found) {
+      try {
+        const res: AxiosResponse<IEntry> = await Api.put(
+          `/entry/${updatedEntry._id}`,
+          updatedEntry
+        )
+        if (res.status === EResponse.OK) {
+          setState(newEntries)
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  }
+
+  const addEntry = async (newEntry: IEntry) => {
+    try {
+      const res: AxiosResponse<IEntry> = await Api.post('/entry', newEntry)
+      if (res.status === EResponse.OK) {
+        const entry = res.data
+        setState((oldState: IEntry[]) => [...oldState, entry])
+      }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return {
     entries: state,
-    setEntry,
+    addEntry,
     deleteEntry,
+    updateEntry,
   }
 }

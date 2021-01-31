@@ -127,8 +127,13 @@ const YearView: FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      {/* // change state of modal from entry form */}
       <Modal open={modalState.isOpen} onClose={handleModalClose}>
-        <EntryForm entry={modalState.entry} isEditing={true} />
+        <EntryForm
+          entry={modalState.entry}
+          isEditing={modalState.isOpen}
+          handleModalClose={handleModalClose}
+        />
       </Modal>
     </Paper>
   )
