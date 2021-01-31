@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useReducer } from 'react'
+import React, { FC, useEffect, useReducer, useState } from 'react'
 import {
   Paper,
   Button,
@@ -11,6 +11,7 @@ import {
   createStyles,
   makeStyles,
   Theme,
+  Modal,
 } from '@material-ui/core'
 import EditIcon from '@material-ui/icons/Edit'
 import { EInputType, MonthArray } from '../common/enums'
@@ -21,13 +22,17 @@ import {
   nextMonthAction,
   prevMonthAction,
   setYearAction,
+  updateEntriesAction,
 } from '../store/MonthViewStore'
+import { IEntry } from '../common/types'
+import EntryForm from '../components/forms/Entry'
 
 const date = new Date()
 
 const INITIAL_STATE: IMonthViewState = {
   monthIndex: date.getMonth(),
   year: date.getFullYear(),
+  entries: [],
   monthlyIncome: [],
   monthlyExpense: [],
 }
@@ -53,23 +58,48 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: 'inherit',
       // padding: 0,
     },
+    icon: {
+      cursor: 'pointer',
+    },
   })
 )
 
+interface IModalState {
+  isOpen: boolean
+  entry: IEntry | undefined
+}
+
+const defaultModalState: IModalState = {
+  isOpen: false,
+  entry: undefined,
+}
+
 const MonthView: FC = () => {
   const [state, dispatch] = useReducer(monthViewReducer, INITIAL_STATE)
+  const [modalState, openModal] = useState<IModalState>(defaultModalState)
+
   const { entries } = useEntry()
   const classes = useStyles()
 
+  const handleModalOpen = (entry: IEntry) => {
+    openModal({ isOpen: true, entry: entry })
+  }
+
+  const handleModalClose = () => {
+    openModal({ isOpen: false, entry: undefined })
+  }
+
+  // on startup
   useEffect(() => {
     dispatch(setYearAction(date.getFullYear(), entries))
   }, [])
 
-  const getMonthAndYearString = () => {
-    return MonthArray[state.monthIndex] + ' ' + state.year.toString()
-  }
+  useEffect(() => {
+    dispatch(updateEntriesAction(entries))
+  }, [entries])
 
-  console.log(state.monthIndex)
+  const getMonthAndYearString = () =>
+    MonthArray[state.monthIndex] + ' ' + state.year.toString()
 
   const renderListOfEntriesPerType = (inputType: EInputType) => {
     const entriesToRender =
@@ -108,7 +138,10 @@ const MonthView: FC = () => {
                   <Checkbox />
                 </Grid>
                 <Grid item xs={2} md={2}>
-                  <EditIcon />
+                  <EditIcon
+                    className={classes.icon}
+                    onClick={() => handleModalOpen(entry)}
+                  />
                 </Grid>
               </Grid>
             </ListItem>
@@ -120,6 +153,13 @@ const MonthView: FC = () => {
 
   return (
     <Paper>
+      <Modal open={modalState.isOpen} onClose={handleModalClose}>
+        <EntryForm
+          entry={modalState.entry}
+          isEditing={modalState.isOpen}
+          handleModalClose={handleModalClose}
+        />
+      </Modal>
       <div className={classes.header}>
         <Button
           color="secondary"

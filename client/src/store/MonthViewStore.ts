@@ -6,6 +6,7 @@ export enum EMonthViewActions {
   NEXT_MONTH = 'NEXT_MONTH',
   PREV_MONTH = 'PREV_MONTH',
   SET_YEAR = 'SET_YEAR',
+  UPDATE_ENTRIES = 'UPDATE_ENTRIES',
 }
 
 export interface SetMonthAction {
@@ -37,9 +38,17 @@ export interface SetYearAction {
   }
 }
 
+export interface UpdateEntriesAction {
+  type: EMonthViewActions.UPDATE_ENTRIES
+  payload: {
+    entries: IEntry[]
+  }
+}
+
 export interface IMonthViewState {
   monthIndex: number
   year: number
+  entries: IEntry[]
   monthlyIncome: IEntry[]
   monthlyExpense: IEntry[]
 }
@@ -49,6 +58,7 @@ export type Action =
   | NextMonthAction
   | PrevMonthAction
   | SetYearAction
+  | UpdateEntriesAction
 
 export const setMonthAction = (month: number): SetMonthAction => {
   const action: SetMonthAction = {
@@ -88,6 +98,16 @@ export const setYearAction = (
     type: EMonthViewActions.SET_YEAR,
     payload: {
       year: year,
+      entries: entries,
+    },
+  }
+  return action
+}
+
+export const updateEntriesAction = (entries: IEntry[]): UpdateEntriesAction => {
+  const action: UpdateEntriesAction = {
+    type: EMonthViewActions.UPDATE_ENTRIES,
+    payload: {
       entries: entries,
     },
   }
@@ -176,6 +196,20 @@ export const monthViewReducer = (
         year: action.payload.year,
         monthlyIncome: updatedIncomes,
         monthlyExpense: updatedExpenses,
+      }
+    }
+    case EMonthViewActions.UPDATE_ENTRIES: {
+      state.entries = action.payload.entries
+      state.monthlyIncome = state.entries.filter(
+        (entry) =>
+          entry.year === state.year && entry.inputType === EInputType.Income
+      )
+      state.monthlyExpense = state.entries.filter(
+        (entry) =>
+          entry.year === state.year && entry.inputType === EInputType.Expense
+      )
+      return {
+        ...state,
       }
     }
     default:
