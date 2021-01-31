@@ -22,6 +22,10 @@ const protectedRoutes = [
     name: 'Dashboard',
   },
   {
+    path: '/monthview',
+    name: 'Month View',
+  },
+  {
     path: '/yearview',
     name: 'Year View',
   },
