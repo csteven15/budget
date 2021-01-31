@@ -1,4 +1,4 @@
-var environment = process.env.NODE_ENV;
+const environment = process.env.NODE_ENV;
 
 export const isDevelopment = environment === 'development';
 

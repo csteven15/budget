@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import { Document } from 'mongoose';
 
 export type EntryDocument = Entry & Document;
 
@@ -17,7 +17,7 @@ export class Entry {
   // 0 = income
   // 1 = expense
   @Prop({ required: true })
-  inputType: Number;
+  inputType: number;
 
   @Prop({ required: true })
   monthlyAmount: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];

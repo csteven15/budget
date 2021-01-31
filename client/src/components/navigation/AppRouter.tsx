@@ -1,8 +1,8 @@
-import React, { FC } from "react";
-import { BrowserRouter } from "react-router-dom";
+import React, { FC } from 'react'
+import { BrowserRouter } from 'react-router-dom'
 
-import Navigation from "./Navigation";
-import Routes from "./Routes";
+import Navigation from './Navigation'
+import Routes from './Routes'
 
 const AppRouter: FC = () => {
   return (
@@ -14,4 +14,4 @@ const AppRouter: FC = () => {
   )
 }
 
-export default AppRouter;
+export default AppRouter

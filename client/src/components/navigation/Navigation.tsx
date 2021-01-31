@@ -1,49 +1,49 @@
-import React, { FC } from "react";
-import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import React, { FC } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 
-let routes = [
+const routes = [
   {
-    path: "/",
-    name: "Home",
+    path: '/',
+    name: 'Home',
   },
-];
+]
 
 const unprotectedRoutes = [
   {
-    path: "/signin",
-    name: "Sign In",
+    path: '/signin',
+    name: 'Sign In',
   },
-];
+]
 
 const protectedRoutes = [
   {
-    path: "/dashboard",
-    name: "Dashboard",
+    path: '/dashboard',
+    name: 'Dashboard',
   },
   {
-    path: "/listview",
-    name: "List View",
+    path: '/yearview',
+    name: 'Year View',
   },
   {
-    path: "/yearview",
-    name: "Year View",
+    path: '/totalview',
+    name: 'Total View',
   },
   {
-    path: "/",
-    name: "Sign Out",
+    path: '/',
+    name: 'Sign Out',
   },
-];
+]
 
 const Navigation: FC = ({ children }) => {
-  const { user, signOut } = useAuth();
+  const { user, signOut } = useAuth()
 
-  let combinedRoutes = routes;
+  let combinedRoutes = routes
 
   if (user.isLoggedIn) {
-    combinedRoutes = combinedRoutes.concat(protectedRoutes);
+    combinedRoutes = combinedRoutes.concat(protectedRoutes)
   } else {
-    combinedRoutes = combinedRoutes.concat(unprotectedRoutes);
+    combinedRoutes = combinedRoutes.concat(unprotectedRoutes)
   }
 
   return (
@@ -53,7 +53,7 @@ const Navigation: FC = ({ children }) => {
           {combinedRoutes.map((route) => (
             <li
               key={route.name}
-              onClick={route.name === "Sign Out" ? () => signOut() : undefined}
+              onClick={route.name === 'Sign Out' ? () => signOut() : undefined}
             >
               <Link to={route.path}>{route.name}</Link>
             </li>
@@ -62,7 +62,7 @@ const Navigation: FC = ({ children }) => {
       </div>
       <div>{children}</div>
     </div>
-  );
-};
+  )
+}
 
-export default Navigation;
+export default Navigation

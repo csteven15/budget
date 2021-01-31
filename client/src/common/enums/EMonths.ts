@@ -1,4 +1,4 @@
-const totalMonths = 12;
+const totalMonths = 12
 
 enum EMonth {
   January,
@@ -12,8 +12,9 @@ enum EMonth {
   September,
   October,
   November,
-  December
+  December,
 }
-const MonthArray = Object.keys(EMonth).splice(totalMonths);
 
-export { EMonth, MonthArray };
+const MonthArray: string[] = Object.keys(EMonth).splice(totalMonths)
+
+export { EMonth, MonthArray }

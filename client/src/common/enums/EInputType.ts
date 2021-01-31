@@ -1,4 +1,4 @@
 export enum EInputType {
   Income,
-  Expense
-};
+  Expense,
+}
