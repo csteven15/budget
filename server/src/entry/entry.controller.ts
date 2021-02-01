@@ -73,4 +73,17 @@ export class EntryController {
   async deleteEntry(@Param('id') id: string) {
     return await this.entryService.deleteEntry(id);
   }
+
+  @Get('util/:uid/:numEntries/:inputType')
+  @ApiTags('Entry')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'mock data given a user id' })
+  @ApiOkResponse({})
+  async mockData(
+    @Param('uid') uid: string,
+    @Param('numEntries') numEntries: number,
+    @Param('inputType') inputType: number,
+  ) {
+    this.entryService.fakeEntries(uid, numEntries, inputType);
+  }
 }
