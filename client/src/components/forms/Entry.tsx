@@ -9,6 +9,9 @@ import {
   Paper,
   TextField,
   Typography,
+  createStyles,
+  makeStyles,
+  Theme,
 } from '@material-ui/core'
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
@@ -30,6 +33,17 @@ interface IProps {
   isEditing?: boolean
   handleModalClose?: () => void
 }
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    paper: {
+      width: '50%',
+      margin: '0 auto',
+      padding: '1em',
+      backgroundColor: theme.palette.background.paper,
+    },
+  })
+)
 
 const EntrySchema = Joi.object({
   name: Joi.string().required().messages({
@@ -71,6 +85,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
     resolver: joiResolver(EntrySchema),
   })
 
+  const classes = useStyles()
   const { user } = useAuth()
   const { addEntry, deleteEntry, updateEntry } = useEntry()
 
@@ -140,13 +155,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
   }
 
   return (
-    <Paper
-      style={{
-        width: '50%',
-        margin: '0 auto',
-        padding: '1em',
-      }}
-    >
+    <Paper className={classes.paper}>
       <Typography align="center">Add an Budget Entry</Typography>
       <br />
       <SimpleSnackbar isOpen={formSubmitted} message={'Form Submitted'} />

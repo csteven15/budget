@@ -9,6 +9,9 @@ import {
   Paper,
   TextField,
   Typography,
+  createStyles,
+  makeStyles,
+  Theme,
 } from '@material-ui/core'
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
@@ -26,6 +29,17 @@ interface IProps {
   handleModalClose?: () => void
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    paper: {
+      width: '50%',
+      margin: '0 auto',
+      padding: '1em',
+      backgroundColor: theme.palette.background.paper,
+    },
+  })
+)
+
 const AccountSchema = Joi.object({
   name: Joi.string().required().messages({
     'any.required': 'Name for account cannot be empty',
@@ -42,6 +56,7 @@ const AccountForm: FC<IProps> = ({ account, isEditing, handleModalClose }) => {
     resolver: joiResolver(AccountSchema),
   })
 
+  const classes = useStyles()
   const { user } = useAuth()
   const { addAccount, deleteAccount, updateAccount } = useAccount()
 
@@ -92,13 +107,7 @@ const AccountForm: FC<IProps> = ({ account, isEditing, handleModalClose }) => {
   }
 
   return (
-    <Paper
-      style={{
-        width: '50%',
-        margin: '0 auto',
-        padding: '1em',
-      }}
-    >
+    <Paper className={classes.paper}>
       <Typography align="center">Add an Account</Typography>
       <br />
       <SimpleSnackbar isOpen={formSubmitted} message={'Form Submitted'} />

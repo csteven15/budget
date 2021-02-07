@@ -17,7 +17,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, options, {
-    include: [EntryModule, AccountModule]
+    include: [EntryModule, AccountModule],
   });
   SwaggerModule.setup('api', app, document);
 

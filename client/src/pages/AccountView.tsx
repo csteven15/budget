@@ -1,7 +1,6 @@
-import React, { FC, useEffect, useReducer, useState } from 'react'
+import React, { FC, useState } from 'react'
 import {
   Paper,
-  Button,
   Grid,
   Typography,
   List,
@@ -29,9 +28,37 @@ const defaultModalState: IModalState = {
   account: undefined,
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    header: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      maxHeight: '10vh',
+    },
+    listSection: {
+      position: 'relative',
+      overflow: 'auto',
+      maxHeight: '70vh',
+      backgroundColor: theme.palette.background.paper,
+    },
+    ul: {
+      backgroundColor: 'inherit',
+      // padding: 0,
+    },
+    li: {
+      backgroundColor: 'inherit',
+      // padding: 0,
+    },
+    icon: {
+      cursor: 'pointer',
+    },
+  })
+)
+
 const AccountView: FC = () => {
   const { accounts, updateAccount } = useAccount()
   const [modalState, openModal] = useState<IModalState>(defaultModalState)
+  const classes = useStyles()
 
   const handleModalOpen = (account: IAccount) => {
     openModal({ isOpen: true, account: account })
@@ -64,8 +91,8 @@ const AccountView: FC = () => {
   const renderAccountsPerType = (type: EAccountType) => {
     const accountsToRender = accounts.filter((account) => account.type === type)
     return (
-      <li>
-        <ul>
+      <li className={classes.li}>
+        <ul className={classes.ul}>
           <ListSubheader>
             <Grid container>
               <Grid item xs={4} md={4}>
@@ -102,7 +129,10 @@ const AccountView: FC = () => {
                     }
                   />
                 </Grid>
-                <EditIcon onClick={() => handleModalOpen(account)} />
+                <EditIcon
+                  className={classes.icon}
+                  onClick={() => handleModalOpen(account)}
+                />
               </Grid>
             </ListItem>
           ))}
@@ -123,7 +153,8 @@ const AccountView: FC = () => {
           handleModalClose={handleModalClose}
         />
       </Modal>
-      <List subheader={<li />}>
+      <List className={classes.listSection} subheader={<li />}>
+        {/* TODO: Make interative */}
         {renderAccountsPerType(EAccountType.Checking)}
         {renderAccountsPerType(EAccountType.Savings)}
         {renderAccountsPerType(EAccountType.Investment)}
