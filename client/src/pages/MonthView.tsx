@@ -115,7 +115,7 @@ const MonthView: FC = () => {
                 {inputType === EInputType.Income ? 'Income' : 'Expense'}
               </Grid>
               <Grid item xs={4} md={4}>
-                Month
+                Amount
               </Grid>
               <Grid item xs={2} md={2}>
                 Paid
