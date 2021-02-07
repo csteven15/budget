@@ -5,13 +5,16 @@ import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { AuthProvider } from './context/AuthContext'
 import { EntryProvider } from './context/EntryContext'
+import { AccountProvider } from './context/AccountContext'
 
 ReactDOM.render(
   <React.StrictMode>
     <AuthProvider>
-      <EntryProvider>
-        <App />
-      </EntryProvider>
+      <AccountProvider>
+        <EntryProvider>
+          <App />
+        </EntryProvider>
+      </AccountProvider>
     </AuthProvider>
   </React.StrictMode>,
   document.getElementById('root')

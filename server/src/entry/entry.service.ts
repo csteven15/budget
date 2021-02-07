@@ -65,8 +65,16 @@ export class EntryService {
     const entryType = inputType === 0 ? 'income' : 'expense';
     this.logger.log(`making ${entries} ${entryType} entries for uid ${uid}`);
     const today = new Date();
-    const past = new Date(today.getFullYear() - 2, today.getMonth(), today.getDate());
-    const future = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate());
+    const past = new Date(
+      today.getFullYear() - 2,
+      today.getMonth(),
+      today.getDate(),
+    );
+    const future = new Date(
+      today.getFullYear() + 2,
+      today.getMonth(),
+      today.getDate(),
+    );
     const numEntries = entries;
     const randomEntries = Array<IEntry>(numEntries);
     for (let i = 0; i < numEntries; i++) {
@@ -81,10 +89,11 @@ export class EntryService {
       const randomEntry: IEntry = {
         uid: uid,
         inputType: inputType,
-        name: inputType === 0 ? faker.name.jobTitle() : faker.commerce.productName(),
-        year: faker.date
-          .between(past, future)
-          .getFullYear(),
+        name:
+          inputType === 0
+            ? faker.name.jobTitle()
+            : faker.commerce.productName(),
+        year: faker.date.between(past, future).getFullYear(),
         monthlyAmount: monthlyAmount,
         maxAmount: Number.parseFloat(maxAmount.toFixed(2)),
       };

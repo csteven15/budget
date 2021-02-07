@@ -5,6 +5,7 @@ import SignIn from '../forms/SignIn'
 import YearView from '../../pages/YearView'
 import TotalView from '../../pages/TotalView'
 import MonthView from '../../pages/MonthView'
+import AccountView from '../../pages/AccountView'
 
 const routes = [
   {
@@ -14,6 +15,10 @@ const routes = [
   {
     path: '/dashboard',
     component: <Dashboard />,
+  },
+  {
+    path: '/accountview',
+    component: <AccountView />,
   },
   {
     path: '/monthview',

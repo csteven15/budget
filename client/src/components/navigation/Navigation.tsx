@@ -23,6 +23,10 @@ const protectedRoutes = [
     name: 'Dashboard',
   },
   {
+    path: '/accountview',
+    name: 'Account View',
+  },
+  {
     path: '/monthview',
     name: 'Month View',
   },

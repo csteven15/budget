@@ -8,6 +8,7 @@ import {
   MenuItem,
   Paper,
   TextField,
+  Typography,
 } from '@material-ui/core'
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
@@ -89,6 +90,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
   }
 
   const onSubmit = async (formData: IEntry) => {
+    console.log(formData)
     let transformedMonthlyAmount: number[] = new Array<number>(12)
     if (formData.isFixed) {
       transformedMonthlyAmount.fill(formData!.amount!)
@@ -145,6 +147,8 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
         padding: '1em',
       }}
     >
+      <Typography align="center">Add an Budget Entry</Typography>
+      <br />
       <SimpleSnackbar isOpen={formSubmitted} message={'Form Submitted'} />
       <SimpleSnackbar isOpen={formError} message={'Error'} />
       <form autoComplete="off">
