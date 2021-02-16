@@ -10,11 +10,12 @@ import {
   Grid,
   List,
   ListSubheader,
+  ListItem,
   Checkbox,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  AccordionActions,
+  Container,
 } from '@material-ui/core'
 import EditIcon from '@material-ui/icons/Edit'
 import { useEntry } from '../context/EntryContext'
@@ -56,15 +57,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     icon: {
       cursor: 'pointer',
-    },
-    editableCell: {
-      width: '10vh',
-    },
-    accordion: {
-      display: 'flex',
-      width: '100%',
-      justifyContent: 'center',
-      alignItems: 'center',
     },
   })
 )
@@ -117,6 +109,17 @@ const YearView: FC = () => {
     return total
   }
 
+  const balanceList = Array<number>(12)
+
+  const getBalanceUpToMonth = (monthIndex: number) => {
+    let total = 0
+    for (let i = 0; i < monthIndex; i++) {
+      total += balanceList[i]
+    }
+    console.log(total)
+    return total
+  }
+
   const getMonthData = (monthIndex: number) => {
     const data: MonthData = defaultMonthData
     // sort by InputType
@@ -142,50 +145,59 @@ const YearView: FC = () => {
     )
 
     data.balance = data.incomeTotal - data.expenseTotal
-    data.endOfMonthTotal = getTotalAppliedToBudget() + data.balance
+    data.endOfMonthTotal =
+      getTotalAppliedToBudget() + getBalanceUpToMonth(monthIndex)
     data.monthIndex = monthIndex
     return data
   }
 
-  const renderListOfEntriesPerType = (
+  const renderMonthListPerType = (
     inputType: EInputType,
     entriesToRender: IEntry[],
     monthIndex: number
   ) => {
     return (
-      <Grid container className={classes.accordion}>
-        <Grid item xs={4} md={4}>
-          {inputType === EInputType.Income ? 'Income' : 'Expense'}
-        </Grid>
-        <Grid item xs={4} md={4}>
-          Amount
-        </Grid>
-        <Grid item xs={2} md={2}>
-          Paid
-        </Grid>
-        <Grid item xs={2} md={2}>
-          Edit
-        </Grid>
-        {entriesToRender.map((entry, i) => (
-          <Grid key={i} container>
-            <Grid item xs={4} md={4}>
-              {entry.name}
+      <List className={classes.listSection} subheader={<li />}>
+        <li>
+          <ListSubheader>
+            <Grid container>
+              <Grid item xs={4} md={4}>
+                {inputType === EInputType.Income ? 'Income' : 'Expense'}
+              </Grid>
+              <Grid item xs={4} md={4}>
+                Amount
+              </Grid>
+              <Grid item xs={2} md={2}>
+                Paid
+              </Grid>
+              <Grid item xs={2} md={2}>
+                Edit
+              </Grid>
             </Grid>
-            <Grid item xs={4} md={4}>
-              {entry.monthlyAmount[monthIndex]}
-            </Grid>
-            <Grid item xs={2} md={2}>
-              <Checkbox />
-            </Grid>
-            <Grid item xs={2} md={2}>
-              <EditIcon
-                className={classes.icon}
-                onClick={() => handleModalOpen(entry)}
-              />
-            </Grid>
-          </Grid>
-        ))}
-      </Grid>
+          </ListSubheader>
+          {entriesToRender.map((entry, i) => (
+            <ListItem key={i}>
+              <Grid container>
+                <Grid item xs={4} md={4}>
+                  {entry.name}
+                </Grid>
+                <Grid item xs={4} md={4}>
+                  {entry.monthlyAmount[monthIndex]}
+                </Grid>
+                <Grid item xs={2} md={2}>
+                  <Checkbox />
+                </Grid>
+                <Grid item xs={2} md={2}>
+                  <EditIcon
+                    className={classes.icon}
+                    onClick={() => handleModalOpen(entry)}
+                  />
+                </Grid>
+              </Grid>
+            </ListItem>
+          ))}
+        </li>
+      </List>
     )
   }
 
@@ -212,29 +224,40 @@ const YearView: FC = () => {
             </Grid>
           </Grid>
         </AccordionSummary>
-        <AccordionDetails className={classes.accordion}>
-          <div className={classes.listSection}>
-            {renderListOfEntriesPerType(
+        <AccordionDetails>
+          <Container>
+            {renderMonthListPerType(
               EInputType.Income,
               data.incomeList,
               data.monthIndex
             )}
-            {renderListOfEntriesPerType(
+            {renderMonthListPerType(
               EInputType.Expense,
               data.expenseList,
               data.monthIndex
             )}
-          </div>
+          </Container>
         </AccordionDetails>
-        <AccordionActions></AccordionActions>
       </Accordion>
     )
   }
 
+  const monthDataList = MonthArray.map((month, i) => {
+    const data = getMonthData(i)
+    balanceList[i] = data.balance
+    return data
+  })
+
   const renderMonthData = () => {
+    return MonthArray.map((month, i) => {
+      return renderRow(month, monthDataList[i])
+    })
+  }
+
+  const renderYearViewData = () => {
     return (
-      <li className={classes.li}>
-        <ul className={classes.ul}>
+      <List className={classes.listSection} subheader={<li />}>
+        <li>
           <ListSubheader>
             <Grid container>
               <Grid item xs={4} md={4}>
@@ -254,11 +277,9 @@ const YearView: FC = () => {
               </Grid>
             </Grid>
           </ListSubheader>
-          {MonthArray.map((month, i) => {
-            return renderRow(month, getMonthData(i))
-          })}
-        </ul>
-      </li>
+          {renderMonthData()}
+        </li>
+      </List>
     )
   }
 
@@ -269,9 +290,7 @@ const YearView: FC = () => {
         <Typography align="center">{date.getFullYear()}</Typography>
         <Button color="primary">Next Year</Button>
       </div>
-      <List className={classes.listSection} subheader={<li />}>
-        {renderMonthData()}
-      </List>
+      {renderYearViewData()}
       {/* // change state of modal from entry form */}
       <Modal open={modalState.isOpen} onClose={handleModalClose}>
         <EntryForm
