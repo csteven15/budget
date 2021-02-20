@@ -96,8 +96,8 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
   let isFixed = false
 
   if (isEditing) {
-    isFixed = entry!.monthlyAmount.every(
-      (amount) => amount === entry?.monthlyAmount[0]
+    isFixed = entry!.monthlyAmount!.every(
+      (amount) => amount === entry?.monthlyAmount![0]
     )!
     if (!isFixed) {
       watchIsFixed = false
@@ -230,7 +230,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
               <TextField
                 label="Amount"
                 name="amount"
-                defaultValue={isEditing && entry?.monthlyAmount[0]}
+                defaultValue={isEditing && entry?.monthlyAmount![0]}
                 inputRef={register}
                 error={!!errors?.amount?.message}
                 helperText={errors?.amount?.message}
@@ -247,7 +247,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
                     inputRef={register}
                     defaultValue={
                       isEditing
-                        ? entry!.monthlyAmount[i]
+                        ? entry!.monthlyAmount![i]
                         : getValues('maxAmount')
                     }
                     // @ts-ignore

@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useReducer, useState } from 'react'
 import {
-  Paper,
   Button,
   Grid,
   Typography,
@@ -17,28 +16,45 @@ import EditIcon from '@material-ui/icons/Edit'
 import { EInputType, MonthArray } from '../common/enums'
 import { useEntry } from '../context/EntryContext'
 import {
-  IMonthViewState,
-  monthViewReducer,
-  nextMonthAction,
+  calculatedDataStoreReducer,
+  ICalcualtedMonth,
+  ICalculatedMonthState,
   prevMonthAction,
+  nextMonthAction,
   setYearAction,
   updateEntriesAction,
-} from '../store/MonthViewStore'
-import { IEntry } from '../common/types'
+} from '../store/CalculatedMonthDataStore'
+import { IAccount, IEntry } from '../common/types'
 import EntryForm from '../components/forms/Entry'
+import { useAccount } from '../context/AccountContext'
 
 const date = new Date()
 
-const INITIAL_STATE: IMonthViewState = {
-  monthIndex: date.getMonth(),
+const INITIAL_CALCULATED_MONTH: ICalcualtedMonth[] = MonthArray.map(
+  (month, i) => ({
+    monthIndex: i,
+    year: date.getFullYear(),
+    monthlyIncome: [],
+    monthlyExpense: [],
+    incomeTotal: 0,
+    expenseTotal: 0,
+    endOfMonthTotal: 0,
+    balance: 0,
+  })
+)
+
+const INITIAL_STATE: ICalculatedMonthState = {
+  calculatedMonthData: INITIAL_CALCULATED_MONTH,
+  totalAccountAppliedToBudget: 0,
+  month: date.getMonth(),
   year: date.getFullYear(),
-  entries: [],
-  monthlyIncome: [],
-  monthlyExpense: [],
 }
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    root: {
+      flex: '0 0 100%',
+    },
     header: {
       display: 'flex',
       justifyContent: 'space-between',
@@ -52,11 +68,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     ul: {
       backgroundColor: 'inherit',
-      // padding: 0,
+      padding: 0,
     },
     li: {
       backgroundColor: 'inherit',
-      // padding: 0,
     },
     icon: {
       cursor: 'pointer',
@@ -74,11 +89,27 @@ const defaultModalState: IModalState = {
   entry: undefined,
 }
 
-const MonthView: FC = () => {
-  const [state, dispatch] = useReducer(monthViewReducer, INITIAL_STATE)
+interface IProps {
+  renderHeaders: boolean
+  propEntries?: IEntry[]
+  propAccounts?: IAccount[]
+  month?: number
+}
+
+const MonthView: FC<IProps> = ({
+  renderHeaders,
+  propEntries,
+  propAccounts,
+}) => {
+  const [state, dispatch] = useReducer(
+    calculatedDataStoreReducer,
+    INITIAL_STATE
+  )
   const [modalState, openModal] = useState<IModalState>(defaultModalState)
 
-  const { entries } = useEntry()
+  const entries = renderHeaders ? useEntry().entries : propEntries
+  const accounts = renderHeaders ? useAccount().accounts : propAccounts
+
   const classes = useStyles()
 
   const handleModalOpen = (entry: IEntry) => {
@@ -91,21 +122,22 @@ const MonthView: FC = () => {
 
   // on startup
   useEffect(() => {
-    dispatch(setYearAction(date.getFullYear(), entries))
+    dispatch(setYearAction(date.getFullYear()))
   }, [])
 
   useEffect(() => {
-    dispatch(updateEntriesAction(entries))
-  }, [entries])
+    dispatch(updateEntriesAction(entries!, accounts!))
+  }, [entries, accounts, state.year])
 
   const getMonthAndYearString = () =>
-    MonthArray[state.monthIndex] + ' ' + state.year.toString()
+    MonthArray[state.month] + ' ' + state.year.toString()
 
   const renderListOfEntriesPerType = (inputType: EInputType) => {
     const entriesToRender =
       inputType === EInputType.Income
-        ? state.monthlyIncome
-        : state.monthlyExpense
+        ? state.calculatedMonthData[state.month].monthlyIncome
+        : state.calculatedMonthData[state.month].monthlyExpense
+
     return (
       <li className={classes.li}>
         <ul className={classes.ul}>
@@ -132,7 +164,7 @@ const MonthView: FC = () => {
                   {entry.name}
                 </Grid>
                 <Grid item xs={4} md={4}>
-                  {entry.monthlyAmount[state.monthIndex]}
+                  {entry.monthlyAmount[state.month]}
                 </Grid>
                 <Grid item xs={2} md={2}>
                   <Checkbox />
@@ -152,7 +184,7 @@ const MonthView: FC = () => {
   }
 
   return (
-    <Paper>
+    <div className={classes.root}>
       <Modal open={modalState.isOpen} onClose={handleModalClose}>
         <EntryForm
           entry={modalState.entry}
@@ -160,26 +192,31 @@ const MonthView: FC = () => {
           handleModalClose={handleModalClose}
         />
       </Modal>
-      <div className={classes.header}>
-        <Button
-          color="secondary"
-          onClick={() => dispatch(prevMonthAction(entries))}
-        >
-          Prev Month
-        </Button>
-        <Typography align="center">{getMonthAndYearString()}</Typography>
-        <Button
-          color="primary"
-          onClick={() => dispatch(nextMonthAction(entries))}
-        >
-          Next Month
-        </Button>
-      </div>
+      {renderHeaders ? (
+        <div className={classes.header}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => dispatch(prevMonthAction())}
+          >
+            Prev Month
+          </Button>
+          <Typography align="center">{getMonthAndYearString()}</Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => dispatch(nextMonthAction())}
+          >
+            Next Month
+          </Button>
+        </div>
+      ) : null}
+
       <List className={classes.listSection} subheader={<li />}>
         {renderListOfEntriesPerType(EInputType.Income)}
         {renderListOfEntriesPerType(EInputType.Expense)}
       </List>
-    </Paper>
+    </div>
   )
 }
 
