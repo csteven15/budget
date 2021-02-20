@@ -156,7 +156,9 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
 
   return (
     <Paper className={classes.paper}>
-      <Typography align="center">Add an Budget Entry</Typography>
+      <Typography align="center">
+        {isEditing ? 'Entry Update' : 'Add an Entry'}
+      </Typography>
       <br />
       <SimpleSnackbar isOpen={formSubmitted} message={'Form Submitted'} />
       <SimpleSnackbar isOpen={formError} message={'Error'} />
@@ -167,7 +169,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
               id="standard-basic"
               label="Name"
               name="name"
-              defaultValue={isEditing && entry?.name}
+              defaultValue={entry?.name}
               inputRef={register()}
               error={!!errors?.name?.message}
               helperText={errors?.name?.message}
@@ -179,7 +181,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
               id="standard-basic"
               label="Year"
               name="year"
-              defaultValue={isEditing && entry?.year}
+              defaultValue={entry?.year}
               inputRef={register()}
               error={!!errors?.name?.message}
               helperText={errors?.name?.message}
@@ -206,7 +208,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
             <TextField
               label="Max Amount"
               name="maxAmount"
-              defaultValue={isEditing && entry?.maxAmount}
+              defaultValue={entry?.maxAmount}
               inputRef={register}
               error={!!errors.maxAmount?.message}
               helperText={errors.maxAmount?.message}
@@ -230,7 +232,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
               <TextField
                 label="Amount"
                 name="amount"
-                defaultValue={isEditing && entry?.monthlyAmount![0]}
+                defaultValue={entry?.monthlyAmount![0]}
                 inputRef={register}
                 error={!!errors?.amount?.message}
                 helperText={errors?.amount?.message}
