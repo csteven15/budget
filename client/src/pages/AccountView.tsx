@@ -102,7 +102,7 @@ const AccountView: FC = () => {
                 Total
               </Grid>
               <Grid item xs={2} md={2}>
-                Applied to Budget
+                Applied
               </Grid>
               <Grid item xs={2} md={2}>
                 Edit
@@ -146,6 +146,7 @@ const AccountView: FC = () => {
       <Typography align="center">
         {'Total Applied to Budget: ' + getTotalAppliedToBudget()}
       </Typography>
+      <br />
       <Modal open={modalState.isOpen} onClose={handleModalClose}>
         <AccountForm
           account={modalState.account}

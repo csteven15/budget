@@ -22,7 +22,7 @@ const routes = [
   },
   {
     path: '/monthview',
-    component: <MonthView />,
+    component: <MonthView renderHeaders={true} />,
   },
   {
     path: '/yearview',

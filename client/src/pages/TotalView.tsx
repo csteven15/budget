@@ -26,7 +26,7 @@ const TotalView: FC = () => {
   const getTotalFromInputType = (entriesForYear: IEntry[]) => {
     let total = 0
     entriesForYear.forEach((entry) => {
-      total += entry.monthlyAmount.reduce(
+      total += entry.monthlyAmount!.reduce(
         (accumulator: number, monthlyAmount: number) =>
           accumulator + monthlyAmount,
         0

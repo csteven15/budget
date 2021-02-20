@@ -1,141 +1,188 @@
-import React, { FC, ReactNode, useState } from 'react'
+import React, { FC, useEffect, useReducer, useState } from 'react'
 import {
-  Table,
-  TableHead,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Paper,
-  Modal,
+  Typography,
+  createStyles,
+  makeStyles,
+  Button,
+  Theme,
+  Grid,
+  List,
+  ListSubheader,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@material-ui/core'
 import { useEntry } from '../context/EntryContext'
-import { EInputType, MonthArray } from '../common/enums'
-import { IEntry } from '../common/types'
-import EntryForm from '../components/forms/Entry'
+import { MonthArray } from '../common/enums'
+import { useAccount } from '../context/AccountContext'
+import MonthView from './MonthView'
+import {
+  calculatedDataStoreReducer,
+  ICalcualtedMonth,
+  ICalculatedMonthState,
+  setYearAction,
+  updateEntriesAction,
+} from '../store/CalculatedMonthDataStore'
 
-interface IModalState {
-  isOpen: boolean
-  entry: IEntry | undefined
+const date = new Date()
+
+const INITIAL_CALCULATED_MONTH: ICalcualtedMonth[] = MonthArray.map((_, i) => ({
+  monthIndex: i,
+  year: date.getFullYear(),
+  monthlyIncome: [],
+  monthlyExpense: [],
+  incomeTotal: 0,
+  expenseTotal: 0,
+  endOfMonthTotal: 0,
+  balance: 0,
+}))
+
+const INITIAL_STATE: ICalculatedMonthState = {
+  calculatedMonthData: INITIAL_CALCULATED_MONTH,
+  totalAccountAppliedToBudget: 0,
+  month: date.getMonth(),
+  year: date.getFullYear(),
 }
 
-const defaultModalState: IModalState = {
-  isOpen: false,
-  entry: undefined,
-}
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    header: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      maxHeight: '10vh',
+    },
+    monthViewContainer: {
+      flex: '0 0 100%',
+    },
+    listSection: {
+      position: 'relative',
+      overflow: 'auto',
+      backgroundColor: theme.palette.background.paper,
+    },
+    ul: {
+      backgroundColor: 'inherit',
+      padding: 0,
+    },
+    li: {
+      backgroundColor: 'inherit',
+    },
+    icon: {
+      cursor: 'pointer',
+    },
+  })
+)
 
 const YearView: FC = () => {
-  const { entries } = useEntry()
-
-  const [modalState, openModal] = useState<IModalState>(defaultModalState)
-  const date = new Date()
-
-  // sort by InputType
-  const sortedByInputTypeArray = entries.sort(
-    (a, b) => a.inputType - b.inputType
+  const [state, dispatch] = useReducer(
+    calculatedDataStoreReducer,
+    INITIAL_STATE
   )
-  const sortedByIncomeName = sortedByInputTypeArray
-    .filter((entry) => entry.inputType === EInputType.Income)
-    .sort((a, b) => a.name.localeCompare(b.name))
-  const sortedByExpenseName = sortedByInputTypeArray
-    .filter((entry) => entry.inputType === EInputType.Expense)
-    .sort((a, b) => a.name.localeCompare(b.name))
-  const sortedEntries = [...sortedByIncomeName, ...sortedByExpenseName]
 
-  const incomeCount: number = sortedByIncomeName.length
+  const { entries } = useEntry()
+  const { accounts } = useAccount()
+  const classes = useStyles()
 
-  const handleModalOpen = (entry: IEntry) => {
-    openModal({ isOpen: true, entry: entry })
+  // on startup
+  useEffect(() => {
+    dispatch(setYearAction(date.getFullYear()))
+  }, [])
+
+  useEffect(() => {
+    dispatch(updateEntriesAction(entries!, accounts!))
+  }, [entries, accounts, state.year])
+
+  const renderRow = (month: string, i: number) => {
+    const [openMonthList, setOpenMonthList] = useState(false)
+    return (
+      <Accordion TransitionProps={{ unmountOnExit: true }}>
+        <AccordionSummary>
+          <Grid container onClick={() => setOpenMonthList(!openMonthList)}>
+            <Grid item xs={4} md={4}>
+              {month}
+            </Grid>
+            <Grid item xs={2} md={2}>
+              {}
+              {state.calculatedMonthData[i].incomeTotal}
+            </Grid>
+            <Grid item xs={2} md={2}>
+              {state.calculatedMonthData[i].expenseTotal}
+            </Grid>
+            <Grid item xs={2} md={2}>
+              {state.calculatedMonthData[i].balance}
+            </Grid>
+            <Grid item xs={2} md={2}>
+              {state.calculatedMonthData[i].endOfMonthTotal}
+            </Grid>
+          </Grid>
+        </AccordionSummary>
+        <AccordionDetails>
+          <div className={classes.monthViewContainer}>
+            <MonthView
+              renderHeaders={false}
+              propEntries={entries}
+              propAccounts={accounts}
+            />
+          </div>
+        </AccordionDetails>
+      </Accordion>
+    )
   }
 
-  const handleModalClose = () => {
-    openModal({ isOpen: false, entry: undefined })
-  }
+  const renderMonthData = () =>
+    MonthArray.map((month, i) => renderRow(month, i))
 
-  const renderTableEntry = () => {
-    const tableBody: ReactNode[] = []
-    sortedEntries.forEach((entry: IEntry, i: number) => {
-      const tableRow = []
-      if (i === 0 || i === incomeCount) {
-        tableRow.push(
-          <TableCell key={i + entry.name}>{`${
-            EInputType[entry.inputType]
-          }`}</TableCell>
-        )
-      } else {
-        tableRow.push(<TableCell key={i + entry.name}></TableCell>)
-      }
-      tableRow.push(<TableCell>{entry.name}</TableCell>)
-      const monthlyAmount = entry.monthlyAmount.map((monthlyAmount, i) => (
-        <TableCell key={i}>{monthlyAmount}</TableCell>
-      ))
-      tableRow.push(monthlyAmount)
-      const totalAmount = entry.monthlyAmount.reduce(
-        (total: number, currentValue: number) => total + currentValue,
-        0.0
-      )
-      tableRow.push(<TableCell>{totalAmount}</TableCell>)
-      tableBody.push(
-        <TableRow onClick={() => handleModalOpen(entry)}>{tableRow}</TableRow>
-      )
-    })
-    return tableBody
-  }
-
-  const renderTableBalance = () => {
-    const monthlyTotal: number[] = []
-    for (let i = 0; i < MonthArray.length; i++) {
-      const totalIncome = sortedByIncomeName.reduce(
-        (accumulator, { monthlyAmount }) => accumulator + monthlyAmount[i],
-        0
-      )
-      const totalExpense = sortedByExpenseName.reduce(
-        (accumulator, { monthlyAmount }) => accumulator + monthlyAmount[i],
-        0
-      )
-      monthlyTotal.push(totalIncome - totalExpense)
-    }
-    const tableRow = []
-    tableRow.push(<TableCell>Balance</TableCell>)
-    tableRow.push(<TableCell></TableCell>)
-    const monthlyAmountCells = monthlyTotal.map((monthlyAmount, i) => (
-      <TableCell key={i}> {monthlyAmount}</TableCell>
-    ))
-    tableRow.push(monthlyAmountCells)
-    tableRow.push(<TableCell></TableCell>)
-    return <TableRow>{tableRow}</TableRow>
+  const renderYearViewData = () => {
+    return (
+      <List className={classes.listSection} subheader={<ul />}>
+        <li className={classes.li}>
+          <ul className={classes.ul}>
+            <ListSubheader>
+              <Grid container>
+                <Grid item xs={4} md={4}>
+                  Month
+                </Grid>
+                <Grid item xs={2} md={2}>
+                  Income
+                </Grid>
+                <Grid item xs={2} md={2}>
+                  Expenses
+                </Grid>
+                <Grid item xs={2} md={2}>
+                  Balance
+                </Grid>
+                <Grid item xs={2} md={2}>
+                  Total In Bank
+                </Grid>
+              </Grid>
+            </ListSubheader>
+            {renderMonthData()}
+          </ul>
+        </li>
+      </List>
+    )
   }
 
   return (
-    <Paper>
-      <div>{date.toDateString()}</div>
-      <TableContainer>
-        <Table size="small" aria-label="a dense table">
-          <TableHead>
-            <TableRow>
-              <TableCell></TableCell>
-              <TableCell>Name</TableCell>
-              {MonthArray.map((month) => (
-                <TableCell key={month}>{month}</TableCell>
-              ))}
-              <TableCell>Total</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {renderTableEntry()}
-            {renderTableBalance()}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {/* // change state of modal from entry form */}
-      <Modal open={modalState.isOpen} onClose={handleModalClose}>
-        <EntryForm
-          entry={modalState.entry}
-          isEditing={modalState.isOpen}
-          handleModalClose={handleModalClose}
-        />
-      </Modal>
-    </Paper>
+    <>
+      <div className={classes.header}>
+        <Button
+          color="secondary"
+          variant="contained"
+          onClick={() => dispatch(setYearAction(state.year - 1))}
+        >
+          Prev Year
+        </Button>
+        <Typography align="center">{state.year}</Typography>
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={() => dispatch(setYearAction(state.year + 1))}
+        >
+          Next Year
+        </Button>
+      </div>
+      {renderYearViewData()}
+    </>
   )
 }
 
