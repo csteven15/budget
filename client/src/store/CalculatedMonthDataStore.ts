@@ -160,14 +160,6 @@ export const calculatedDataStoreReducer = (
     }
     // Dispatch needs to be called if entries need to be updated
     case ECalculatedDataStoreAction.UPDATE_ENTRIES: {
-      const getBalanceUpToMonth = (monthIndex: number) => {
-        let total = 0
-        for (let i = 0; i < monthIndex; i++) {
-          total += state.calculatedMonthData[i].balance
-        }
-        return total
-      }
-
       const entries = action.payload.entries
       const accounts = action.payload.accounts
 
@@ -189,13 +181,13 @@ export const calculatedDataStoreReducer = (
         state.calculatedMonthData[i].monthlyIncome = monthlyIncome
         state.calculatedMonthData[i].monthlyExpense = monthlyExpense
         const incomeAmountList = monthlyIncome.map(
-          (month) => month.monthlyAmount!
+          (entry) => entry.monthlyAmount[i]!
         )
         state.calculatedMonthData[i].incomeTotal = sumUp(
           incomeAmountList.flat()
         )
         const expenseAmountList = monthlyExpense.map(
-          (month) => month.monthlyAmount!
+          (entry) => entry.monthlyAmount[i]!
         )
         state.calculatedMonthData[i].expenseTotal = sumUp(
           expenseAmountList.flat()
@@ -203,8 +195,16 @@ export const calculatedDataStoreReducer = (
         state.calculatedMonthData[i].balance =
           state.calculatedMonthData[i].incomeTotal -
           state.calculatedMonthData[i].expenseTotal
+
+        let totalAccountBalanceToApply = 0
+        if (i === 0) {
+          totalAccountBalanceToApply = state.totalAccountAppliedToBudget
+        } else {
+          totalAccountBalanceToApply =
+            state.calculatedMonthData[i - 1].endOfMonthTotal
+        }
         state.calculatedMonthData[i].endOfMonthTotal =
-          state.calculatedMonthData[i].balance + getBalanceUpToMonth(i + 1)
+          totalAccountBalanceToApply + state.calculatedMonthData[i].balance
       })
 
       return {
