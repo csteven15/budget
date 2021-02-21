@@ -11,7 +11,9 @@ import {
   makeStyles,
   Theme,
   Modal,
+  Fab,
 } from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add'
 import EditIcon from '@material-ui/icons/Edit'
 import { useAccount } from '../context/AccountContext'
 import { EAccountType } from '../common/enums'
@@ -20,11 +22,13 @@ import AccountForm from '../components/forms/Account'
 
 interface IModalState {
   isOpen: boolean
-  account: IAccount | undefined
+  isEditing: boolean
+  account?: IAccount
 }
 
 const defaultModalState: IModalState = {
   isOpen: false,
+  isEditing: false,
   account: undefined,
 }
 
@@ -32,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     header: {
       display: 'flex',
-      justifyContent: 'space-between',
+      justifyContent: 'space-evenly',
       maxHeight: '10vh',
     },
     listSection: {
@@ -52,6 +56,15 @@ const useStyles = makeStyles((theme: Theme) =>
     icon: {
       cursor: 'pointer',
     },
+    modal: {
+      position: 'absolute',
+      padding: theme.spacing(2, 4, 3),
+    },
+    add: {
+      position: 'absolute',
+      bottom: theme.spacing(2),
+      right: theme.spacing(2),
+    },
   })
 )
 
@@ -60,12 +73,13 @@ const AccountView: FC = () => {
   const [modalState, openModal] = useState<IModalState>(defaultModalState)
   const classes = useStyles()
 
-  const handleModalOpen = (account: IAccount) => {
-    openModal({ isOpen: true, account: account })
+  const handleModalOpen = (account?: IAccount) => {
+    const isEditing = account === undefined ? false : true
+    openModal({ isOpen: true, isEditing: isEditing, account: account })
   }
 
   const handleModalClose = () => {
-    openModal({ isOpen: false, account: undefined })
+    openModal({ isOpen: false, isEditing: false, account: undefined })
   }
 
   const getTotalAppliedToBudget = () => {
@@ -143,14 +157,18 @@ const AccountView: FC = () => {
 
   return (
     <Paper>
-      <Typography align="center">
+      <Typography className={classes.header}>
         {'Total Applied to Budget: ' + getTotalAppliedToBudget()}
       </Typography>
       <br />
-      <Modal open={modalState.isOpen} onClose={handleModalClose}>
+      <Modal
+        className={classes.modal}
+        open={modalState.isOpen}
+        onClose={handleModalClose}
+      >
         <AccountForm
           account={modalState.account}
-          isEditing={modalState.isOpen}
+          isEditing={modalState.isEditing}
           handleModalClose={handleModalClose}
         />
       </Modal>
@@ -161,6 +179,11 @@ const AccountView: FC = () => {
         {renderAccountsPerType(EAccountType.Investment)}
         {renderAccountsPerType(EAccountType.Retirement)}
       </List>
+      <div className={classes.add}>
+        <Fab color="primary" aria-label="add">
+          <AddIcon onClick={() => handleModalOpen()} />
+        </Fab>
+      </div>
     </Paper>
   )
 }
