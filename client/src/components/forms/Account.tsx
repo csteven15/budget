@@ -108,7 +108,9 @@ const AccountForm: FC<IProps> = ({ account, isEditing, handleModalClose }) => {
 
   return (
     <Paper className={classes.paper}>
-      <Typography align="center">Add an Account</Typography>
+      <Typography align="center">
+        {isEditing ? 'Account Update' : 'Add an Account'}
+      </Typography>
       <br />
       <SimpleSnackbar isOpen={formSubmitted} message={'Form Submitted'} />
       <SimpleSnackbar isOpen={formError} message={'Error'} />
@@ -119,7 +121,7 @@ const AccountForm: FC<IProps> = ({ account, isEditing, handleModalClose }) => {
               id="standard-basic"
               label="Account Name"
               name="name"
-              defaultValue={isEditing && account?.name}
+              defaultValue={account?.name}
               inputRef={register()}
               error={!!errors?.name?.message}
               helperText={errors?.name?.message}
@@ -146,7 +148,7 @@ const AccountForm: FC<IProps> = ({ account, isEditing, handleModalClose }) => {
             <TextField
               label="Total in Account"
               name="total"
-              defaultValue={isEditing && account?.total}
+              defaultValue={account?.total}
               inputRef={register()}
               error={!!errors.total?.message}
               helperText={errors.total?.message}

@@ -11,7 +11,9 @@ import {
   makeStyles,
   Theme,
   Modal,
+  Fab,
 } from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add'
 import EditIcon from '@material-ui/icons/Edit'
 import { EInputType, MonthArray } from '../common/enums'
 import { useEntry } from '../context/EntryContext'
@@ -59,7 +61,6 @@ const useStyles = makeStyles((theme: Theme) =>
     header: {
       display: 'flex',
       justifyContent: 'space-between',
-      maxHeight: '10vh',
     },
     listSection: {
       position: 'relative',
@@ -77,16 +78,28 @@ const useStyles = makeStyles((theme: Theme) =>
     icon: {
       cursor: 'pointer',
     },
+    modal: {
+      position: 'absolute',
+      padding: theme.spacing(2, 4, 3),
+    },
+    add: {
+      position: 'absolute',
+      bottom: theme.spacing(2),
+      right: theme.spacing(2),
+      zIndex: 2,
+    },
   })
 )
 
 interface IModalState {
   isOpen: boolean
-  entry: IEntry | undefined
+  isEditing: boolean
+  entry?: IEntry
 }
 
 const defaultModalState: IModalState = {
   isOpen: false,
+  isEditing: false,
   entry: undefined,
 }
 
@@ -114,12 +127,13 @@ const MonthView: FC<IProps> = ({
 
   const classes = useStyles()
 
-  const handleModalOpen = (entry: IEntry) => {
-    openModal({ isOpen: true, entry: entry })
+  const handleModalOpen = (entry?: IEntry) => {
+    const isEditing = entry === undefined ? false : true
+    openModal({ isOpen: true, isEditing: isEditing, entry: entry })
   }
 
   const handleModalClose = () => {
-    openModal({ isOpen: false, entry: undefined })
+    openModal({ isOpen: false, isEditing: false, entry: undefined })
   }
 
   // on startup
@@ -190,10 +204,14 @@ const MonthView: FC<IProps> = ({
 
   return (
     <div className={classes.root}>
-      <Modal open={modalState.isOpen} onClose={handleModalClose}>
+      <Modal
+        className={classes.modal}
+        open={modalState.isOpen}
+        onClose={handleModalClose}
+      >
         <EntryForm
           entry={modalState.entry}
-          isEditing={modalState.isOpen}
+          isEditing={modalState.isEditing}
           handleModalClose={handleModalClose}
         />
       </Modal>
@@ -221,6 +239,11 @@ const MonthView: FC<IProps> = ({
         {renderListOfEntriesPerType(EInputType.Income)}
         {renderListOfEntriesPerType(EInputType.Expense)}
       </List>
+      <div className={classes.add}>
+        <Fab color="primary" aria-label="add">
+          <AddIcon onClick={() => handleModalOpen()} />
+        </Fab>
+      </div>
     </div>
   )
 }
