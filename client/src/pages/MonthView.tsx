@@ -25,6 +25,7 @@ import {
   nextMonthAction,
   setYearAction,
   updateEntriesAction,
+  setMonthAction,
 } from '../store/CalculatedMonthDataStore'
 import { IAccount, IEntry } from '../common/types'
 import EntryForm from '../components/forms/Entry'
@@ -113,6 +114,7 @@ const MonthView: FC<IProps> = ({
   renderHeaders,
   propEntries,
   propAccounts,
+  month,
 }) => {
   const [state, dispatch] = useReducer(
     calculatedDataStoreReducer,
@@ -137,6 +139,9 @@ const MonthView: FC<IProps> = ({
   // on startup
   useEffect(() => {
     dispatch(setYearAction(date.getFullYear()))
+    if (month !== undefined) {
+      dispatch(setMonthAction(month))
+    }
   }, [])
 
   useEffect(() => {

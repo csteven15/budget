@@ -94,7 +94,7 @@ const YearView: FC = () => {
   const renderRow = (month: string, i: number) => {
     const [openMonthList, setOpenMonthList] = useState(false)
     return (
-      <Accordion TransitionProps={{ unmountOnExit: true }}>
+      <Accordion key={i} TransitionProps={{ unmountOnExit: true }}>
         <AccordionSummary>
           <Grid container onClick={() => setOpenMonthList(!openMonthList)}>
             <Grid item xs={4} md={4}>
@@ -121,6 +121,7 @@ const YearView: FC = () => {
               renderHeaders={false}
               propEntries={entries}
               propAccounts={accounts}
+              month={i}
             />
           </div>
         </AccordionDetails>
