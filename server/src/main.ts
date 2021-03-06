@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 import { EntryModule } from './entry/entry.module';
+import { AccountModule } from './account/account.module';
 import { isDevelopment } from './util/environment';
 
 async function bootstrap() {
@@ -16,7 +17,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, options, {
-    include: [EntryModule],
+    include: [EntryModule, AccountModule],
   });
   SwaggerModule.setup('api', app, document);
 
