@@ -6,7 +6,7 @@ export type AccountDocument = Account & Document;
 @Schema()
 export class Account {
   @Prop({ required: true })
-  uid: string;
+  userId: string;
 
   @Prop({ required: true })
   name: string;

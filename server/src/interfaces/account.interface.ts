@@ -1,5 +1,5 @@
 export interface IAccount {
-  uid: string;
+  userId: string;
   name: string;
   type: number;
   total: number;

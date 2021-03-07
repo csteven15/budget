@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { EntryModule } from './entry/entry.module';
 import { AccountModule } from './account/account.module';
 import { isDevelopment } from './util/environment';
+import { AmountModule } from './amount/amount.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,7 +18,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, options, {
-    include: [EntryModule, AccountModule],
+    include: [EntryModule, AmountModule, AccountModule],
   });
   SwaggerModule.setup('api', app, document);
 

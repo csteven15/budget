@@ -10,13 +10,14 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import {
+  ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateAccountDto, UpdateAccountDto } from './dtos';
+import { CreateAccountInputs, UpdateAccountInputs } from './account.inputs';
 import { AccountService } from './account.service';
 
 @Controller('account')
@@ -46,9 +47,10 @@ export class AccountController {
   @ApiTags('Account')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create an account' })
+  @ApiBody({ type: CreateAccountInputs })
   @ApiCreatedResponse({})
-  async createUser(@Body() createAccountDto: CreateAccountDto) {
-    return await this.AccountService.createAccount(createAccountDto);
+  async createUser(@Body() createAccountInputs: CreateAccountInputs) {
+    return await this.AccountService.createAccount(createAccountInputs);
   }
 
   @Put(':id')
@@ -56,12 +58,13 @@ export class AccountController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update an account by id ( all params )' })
   @ApiParam({ name: 'id', description: 'id of Account' })
+  @ApiBody({ type: UpdateAccountInputs })
   @ApiOkResponse({})
   async updateAccount(
     @Param('id') id: string,
-    @Body() updateAccountDto: UpdateAccountDto,
+    @Body() updateAccountInputs: UpdateAccountInputs,
   ) {
-    return await this.AccountService.updateAccount(id, updateAccountDto);
+    return await this.AccountService.updateAccount(id, updateAccountInputs);
   }
 
   @Delete(':id')
