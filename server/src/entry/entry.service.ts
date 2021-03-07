@@ -1,12 +1,12 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import {
-  CreateEntryInputs,
-  GetEntryInputs,
-  UpdateEntryInputs,
-} from './entry.inputs';
+  CreateEntryInput,
+  GetEntryInput,
+  UpdateEntryInput,
+} from './entry.input';
 import { Entry, EntryDocument } from './entry.schema';
 
 @Injectable()
@@ -17,46 +17,48 @@ export class EntryService {
     @InjectModel(Entry.name) private entryModel: Model<EntryDocument>,
   ) {}
 
-  async createEntry(createEntryInputs: CreateEntryInputs): Promise<Entry> {
-    const entry = new this.entryModel(createEntryInputs);
+  async createEntry(createEntryInput: CreateEntryInput): Promise<Entry> {
+    const entry = new this.entryModel(createEntryInput);
     entry.createdAt = new Date();
     this.logger.log(`created entry ${entry._id}`);
     return entry.save();
   }
 
-  async getAllEntries(): Promise<Entry[]> {
-    this.logger.log(`getting all entires`);
+  async getEntryById(_id: Types.ObjectId): Promise<Entry> {
+    this.logger.log(`getting entry with id ${_id}`);
     return this.entryModel
-      .find()
+      .findById(_id)
       .populate({
         path: 'amounts',
       })
       .exec();
   }
 
-  async getAllEntriesFilter(getEntryInputs: GetEntryInputs): Promise<Entry[]> {
+  async getEntry(getEntryInput: GetEntryInput): Promise<Entry[]> {
     this.logger.log(`getting all entires`);
-    console.log(
-      'startDate',
-      getEntryInputs.startDate,
-      'endDate',
-      getEntryInputs.endDate,
-    );
+    console.log({
+      _id: getEntryInput?._id ?? null,
+      userId: getEntryInput?.userId ?? null,
+      name: getEntryInput?.name ?? null,
+      type: getEntryInput?.type ?? null
+    })
     return this.entryModel
-      .find()
+      .find({
+        ...getEntryInput,
+      })
       .populate({
         path: 'amounts',
         match: {
           date: {
-            $gte: getEntryInputs.startDate,
-            $lte: getEntryInputs.endDate,
+            $gte: getEntryInput?.startDate,
+            $lte: getEntryInput?.endDate,
           },
-        },
+        }
       })
       .exec();
   }
 
-  async getAllEntriesForUser(userId: string): Promise<Entry[]> {
+  async getAllEntriesForUser(userId: Types.ObjectId): Promise<Entry[]> {
     this.logger.log(`getting all entries for ${userId}`);
     return this.entryModel
       .find({ userId: userId }, null, {
@@ -69,8 +71,8 @@ export class EntryService {
   }
 
   async updateEntry(
-    id: string,
-    updateEntryInputs: UpdateEntryInputs,
+    id: Types.ObjectId,
+    updateEntryInputs: UpdateEntryInput,
   ): Promise<Entry> {
     this.logger.log(`updating ${id}`);
     return this.entryModel
@@ -78,7 +80,7 @@ export class EntryService {
       .exec();
   }
 
-  async deleteEntry(id: string): Promise<Entry> {
+  async deleteEntry(id: Types.ObjectId): Promise<Entry> {
     this.logger.log(`deleting ${id}`);
     return this.entryModel
       .findByIdAndDelete(id, { useFindAndModify: false })

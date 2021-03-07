@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
-export class CreateAccountInputs {
+export class CreateAccountInput {
   @ApiProperty()
   uid: string;
   @ApiProperty()
@@ -13,7 +14,9 @@ export class CreateAccountInputs {
   isApplieInputsBudget: boolean;
 }
 
-export class UpdateAccountInputs {
+export class UpdateAccountInput {
+  @ApiProperty()
+  _id: Types.ObjectId;
   @ApiProperty()
   uid: string;
   @ApiProperty()

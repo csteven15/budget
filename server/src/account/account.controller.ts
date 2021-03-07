@@ -17,7 +17,8 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateAccountInputs, UpdateAccountInputs } from './account.inputs';
+import { Types } from 'mongoose';
+import { CreateAccountInput, UpdateAccountInput } from './account.input';
 import { AccountService } from './account.service';
 
 @Controller('account')
@@ -47,10 +48,10 @@ export class AccountController {
   @ApiTags('Account')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create an account' })
-  @ApiBody({ type: CreateAccountInputs })
+  @ApiBody({ type: CreateAccountInput })
   @ApiCreatedResponse({})
-  async createUser(@Body() createAccountInputs: CreateAccountInputs) {
-    return await this.AccountService.createAccount(createAccountInputs);
+  async createUser(@Body() createAccountInput: CreateAccountInput) {
+    return await this.AccountService.createAccount(createAccountInput);
   }
 
   @Put(':id')
@@ -58,13 +59,13 @@ export class AccountController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update an account by id ( all params )' })
   @ApiParam({ name: 'id', description: 'id of Account' })
-  @ApiBody({ type: UpdateAccountInputs })
+  @ApiBody({ type: UpdateAccountInput })
   @ApiOkResponse({})
   async updateAccount(
-    @Param('id') id: string,
-    @Body() updateAccountInputs: UpdateAccountInputs,
+    @Param('id') id: Types.ObjectId,
+    @Body() updateAccountInput: UpdateAccountInput,
   ) {
-    return await this.AccountService.updateAccount(id, updateAccountInputs);
+    return await this.AccountService.updateAccount(id, updateAccountInput);
   }
 
   @Delete(':id')
@@ -73,7 +74,7 @@ export class AccountController {
   @ApiOperation({ summary: 'Delete a Account by id' })
   @ApiParam({ name: 'id', description: 'id of Account' })
   @ApiOkResponse({})
-  async deleteAccount(@Param('id') id: string) {
+  async deleteAccount(@Param('id') id: Types.ObjectId) {
     return await this.AccountService.deleteAccount(id);
   }
 }

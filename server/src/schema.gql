@@ -1,0 +1,70 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Amount {
+  amount: Float!
+  date: DateTime!
+  entryId: ID!
+  isPaid: Boolean!
+}
+
+input CreateAmountInput {
+  amount: Float!
+  date: DateTime!
+  entryId: ID!
+}
+
+input CreateEntryInput {
+  budgetedAmount: Float!
+  endDate: DateTime!
+  frequency: Int!
+  name: String!
+  startDate: DateTime!
+  type: Int!
+  userId: ID!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Entry {
+  amounts: [Amount!]
+  budgetedAmount: Float!
+  createdAt: DateTime!
+  endDate: DateTime
+  name: String!
+  startDate: DateTime
+  type: Int!
+  userId: ID!
+}
+
+input GetAmountInput {
+  _id: ID!
+  amount: Float!
+  date: DateTime!
+  entryId: ID!
+}
+
+input GetEntryInput {
+  _id: ID
+  endDate: DateTime
+  name: String
+  startDate: DateTime
+  type: Int
+  userId: ID
+}
+
+type Mutation {
+  createAmount(payload: CreateAmountInput!): Amount!
+  createEntry(payload: CreateEntryInput!): Entry!
+}
+
+type Query {
+  amount(_id: String!): Amount!
+  amounts(filters: GetAmountInput): [Amount!]!
+  entries(filters: GetEntryInput): [Entry!]!
+  entry(_id: String!): Entry!
+}

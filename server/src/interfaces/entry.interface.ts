@@ -1,5 +1,8 @@
+import { Types } from 'mongoose';
+
 export interface IEntry {
-  userId: string;
+  _id: Types.ObjectId;
+  userId: Types.ObjectId;
   name: string;
   type: number;
   budgetedAmount: number;

@@ -1,9 +1,9 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Account, AccountDocument } from './account.schema';
-import { CreateAccountInputs, UpdateAccountInputs } from './account.inputs';
+import { CreateAccountInput, UpdateAccountInput } from './account.input';
 
 @Injectable()
 export class AccountService {
@@ -14,9 +14,9 @@ export class AccountService {
   ) {}
 
   async createAccount(
-    createAccountInputs: CreateAccountInputs,
+    createAccountInput: CreateAccountInput,
   ): Promise<Account> {
-    const Account = new this.accountModel(createAccountInputs);
+    const Account = new this.accountModel(createAccountInput);
     this.logger.log(`created account ${Account._id}`);
     return Account.save();
   }
@@ -26,24 +26,24 @@ export class AccountService {
     return this.accountModel.find().exec();
   }
 
-  async getAllAccountsForUser(uid: string): Promise<Account[]> {
-    this.logger.log(`getting all accounts for ${uid}`);
-    return this.accountModel.find({ uid: uid }, null).exec();
+  async getAllAccountsForUser(userId: Types.ObjectId): Promise<Account[]> {
+    this.logger.log(`getting all accounts for ${userId}`);
+    return this.accountModel.find({ userId: userId }, null).exec();
   }
 
   async updateAccount(
-    id: string,
-    updateAccountInputs: UpdateAccountInputs,
+    id: Types.ObjectId,
+    updateAccountInput: UpdateAccountInput,
   ): Promise<Account> {
     this.logger.log(`updating ${id}`);
     return this.accountModel
-      .findByIdAndUpdate(id, updateAccountInputs, {
+      .findByIdAndUpdate(id, updateAccountInput, {
         useFindAndModify: false,
       })
       .exec();
   }
 
-  async deleteAccount(id: string): Promise<Account> {
+  async deleteAccount(id: Types.ObjectId): Promise<Account> {
     this.logger.log(`deleting ${id}`);
     return this.accountModel
       .findByIdAndDelete(id, {
