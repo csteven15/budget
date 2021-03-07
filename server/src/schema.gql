@@ -3,26 +3,28 @@
 # ------------------------------------------------------
 
 type Amount {
+  _id: ID!
   amount: Float!
   date: DateTime!
   entryId: ID!
-  isPaid: Boolean!
+  paid: Boolean!
 }
 
 input CreateAmountInput {
   amount: Float!
-  date: DateTime!
+  date: DateTime
   entryId: ID!
+  paid: Boolean
 }
 
 input CreateEntryInput {
   budgetedAmount: Float!
-  endDate: DateTime!
-  frequency: Int!
+  endDate: DateTime
+  frequency: Int
   name: String!
-  startDate: DateTime!
+  startDate: DateTime
   type: Int!
-  userId: ID!
+  userId: String!
 }
 
 """
@@ -31,6 +33,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Entry {
+  _id: ID!
   amounts: [Amount!]
   budgetedAmount: Float!
   createdAt: DateTime!
@@ -38,33 +41,58 @@ type Entry {
   name: String!
   startDate: DateTime
   type: Int!
-  userId: ID!
+  userId: String!
 }
 
 input GetAmountInput {
-  _id: ID!
-  amount: Float!
-  date: DateTime!
-  entryId: ID!
+  _id: ID
+  amount: Float
+  date: DateTime
+  entryId: ID
+  paid: Boolean
+}
+
+input GetEntryDateFilterInput {
+  endDate: DateTime
+  startDate: DateTime
 }
 
 input GetEntryInput {
   _id: ID
-  endDate: DateTime
   name: String
-  startDate: DateTime
   type: Int
-  userId: ID
+  userId: String
 }
 
 type Mutation {
   createAmount(payload: CreateAmountInput!): Amount!
   createEntry(payload: CreateEntryInput!): Entry!
+  deleteAmount(_id: ID!): Amount!
+  deleteEntry(_id: ID!): Entry!
+  updateAmount(payload: UpdateAmountInput!): Amount!
+  updateEntry(payload: UpdateEntryInput!): Entry!
 }
 
 type Query {
-  amount(_id: String!): Amount!
+  amount(_id: ID!): Amount!
   amounts(filters: GetAmountInput): [Amount!]!
-  entries(filters: GetEntryInput): [Entry!]!
-  entry(_id: String!): Entry!
+  entries(filter: GetEntryDateFilterInput, payload: GetEntryInput): [Entry!]!
+  entry(_id: ID!): Entry!
+}
+
+input UpdateAmountInput {
+  _id: ID!
+  amount: Float
+  date: DateTime
+  entryId: ID
+  paid: Boolean
+}
+
+input UpdateEntryInput {
+  _id: ID!
+  endDate: DateTime
+  name: String
+  startDate: DateTime
+  type: Int
+  userId: String
 }

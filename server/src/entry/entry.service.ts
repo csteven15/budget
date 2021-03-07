@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import {
   CreateEntryInput,
+  GetEntryDateFilterInput,
   GetEntryInput,
   UpdateEntryInput,
 } from './entry.input';
@@ -20,6 +21,13 @@ export class EntryService {
   async createEntry(createEntryInput: CreateEntryInput): Promise<Entry> {
     const entry = new this.entryModel(createEntryInput);
     entry.createdAt = new Date();
+    if (createEntryInput?.startDate === undefined) {
+      entry.startDate = entry.createdAt;
+    }
+    if (createEntryInput?.endDate === undefined) {
+      entry.endDate = entry.createdAt;
+      entry.endDate.setFullYear(entry.endDate.getFullYear() + 1);
+    }
     this.logger.log(`created entry ${entry._id}`);
     return entry.save();
   }
@@ -34,49 +42,49 @@ export class EntryService {
       .exec();
   }
 
-  async getEntry(getEntryInput: GetEntryInput): Promise<Entry[]> {
+  async getEntries(
+    getEntryInput: GetEntryInput,
+    getEntryDateFilterInput: GetEntryDateFilterInput,
+  ): Promise<Entry[]> {
     this.logger.log(`getting all entires`);
-    console.log({
-      _id: getEntryInput?._id ?? null,
-      userId: getEntryInput?.userId ?? null,
-      name: getEntryInput?.name ?? null,
-      type: getEntryInput?.type ?? null
-    })
+    let matchObject = {};
+    if (
+      getEntryDateFilterInput?.startDate &&
+      getEntryDateFilterInput?.endDate
+    ) {
+      matchObject = {
+        date: {
+          $gte: getEntryDateFilterInput?.startDate,
+          $lte: getEntryDateFilterInput?.endDate,
+        },
+      };
+    }
     return this.entryModel
-      .find({
-        ...getEntryInput,
-      })
+      .find(
+        {
+          ...getEntryInput,
+        },
+        null,
+        {
+          sort: {
+            date: 1,
+          },
+        },
+      )
       .populate({
         path: 'amounts',
-        match: {
-          date: {
-            $gte: getEntryInput?.startDate,
-            $lte: getEntryInput?.endDate,
-          },
-        }
+        match: matchObject,
       })
       .exec();
   }
 
-  async getAllEntriesForUser(userId: Types.ObjectId): Promise<Entry[]> {
-    this.logger.log(`getting all entries for ${userId}`);
+  async updateEntry(updateEntryInputs: UpdateEntryInput): Promise<Entry> {
+    this.logger.log(`updating ${updateEntryInputs._id}`);
     return this.entryModel
-      .find({ userId: userId }, null, {
-        sort: {
-          year: 1,
-        },
+      .findByIdAndUpdate(updateEntryInputs._id, updateEntryInputs, {
+        useFindAndModify: false,
       })
       .populate('amounts')
-      .exec();
-  }
-
-  async updateEntry(
-    id: Types.ObjectId,
-    updateEntryInputs: UpdateEntryInput,
-  ): Promise<Entry> {
-    this.logger.log(`updating ${id}`);
-    return this.entryModel
-      .findByIdAndUpdate(id, updateEntryInputs, { useFindAndModify: false })
       .exec();
   }
 

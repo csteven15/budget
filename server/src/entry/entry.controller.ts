@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Put,
@@ -18,26 +17,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
-import {
-  CreateEntryInput,
-  GetEntryInput,
-  UpdateEntryInput,
-} from './entry.input';
+import { CreateEntryInput, UpdateEntryInput } from './entry.input';
 import { EntryService } from './entry.service';
 
 @Controller('entry')
 export class EntryController {
   constructor(private readonly entryService: EntryService) {}
-
-  @Get(':userId')
-  @ApiTags('Entry')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get all entries for user' })
-  @ApiParam({ name: 'userId', description: 'id of user' })
-  @ApiOkResponse({})
-  async getEntriesByUserId(@Param() params) {
-    return await this.entryService.getAllEntriesForUser(params.userId);
-  }
 
   @Post()
   @ApiTags('Entry')
@@ -49,18 +34,14 @@ export class EntryController {
     return await this.entryService.createEntry(createEntryInput);
   }
 
-  @Put(':id')
+  @Put()
   @ApiTags('Entry')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update an entry by id ( all params )' })
-  @ApiParam({ name: 'id', description: 'id of entry' })
   @ApiBody({ type: UpdateEntryInput })
   @ApiOkResponse({})
-  async updateEntry(
-    @Param('id') id: Types.ObjectId,
-    @Body() updateEntryInput: UpdateEntryInput,
-  ) {
-    return await this.entryService.updateEntry(id, updateEntryInput);
+  async updateEntry(@Body() updateEntryInput: UpdateEntryInput) {
+    return await this.entryService.updateEntry(updateEntryInput);
   }
 
   @Delete(':id')

@@ -16,8 +16,11 @@ export type EntryDocument = Entry & Document;
 @Schema()
 export class Entry {
   @Field(() => ID)
+  _id: Types.ObjectId;
+
+  @Field(() => String)
   @Prop({ required: true })
-  userId: Types.ObjectId;
+  userId: string;
 
   @Field(() => String)
   @Prop({ required: true })

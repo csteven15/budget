@@ -3,7 +3,6 @@ import {
   Field,
   ObjectType,
   ID,
-  Int,
   Float,
   GraphQLISODateTime,
 } from '@nestjs/graphql';
@@ -15,11 +14,14 @@ export type AmountDocument = Amount & Document;
 @Schema()
 export class Amount {
   @Field(() => ID)
+  _id: Types.ObjectId;
+
+  @Field(() => ID)
   @Prop({ required: true })
   entryId: Types.ObjectId;
 
   @Field(() => GraphQLISODateTime)
-  @Prop({ required: true })
+  @Prop({ required: false, default: new Date() })
   date: Date;
 
   @Field(() => Float)
@@ -27,8 +29,8 @@ export class Amount {
   amount: number;
 
   @Field(() => Boolean)
-  @Prop({ required: true, default: false})
-  isPaid: boolean;
+  @Prop({ required: true, default: false })
+  paid: boolean;
 }
 
 export const AmountSchema = SchemaFactory.createForClass(Amount);

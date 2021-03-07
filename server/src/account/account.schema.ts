@@ -1,12 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import {
-  Field,
-  ObjectType,
-  ID,
-  Int,
-  Float,
-  GraphQLISODateTime,
-} from '@nestjs/graphql';
+import { Field, ObjectType, ID, Int, Float } from '@nestjs/graphql';
 import { Document, Types } from 'mongoose';
 
 export type AccountDocument = Account & Document;
@@ -15,8 +8,11 @@ export type AccountDocument = Account & Document;
 @Schema()
 export class Account {
   @Field(() => ID)
+  _id: Types.ObjectId;
+
+  @Field(() => String)
   @Prop({ required: true })
-  userId: Types.ObjectId;
+  userId: string;
 
   @Field(() => String)
   @Prop({ required: true })
@@ -36,7 +32,7 @@ export class Account {
 
   @Field(() => Boolean)
   @Prop({ required: true })
-  isAppliedToBudget: boolean;
+  appliedToBudget: boolean;
 }
 
 export const AccountSchema = SchemaFactory.createForClass(Account);
