@@ -80,12 +80,10 @@ const useProvideEntry = () => {
         return {
           ...entry,
           _id: updatedEntry._id,
-          uid: updatedEntry.uid,
+          userId: updatedEntry.userId,
           name: updatedEntry.name,
-          year: updatedEntry.year,
-          inputType: updatedEntry.inputType,
-          maxAmount: updatedEntry.maxAmount,
-          monthlyAmount: updatedEntry.monthlyAmount,
+          type: updatedEntry.type,
+          budgetedAmount: updatedEntry.budgetedAmount,
         }
       }
       return entry

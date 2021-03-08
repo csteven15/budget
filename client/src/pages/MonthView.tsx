@@ -183,7 +183,7 @@ const MonthView: FC<IProps> = ({
                   {entry.name}
                 </Grid>
                 <Grid item xs={4} md={4}>
-                  {entry.monthlyAmount[state.month]}
+                  {entry.budgetedAmount}
                 </Grid>
                 <Grid item xs={2} md={2}>
                   <Checkbox />

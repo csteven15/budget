@@ -1,9 +1,7 @@
 import React, { FC, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import {
   Button,
-  Checkbox,
-  FormControlLabel,
   Grid,
   MenuItem,
   Paper,
@@ -13,15 +11,19 @@ import {
   makeStyles,
   Theme,
 } from '@material-ui/core'
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from '@material-ui/pickers'
+import DateFnsUtils from '@date-io/date-fns'
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 
-import { useEntry } from '../../context/EntryContext'
 import { IEntry } from '../../common/types'
 import ReactHookFormSelect from './ReactHookFormSelect'
 import { useAuth } from '../../context/AuthContext'
 import SimpleSnackbar from '../SnackBar'
-import { MonthArray } from '../../common/enums'
+import { EFrequencyType, EFrequencyValues } from '../../common/enums/index'
 
 const inputType = [
   { value: 0, text: 'Income' },
@@ -49,89 +51,52 @@ const EntrySchema = Joi.object({
   name: Joi.string().required().messages({
     'any.required': 'Name for entry cannot be empty',
   }),
-  year: Joi.number().positive().required().messages({
-    'number.positive': 'Year for entry must be positive',
-  }),
-  inputType: Joi.number().required(),
-  maxAmount: Joi.number().required(),
-  isFixed: Joi.boolean().required(),
-  amount: Joi.number().positive().max(Joi.ref('maxAmount')).messages({
-    'number.required': 'amount is required',
-    'number.max': '"amount" should be less than max amount',
-  }),
-  January: Joi.number().positive().max(Joi.ref('maxAmount')),
-  February: Joi.number().positive().max(Joi.ref('maxAmount')),
-  March: Joi.number().positive().max(Joi.ref('maxAmount')),
-  April: Joi.number().positive().max(Joi.ref('maxAmount')),
-  May: Joi.number().positive().max(Joi.ref('maxAmount')),
-  June: Joi.number().positive().max(Joi.ref('maxAmount')),
-  July: Joi.number().positive().max(Joi.ref('maxAmount')),
-  August: Joi.number().positive().max(Joi.ref('maxAmount')),
-  September: Joi.number().positive().max(Joi.ref('maxAmount')),
-  October: Joi.number().positive().max(Joi.ref('maxAmount')),
-  November: Joi.number().positive().max(Joi.ref('maxAmount')),
-  December: Joi.number().positive().max(Joi.ref('maxAmount')),
+  type: Joi.number().required(),
+  budgetedAmount: Joi.number().required(),
+  startDate: Joi.date().iso(),
+  endDate: Joi.date().iso().min(Joi.ref('startDate')),
+  frequency: Joi.number().required(),
 })
 
 const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
-  const {
-    register,
-    watch,
-    control,
-    getValues,
-    errors,
-    handleSubmit,
-  } = useForm<IEntry>({
+  const { register, watch, control, errors, handleSubmit } = useForm<IEntry>({
     resolver: joiResolver(EntrySchema),
   })
 
   const classes = useStyles()
   const { user } = useAuth()
-  const { addEntry, deleteEntry, updateEntry } = useEntry()
 
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [formError, setFormError] = useState(false)
-  let watchIsFixed = watch('isFixed', true)
 
-  let isFixed = false
-
-  if (isEditing) {
-    isFixed = entry!.monthlyAmount!.every(
-      (amount) => amount === entry?.monthlyAmount![0]
-    )!
-    if (!isFixed) {
-      watchIsFixed = false
-    }
+  const today = new Date()
+  const yearFromToday = new Date().setFullYear(today.getFullYear() + 1)
+  const selectedFrequency = watch('frequency')
+  let isRecurring = false
+  if (EFrequencyType.Once !== selectedFrequency) {
+    isRecurring = true
   }
-
   const onSubmit = async (formData: IEntry) => {
     console.log(formData)
-    let transformedMonthlyAmount: number[] = new Array<number>(12)
-    if (formData.isFixed) {
-      transformedMonthlyAmount.fill(formData!.amount!)
-    } else {
-      // each monthly value is stored in an object with the name key due to react-form-hooks api
-      transformedMonthlyAmount = MonthArray.map(
-        (month: string) => formData[month as keyof IEntry] as number
-      )
-    }
     const inputEntry: IEntry = {
       _id: isEditing ? entry?._id : undefined,
-      uid: user.uid as string,
+      userId: user.uid as string,
       name: formData.name,
-      year: formData.year,
-      inputType: formData.inputType,
-      monthlyAmount: transformedMonthlyAmount,
-      maxAmount: formData.maxAmount,
+      type: formData.type,
+      budgetedAmount: formData.budgetedAmount,
+      createdAt: new Date(),
+      frequency: formData.frequency,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
     }
     try {
       if (isEditing) {
-        updateEntry(inputEntry)
+        //updateEntry(inputEntry)
         if (handleModalClose) {
           handleModalClose()
         }
       } else {
-        addEntry(inputEntry)
+        //addEntry(inputEntry)
       }
       setFormSubmitted(true)
       // reset after 5 seconds
@@ -148,7 +113,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
   }
 
   const onDelete = () => {
-    deleteEntry(entry?._id as string)
+    //deleteEntry(entry?._id as string)
     if (handleModalClose) {
       handleModalClose()
     }
@@ -177,23 +142,11 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <TextField
-              id="standard-basic"
-              label="Year"
-              name="year"
-              defaultValue={entry?.year}
-              inputRef={register()}
-              error={!!errors?.name?.message}
-              helperText={errors?.name?.message}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
             <ReactHookFormSelect
-              name="inputType"
+              name="type"
               label="Choose type of input"
               defaultValue={
-                isEditing ? (entry?.inputType as number) : inputType[0].value
+                isEditing ? (entry?.type as number) : inputType[0].value
               }
               control={control}
             >
@@ -206,62 +159,80 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
           </Grid>
           <Grid item xs={12} md={6}>
             <TextField
-              label="Max Amount"
-              name="maxAmount"
-              defaultValue={entry?.maxAmount}
+              label="Budget Amount"
+              name="budgetedAmount"
+              defaultValue={entry?.budgetedAmount}
               inputRef={register}
-              error={!!errors.maxAmount?.message}
-              helperText={errors.maxAmount?.message}
+              error={!!errors.budgetedAmount?.message}
+              helperText={errors.budgetedAmount?.message}
               fullWidth
             />
           </Grid>
-          <Grid item xs={12}>
-            <FormControlLabel
-              name="isFixed"
-              label="Fixed Amount"
-              control={
-                <Checkbox
-                  defaultChecked={isEditing ? (isFixed ? true : false) : true}
-                />
-              }
-              inputRef={register}
-            />
+          <Grid item xs={12} md={6}>
+            <ReactHookFormSelect
+              name="frequency"
+              label="Choose Frequency"
+              defaultValue={EFrequencyType.Once}
+              control={control}
+            >
+              {EFrequencyValues.map((frequency) => (
+                <MenuItem key={frequency.value} value={frequency.value}>
+                  {frequency.text}
+                </MenuItem>
+              ))}
+            </ReactHookFormSelect>
           </Grid>
-          {watchIsFixed === true ? (
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Amount"
-                name="amount"
-                defaultValue={entry?.monthlyAmount![0]}
-                inputRef={register}
-                error={!!errors?.amount?.message}
-                helperText={errors?.amount?.message}
-                fullWidth
+        </Grid>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <Grid container spacing={1}>
+            <Grid item xs={12} md={isRecurring ? 6 : 12}>
+              <Controller
+                control={control}
+                name="startDate"
+                defaultValue={today}
+                render={({ ...rest }) => (
+                  <KeyboardDatePicker
+                    disableToolbar
+                    variant="inline"
+                    format="MM/dd/yyyy"
+                    margin="normal"
+                    label={isRecurring ? 'Choose Start Date' : 'Choose Date'}
+                    KeyboardButtonProps={{
+                      'aria-label': 'change date',
+                    }}
+                    error={!!errors.startDate?.message}
+                    helperText={errors.startDate?.message}
+                    {...rest}
+                  />
+                )}
               />
             </Grid>
-          ) : null}
-          {watchIsFixed === false
-            ? MonthArray.map((month, i) => (
-                <Grid key={month} item xs={12} md={6}>
-                  <TextField
-                    label={`${MonthArray[i]} Amount`}
-                    name={`${MonthArray[i]}`}
-                    inputRef={register}
-                    defaultValue={
-                      isEditing
-                        ? entry!.monthlyAmount![i]
-                        : getValues('maxAmount')
-                    }
-                    // @ts-ignore
-                    error={!!errors[month]?.message}
-                    // @ts-ignore
-                    helperText={errors[month]?.message}
-                    fullWidth
-                  />
-                </Grid>
-              ))
-            : null}
-        </Grid>
+            {isRecurring === true ? (
+              <Grid item xs={12} md={6}>
+                <Controller
+                  control={control}
+                  name="endDate"
+                  defaultValue={new Date(yearFromToday)}
+                  render={({ ...rest }) => (
+                    <KeyboardDatePicker
+                      disableToolbar
+                      variant="inline"
+                      format="MM/dd/yyyy"
+                      margin="normal"
+                      label="Choose End Date"
+                      KeyboardButtonProps={{
+                        'aria-label': 'change date',
+                      }}
+                      error={!!errors.endDate?.message}
+                      helperText={errors.endDate?.message}
+                      {...rest}
+                    />
+                  )}
+                />
+              </Grid>
+            ) : null}
+          </Grid>
+        </MuiPickersUtilsProvider>
         <br />
         <Grid container>
           <Grid item md={6}>
