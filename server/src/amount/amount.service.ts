@@ -63,6 +63,6 @@ export class AmountService {
 
   async deleteAllAmounts(): Promise<Amount> {
     this.logger.log(`deleting all amounts`);
-    return this.amountModel.deleteMany({}).exec();
+    return this.amountModel.remove().exec();
   }
 }

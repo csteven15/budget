@@ -97,6 +97,6 @@ export class EntryService {
 
   async deleteAllEntries(): Promise<Entry> {
     this.logger.log(`deleting all entries`);
-    return this.entryModel.deleteMany({}).exec();
+    return this.entryModel.remove().exec();
   }
 }
