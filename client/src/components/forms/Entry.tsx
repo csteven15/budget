@@ -24,6 +24,33 @@ import ReactHookFormSelect from './ReactHookFormSelect'
 import { useAuth } from '../../context/AuthContext'
 import SimpleSnackbar from '../SnackBar'
 import { EFrequencyType, EFrequencyValues } from '../../common/enums/index'
+import { useQuery, gql, useMutation } from '@apollo/client'
+
+interface CreateEntryInput {
+  userId: string
+  name: string
+  type: number
+  budgetedAmount: number
+  // createdAt will be auto populated
+  startDate?: Date
+  endDate?: Date
+
+  // for the form
+  frequency?: number
+}
+
+interface FormData {
+  payload: CreateEntryInput
+}
+
+const CREATE_ENTRY_MUTATION = gql`
+  mutation createEntry($payload: CreateEntryInput!) {
+    createEntry(payload: $payload) {
+      _id
+      userId
+    }
+  }
+`
 
 const inputType = [
   { value: 0, text: 'Income' },
@@ -63,6 +90,8 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
     resolver: joiResolver(EntrySchema),
   })
 
+  const [addEntry, { data }] = useMutation<FormData>(CREATE_ENTRY_MUTATION)
+
   const classes = useStyles()
   const { user } = useAuth()
 
@@ -78,17 +107,6 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
   }
   const onSubmit = async (formData: IEntry) => {
     console.log(formData)
-    const inputEntry: IEntry = {
-      _id: isEditing ? entry?._id : undefined,
-      userId: user.uid as string,
-      name: formData.name,
-      type: formData.type,
-      budgetedAmount: formData.budgetedAmount,
-      createdAt: new Date(),
-      frequency: formData.frequency,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-    }
     try {
       if (isEditing) {
         //updateEntry(inputEntry)
@@ -96,7 +114,17 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
           handleModalClose()
         }
       } else {
-        //addEntry(inputEntry)
+        const inputEntry: CreateEntryInput = {
+          userId: user.uid as string,
+          name: formData.name,
+          type: formData.type,
+          budgetedAmount: formData.budgetedAmount,
+        }
+        addEntry({
+          variables: {
+            payload: inputEntry,
+          },
+        })
       }
       setFormSubmitted(true)
       // reset after 5 seconds

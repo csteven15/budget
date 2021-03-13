@@ -9,5 +9,5 @@ export interface IEntry {
   createdAt: Date
   startDate?: Date
   endDate?: Date
-  frequency: EFrequencyType
+  frequency?: EFrequencyType
 }
