@@ -1,4 +1,5 @@
 import { EFrequencyType } from '../enums/EFrequencyType'
+import { IAmount } from './index'
 
 export interface IEntry {
   _id?: string
@@ -10,4 +11,5 @@ export interface IEntry {
   startDate?: Date
   endDate?: Date
   frequency?: EFrequencyType
+  amounts?: IAmount[]
 }

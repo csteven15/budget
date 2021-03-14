@@ -78,6 +78,9 @@ export class UpdateEntryInput {
   @Field(() => Int, { nullable: true })
   @ApiProperty({ required: false })
   type: number;
+  @Field(() => Float, { nullable: true })
+  @ApiProperty({ required: false })
+  budgetedAmount: number;
   @Field(() => GraphQLISODateTime, { nullable: true })
   @ApiProperty({ required: false })
   startDate: Date;

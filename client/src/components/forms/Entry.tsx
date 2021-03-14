@@ -24,30 +24,29 @@ import ReactHookFormSelect from './ReactHookFormSelect'
 import { useAuth } from '../../context/AuthContext'
 import SimpleSnackbar from '../SnackBar'
 import { EFrequencyType, EFrequencyValues } from '../../common/enums/index'
-import { useQuery, gql, useMutation } from '@apollo/client'
-
-interface CreateEntryInput {
-  userId: string
-  name: string
-  type: number
-  budgetedAmount: number
-  // createdAt will be auto populated
-  startDate?: Date
-  endDate?: Date
-
-  // for the form
-  frequency?: number
-}
-
-interface FormData {
-  payload: CreateEntryInput
-}
+import { gql, useMutation } from '@apollo/client'
 
 const CREATE_ENTRY_MUTATION = gql`
   mutation createEntry($payload: CreateEntryInput!) {
     createEntry(payload: $payload) {
       _id
       userId
+    }
+  }
+`
+
+const UPDATE_ENTRY_MUTATION = gql`
+  mutation updateEntry($payload: UpdateEntryInput!) {
+    updateEntry(payload: $payload) {
+      _id
+      userId
+    }
+  }
+`
+const DELETE_ENTRY_MUTATION = gql`
+  mutation deleteEntry($_id: ID!) {
+    deleteEntry(_id: $_id) {
+      _id
     }
   }
 `
@@ -90,7 +89,9 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
     resolver: joiResolver(EntrySchema),
   })
 
-  const [addEntry, { data }] = useMutation<FormData>(CREATE_ENTRY_MUTATION)
+  const [addEntry] = useMutation<FormData>(CREATE_ENTRY_MUTATION)
+  const [updateEntry] = useMutation<FormData>(UPDATE_ENTRY_MUTATION)
+  const [deleteEntry] = useMutation<FormData>(DELETE_ENTRY_MUTATION)
 
   const classes = useStyles()
   const { user } = useAuth()
@@ -109,20 +110,30 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
     console.log(formData)
     try {
       if (isEditing) {
-        //updateEntry(inputEntry)
+        updateEntry({
+          variables: {
+            payload: {
+              _id: entry?._id,
+              name: formData.name,
+              type: formData.type,
+              budgetedAmount: formData.budgetedAmount,
+              startDate: formData.startDate,
+              endDate: formData.endDate,
+            },
+          },
+        })
         if (handleModalClose) {
           handleModalClose()
         }
       } else {
-        const inputEntry: CreateEntryInput = {
-          userId: user.uid as string,
-          name: formData.name,
-          type: formData.type,
-          budgetedAmount: formData.budgetedAmount,
-        }
         addEntry({
           variables: {
-            payload: inputEntry,
+            payload: {
+              userId: user.uid as string,
+              name: formData.name,
+              type: formData.type,
+              budgetedAmount: formData.budgetedAmount,
+            },
           },
         })
       }
@@ -141,7 +152,11 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
   }
 
   const onDelete = () => {
-    //deleteEntry(entry?._id as string)
+    deleteEntry({
+      variables: {
+        _id: entry?._id,
+      },
+    })
     if (handleModalClose) {
       handleModalClose()
     }
@@ -217,7 +232,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
               <Controller
                 control={control}
                 name="startDate"
-                defaultValue={today}
+                defaultValue={isEditing ? entry?.startDate : today}
                 render={({ ...rest }) => (
                   <KeyboardDatePicker
                     disableToolbar
@@ -240,7 +255,9 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
                 <Controller
                   control={control}
                   name="endDate"
-                  defaultValue={new Date(yearFromToday)}
+                  defaultValue={
+                    isEditing ? entry?.endDate : new Date(yearFromToday)
+                  }
                   render={({ ...rest }) => (
                     <KeyboardDatePicker
                       disableToolbar

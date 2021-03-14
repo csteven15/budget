@@ -6,6 +6,7 @@ import YearView from '../../pages/YearView'
 import TotalView from '../../pages/TotalView'
 import MonthView from '../../pages/MonthView'
 import AccountView from '../../pages/AccountView'
+import ListView from '../../pages/ListView'
 
 const routes = [
   {
@@ -19,6 +20,10 @@ const routes = [
   {
     path: '/accountview',
     component: <AccountView />,
+  },
+  {
+    path: '/listview',
+    component: <ListView />,
   },
   {
     path: '/monthview',

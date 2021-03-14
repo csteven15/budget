@@ -55,16 +55,12 @@ const Dashboard: FC = () => {
           name: filter,
         }
 
-  const { loading, error, data, refetch } = useQuery<output, input>(
-    GET_ENTRIES,
-    {
-      variables: {
-        filter: {},
-        payload: filterObject,
-      },
-      pollInterval: 500,
-    }
-  )
+  const { data, refetch } = useQuery<output, input>(GET_ENTRIES, {
+    variables: {
+      filter: {},
+      payload: filterObject,
+    },
+  })
 
   console.log('data', data)
 

@@ -27,6 +27,10 @@ const protectedRoutes = [
     name: 'Account View',
   },
   {
+    path: '/listview',
+    name: 'List View',
+  },
+  {
     path: '/monthview',
     name: 'Month View',
   },
