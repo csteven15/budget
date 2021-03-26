@@ -1,11 +1,9 @@
-import React, { FC, useState } from 'react'
+import React, { FC } from 'react'
 import { gql, useQuery } from '@apollo/client'
-
 import { EInputType } from '../common/enums/index'
-import { Box, Text } from '@chakra-ui/layout'
-import { Grid, IconButton, Input, theme, useToast } from '@chakra-ui/react'
-import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
-import { Controller, RegisterOptions, useForm } from 'react-hook-form'
+import { Box } from '@chakra-ui/layout'
+import { Grid } from '@chakra-ui/react'
+import HoverableTextField from '../components/forms/HoverableTextfield'
 
 const GET_ENTRIES = gql`
   query entries($filter: GetEntryDateFilterInput, $payload: GetEntryInput) {
@@ -50,145 +48,6 @@ interface IEntryInfo {
   createdAt: Date
   startDate: Date
   endDate: Date
-}
-
-// interface IEditableTextFieldProp {
-//   value: string | number
-// }
-
-// const EditableTextField: FC<IEditableTextFieldProp> = ({ value }) => {
-//   const [hover, setHover] = useState(false)
-
-//   const EditableControls = () => {
-//     const {
-//       isEditing,
-//       getSubmitButtonProps,
-//       getCancelButtonProps,
-//     } = useEditableControls()
-
-//     if (isEditing) {
-//       return (
-//         <ButtonGroup justifyContent="center" size="sm">
-//           <IconButton
-//             aria-label="Check"
-//             icon={<CheckIcon />}
-//             {...getSubmitButtonProps()}
-//           />
-//           <IconButton
-//             aria-label="Close"
-//             icon={<CloseIcon />}
-//             {...getCancelButtonProps()}
-//           />
-//         </ButtonGroup>
-//       )
-//     }
-//     return null
-//   }
-
-//   return (
-//     <Box>
-//       <Editable
-//         textAlign="center"
-//         defaultValue={value.toString()}
-//         value={value.toString()}
-//         onMouseEnter={() => setHover(true)}
-//         onMouseLeave={() => setHover(false)}
-//       >
-//         <EditablePreview />
-//         <EditableInput />
-//         {hover ? <EditableControls /> : null}
-//       </Editable>
-//     </Box>
-//   )
-// }
-
-interface IHoverableTextField {
-  refName: string
-  defaultValue: number | string
-  rules?: Exclude<
-    RegisterOptions,
-    'valueAsNumber' | 'valueAsDate' | 'setValueAs'
-  >
-}
-
-const HoverableTextField: FC<IHoverableTextField> = ({
-  refName,
-  defaultValue,
-  rules,
-}) => {
-  const { errors, handleSubmit, control } = useForm()
-
-  const [hover, setHover] = useState(false)
-
-  const errorToast = useToast()
-
-  const onSubmit = (data: any) => {
-    console.log(data)
-  }
-
-  console.log('errors', errors[refName])
-  console.log(errors[refName]?.message)
-  return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      <Controller
-        control={control}
-        name={refName}
-        defaultValue={defaultValue}
-        rules={rules}
-        render={({ onChange, onBlur, value, ref }) => (
-          <div>
-            {hover || value !== defaultValue ? (
-              <Input
-                m={-2}
-                variant="filled"
-                onBlur={onBlur}
-                onChange={(e) => onChange(e.target.value)}
-                value={value}
-                inputref={ref}
-                isInvalid={errors[refName]}
-                errorBorderColor={theme.colors.red[300]}
-              />
-            ) : (
-              <Text>{value}</Text>
-            )}
-            {value !== defaultValue ? (
-              <div>
-                <IconButton
-                  aria-label="reset"
-                  icon={<CloseIcon />}
-                  onClick={() => {
-                    setHover(false)
-                    onChange(defaultValue)
-                  }}
-                />
-                <IconButton
-                  aria-label="check"
-                  type="submit"
-                  icon={<CheckIcon />}
-                  onClick={() => {
-                    if (errors[refName]) {
-                      errorToast({
-                        description: errors[refName].message,
-                        status: 'error',
-                        duration: 3e3,
-                        isClosable: true,
-                      })
-                    } else {
-                      setHover(false)
-                    }
-                  }}
-                />
-              </div>
-            ) : null}
-          </div>
-        )}
-      />
-    </form>
-  )
 }
 
 // Fills whole width
