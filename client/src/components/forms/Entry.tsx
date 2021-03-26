@@ -215,7 +215,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
             <ReactHookFormSelect
               name="frequency"
               label="Choose Frequency"
-              defaultValue={EFrequencyType.Once}
+              defaultValue={EFrequencyType.Monthly}
               control={control}
             >
               {EFrequencyValues.map((frequency) => (

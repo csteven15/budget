@@ -2,11 +2,9 @@ import React, { FC } from 'react'
 import { Switch, Route } from 'react-router-dom'
 import Dashboard from '../../pages/Dashboard'
 import SignIn from '../forms/SignIn'
-import YearView from '../../pages/YearView'
-import TotalView from '../../pages/TotalView'
-import MonthView from '../../pages/MonthView'
 import AccountView from '../../pages/AccountView'
 import ListView from '../../pages/ListView'
+import BudgetView from '../../pages/BudgetView'
 
 const routes = [
   {
@@ -26,16 +24,8 @@ const routes = [
     component: <ListView />,
   },
   {
-    path: '/monthview',
-    component: <MonthView renderHeaders={true} />,
-  },
-  {
-    path: '/yearview',
-    component: <YearView />,
-  },
-  {
-    path: '/totalView',
-    component: <TotalView />,
+    path: '/budgetview',
+    component: <BudgetView />,
   },
 ]
 

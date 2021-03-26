@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useState } from 'react'
 import { gql, useQuery } from '@apollo/client'
 import {
   Grid,
@@ -189,12 +189,23 @@ export const CollapsibleRow: FC<CollapsibleRowProps> = ({ entry }) => {
   const classes = useStyles()
   const [openCollapse, setOpenCollapse] = useState(false)
   const [modalState, openModal] = useState<IModalState>(defaultModalState)
+  const incomeQuery = useQuery(
+    GET_ENTRIES,
+    createQueryForType(EInputType.Income)
+  )
+  const ExpenseQuery = useQuery(
+    GET_ENTRIES,
+    createQueryForType(EInputType.Expense)
+  )
+
   const handleModalOpen = (entry?: IEntry) => {
     const isEditing = entry === undefined ? false : true
     openModal({ isOpen: true, isEditing: isEditing, entry: entry })
   }
   const handleModalClose = () => {
     openModal({ isOpen: false, isEditing: false, entry: undefined })
+    incomeQuery.refetch()
+    ExpenseQuery.refetch()
   }
 
   const renderListOfAmountsForEntry = (entry: IEntry) => {

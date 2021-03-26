@@ -31,16 +31,8 @@ const protectedRoutes = [
     name: 'List View',
   },
   {
-    path: '/monthview',
-    name: 'Month View',
-  },
-  {
-    path: '/yearview',
-    name: 'Year View',
-  },
-  {
-    path: '/totalview',
-    name: 'Total View',
+    path: '/budgetview',
+    name: 'Budget View',
   },
   {
     path: '/',

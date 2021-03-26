@@ -2,6 +2,7 @@ import { FC } from 'react'
 import AppRouter from './components/navigation/AppRouter'
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
 import { isDevelopment } from './util/Api'
+import { ChakraProvider } from '@chakra-ui/react'
 
 console.log('isdevelopment', isDevelopment)
 
@@ -12,7 +13,9 @@ const client = new ApolloClient({
 
 const App: FC = () => (
   <ApolloProvider client={client}>
-    <AppRouter />
+    <ChakraProvider>
+      <AppRouter />
+    </ChakraProvider>
   </ApolloProvider>
 )
 
