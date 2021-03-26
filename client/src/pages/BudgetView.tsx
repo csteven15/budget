@@ -68,9 +68,6 @@ const EditableCell: FC<EditableCellProps> = ({ value }) => {
 }
 
 const BudgetView: FC = () => {
-  return (
-    
-  )
+  return <p>BudgetView</p>
 }
-
 export default BudgetView

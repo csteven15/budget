@@ -1,65 +1,27 @@
 import React, { FC, useState } from 'react'
 import { gql, useQuery } from '@apollo/client'
-import {
-  Grid,
-  List,
-  ListItem,
-  createStyles,
-  makeStyles,
-  Theme,
-  ListSubheader,
-  Checkbox,
-  Fab,
-  Modal,
-  Collapse,
-  IconButton,
-} from '@material-ui/core'
-import { format } from 'date-fns'
-import AddIcon from '@material-ui/icons/Add'
-import EditIcon from '@material-ui/icons/Edit'
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import { EInputType } from '../common/enums/index'
-import EntryForm from '../components/forms/Entry'
-import { IAmount, IEntry } from '../common/types'
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      flex: '0 0 100%',
-    },
-    header: {
-      display: 'flex',
-      justifyContent: 'space-between',
-    },
-    listSection: {
-      position: 'relative',
-      overflow: 'auto',
-      maxHeight: '70vh',
-      backgroundColor: theme.palette.background.paper,
-    },
-    ul: {
-      backgroundColor: 'inherit',
-      padding: 0,
-    },
-    li: {
-      backgroundColor: 'inherit',
-    },
-    icon: {
-      cursor: 'pointer',
-    },
-    modal: {
-      position: 'absolute',
-      padding: theme.spacing(2, 4, 3),
-    },
-    add: {
-      position: 'absolute',
-      bottom: theme.spacing(2),
-      right: theme.spacing(2),
-      zIndex: 2,
-    },
-  })
-)
+import { EInputType } from '../common/enums/index'
+import { Box, Flex, Text } from '@chakra-ui/layout'
+import {
+  Button,
+  ButtonGroup,
+  Editable,
+  EditableInput,
+  EditablePreview,
+  Grid,
+  IconButton,
+  Input,
+  useEditableControls,
+} from '@chakra-ui/react'
+import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons'
+import {
+  Control,
+  Controller,
+  FieldValues,
+  useForm,
+  UseFormMethods,
+} from 'react-hook-form'
 
 const GET_ENTRIES = gql`
   query entries($filter: GetEntryDateFilterInput, $payload: GetEntryInput) {
@@ -68,6 +30,9 @@ const GET_ENTRIES = gql`
       _id
       type
       budgetedAmount
+      startDate
+      endDate
+      createdAt
       amounts {
         date
         amount
@@ -76,18 +41,6 @@ const GET_ENTRIES = gql`
     }
   }
 `
-
-interface IModalState {
-  isOpen: boolean
-  isEditing: boolean
-  entry?: IEntry
-}
-
-const defaultModalState: IModalState = {
-  isOpen: false,
-  isEditing: false,
-  entry: undefined,
-}
 
 const date = new Date(),
   y = date.getFullYear(),
@@ -107,9 +60,141 @@ const createQueryForType = (type: EInputType) => {
   }
 }
 
+interface IEntryInfo {
+  name: string
+  budgetedAmount: number
+  createdAt: Date
+  startDate: Date
+  endDate: Date
+}
+
+// interface IEditableTextFieldProp {
+//   value: string | number
+// }
+
+// const EditableTextField: FC<IEditableTextFieldProp> = ({ value }) => {
+//   const [hover, setHover] = useState(false)
+
+//   const EditableControls = () => {
+//     const {
+//       isEditing,
+//       getSubmitButtonProps,
+//       getCancelButtonProps,
+//     } = useEditableControls()
+
+//     if (isEditing) {
+//       return (
+//         <ButtonGroup justifyContent="center" size="sm">
+//           <IconButton
+//             aria-label="Check"
+//             icon={<CheckIcon />}
+//             {...getSubmitButtonProps()}
+//           />
+//           <IconButton
+//             aria-label="Close"
+//             icon={<CloseIcon />}
+//             {...getCancelButtonProps()}
+//           />
+//         </ButtonGroup>
+//       )
+//     }
+//     return null
+//   }
+
+//   return (
+//     <Box>
+//       <Editable
+//         textAlign="center"
+//         defaultValue={value.toString()}
+//         value={value.toString()}
+//         onMouseEnter={() => setHover(true)}
+//         onMouseLeave={() => setHover(false)}
+//       >
+//         <EditablePreview />
+//         <EditableInput />
+//         {hover ? <EditableControls /> : null}
+//       </Editable>
+//     </Box>
+//   )
+// }
+
+interface IHoverableTextField {
+  control: Control<FieldValues>
+  refName: string
+  defaultValue: string
+}
+
+const HoverableTextField: FC<IHoverableTextField> = ({
+  control,
+  refName,
+  defaultValue,
+}) => {
+  const [hover, setHover] = useState(false)
+
+  console.log('control', control)
+  console.log('refname', refName)
+  console.log('value', refName)
+
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      <Controller
+        control={control}
+        name={refName}
+        defaultValue={defaultValue}
+        render={({ onChange, onBlur, value, ref }) => (
+          <div>
+            {hover ? (
+              <Input
+                variant="filled"
+                onBlur={onBlur}
+                onChange={(e) => onChange(e.target.value)}
+                value={value}
+                inputRef={ref}
+              />
+            ) : (
+              <Text>{value}</Text>
+            )}
+            {value !== defaultValue ? (
+              <Button onClick={() => onChange(defaultValue)}>reset</Button>
+            ) : null}
+          </div>
+        )}
+      />
+    </div>
+  )
+}
+
+// Fills whole width
+const EntryInfo: FC<IEntryInfo> = ({
+  name,
+  budgetedAmount,
+  createdAt,
+  startDate,
+  endDate,
+}) => {
+  const { register, handleSubmit, control } = useForm()
+  console.log(name, budgetedAmount, createdAt, startDate, endDate)
+  return (
+    <Grid templateColumns="repeat(5, 1fr)">
+      <Box>
+        <HoverableTextField
+          control={control}
+          refName="name"
+          defaultValue={name}
+        />
+      </Box>
+      <Box>{budgetedAmount}</Box>
+      <Box>{createdAt.toString()}</Box>
+      <Box>{startDate.toString()}</Box>
+      <Box>{endDate.toString()}</Box>
+    </Grid>
+  )
+}
+
 const ListView: FC = () => {
-  const classes = useStyles()
-  const [modalState, openModal] = useState<IModalState>(defaultModalState)
   const incomeQuery = useQuery(
     GET_ENTRIES,
     createQueryForType(EInputType.Income)
@@ -119,200 +204,17 @@ const ListView: FC = () => {
     createQueryForType(EInputType.Expense)
   )
 
-  const handleModalOpen = (entry?: IEntry) => {
-    const isEditing = entry === undefined ? false : true
-    openModal({ isOpen: true, isEditing: isEditing, entry: entry })
-  }
-  const handleModalClose = () => {
-    openModal({ isOpen: false, isEditing: false, entry: undefined })
-    incomeQuery.refetch()
-    ExpenseQuery.refetch()
-  }
+  console.log(incomeQuery.data)
 
-  const renderListOfEntriesByType = (entries: IEntry[]) => {
-    return (
-      <List className={classes.listSection} subheader={<li />}>
-        <li className={classes.li}>
-          <ul className={classes.ul}>
-            <ListSubheader>
-              <Grid container>
-                <Grid item xs={1} md={1} />
-                <Grid item xs={5} md={5}>
-                  {entries === undefined
-                    ? null
-                    : entries[0]?.type === 1
-                    ? 'Expense'
-                    : 'Income'}
-                </Grid>
-                <Grid item xs={5} md={5}>
-                  Budgeted Amount
-                </Grid>
-                <Grid item xs={1} md={1}>
-                  Edit
-                </Grid>
-              </Grid>
-            </ListSubheader>
-            {entries?.map((entry: IEntry, i: number) => {
-              return <CollapsibleRow key={i} entry={entry} />
-            })}
-          </ul>
-        </li>
-      </List>
-    )
+  const renderListOfEntriesByType = (entries: IEntryInfo[]) => {
+    return entries?.map((entry) => <EntryInfo key={entry.name} {...entry} />)
   }
 
   return (
-    <div className={classes.root}>
-      <Modal
-        className={classes.modal}
-        open={modalState.isOpen}
-        onClose={handleModalClose}
-      >
-        <EntryForm handleModalClose={handleModalClose} />
-      </Modal>
+    <Box w="100%">
       {renderListOfEntriesByType(incomeQuery.data?.entries)}
       {renderListOfEntriesByType(ExpenseQuery.data?.entries)}
-      <div className={classes.add}>
-        <Fab color="primary" aria-label="add">
-          <AddIcon onClick={() => handleModalOpen()} />
-        </Fab>
-      </div>
-    </div>
-  )
-}
-
-interface CollapsibleRowProps {
-  entry: IEntry
-}
-
-export const CollapsibleRow: FC<CollapsibleRowProps> = ({ entry }) => {
-  const classes = useStyles()
-  const [openCollapse, setOpenCollapse] = useState(false)
-  const [modalState, openModal] = useState<IModalState>(defaultModalState)
-  const incomeQuery = useQuery(
-    GET_ENTRIES,
-    createQueryForType(EInputType.Income)
-  )
-  const ExpenseQuery = useQuery(
-    GET_ENTRIES,
-    createQueryForType(EInputType.Expense)
-  )
-
-  const handleModalOpen = (entry?: IEntry) => {
-    const isEditing = entry === undefined ? false : true
-    openModal({ isOpen: true, isEditing: isEditing, entry: entry })
-  }
-  const handleModalClose = () => {
-    openModal({ isOpen: false, isEditing: false, entry: undefined })
-    incomeQuery.refetch()
-    ExpenseQuery.refetch()
-  }
-
-  const renderListOfAmountsForEntry = (entry: IEntry) => {
-    return (
-      <List className={classes.listSection} subheader={<li />}>
-        <li className={classes.li}>
-          <ul className={classes.ul}>
-            <ListSubheader>
-              <Grid container>
-                <Grid item xs={2} md={2} />
-                <Grid item xs={3} md={3}>
-                  Dates
-                </Grid>
-                <Grid item xs={3} md={3}>
-                  Actual Amounts
-                </Grid>
-                <Grid item xs={2} md={2}>
-                  Paid
-                </Grid>
-                <Grid item xs={1} md={1}>
-                  Edit
-                </Grid>
-              </Grid>
-            </ListSubheader>
-            {entry?.amounts?.map((amount: IAmount, i: number) => {
-              return (
-                <ListItem key={i}>
-                  <Grid container key={i}>
-                    <Grid item xs={2} md={2} />
-                    <Grid item xs={3} md={3}>
-                      {amount.date === undefined
-                        ? null
-                        : format(new Date(amount.date), 'MM-dd-yyyy')}
-                    </Grid>
-                    <Grid item xs={3} md={3}>
-                      {amount.amount}
-                    </Grid>
-                    <Grid item xs={2} md={2}>
-                      <Checkbox checked={amount.paid} />
-                    </Grid>
-                    <Grid item xs={1} md={1}>
-                      <EditIcon
-                        className={classes.icon}
-                        onClick={() => handleModalOpen(entry)}
-                      />
-                    </Grid>
-                  </Grid>
-                </ListItem>
-              )
-            })}
-          </ul>
-        </li>
-      </List>
-    )
-  }
-
-  return (
-    <div>
-      <Modal
-        className={classes.modal}
-        open={modalState.isOpen}
-        onClose={handleModalClose}
-      >
-        <EntryForm
-          entry={modalState.entry}
-          isEditing={modalState.isEditing}
-          handleModalClose={handleModalClose}
-        />
-      </Modal>
-      <ListItem>
-        <Grid container>
-          <Grid
-            item
-            xs={1}
-            md={1}
-            onClick={() => setOpenCollapse(!openCollapse)}
-          >
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={() => setOpenCollapse(!open)}
-            >
-              {openCollapse ? (
-                <KeyboardArrowUpIcon />
-              ) : (
-                <KeyboardArrowDownIcon />
-              )}
-            </IconButton>
-          </Grid>
-          <Grid item xs={5} md={5}>
-            {entry.name}
-          </Grid>
-          <Grid item xs={5} md={5}>
-            {entry.budgetedAmount}
-          </Grid>
-          <Grid item xs={1} md={1}>
-            <EditIcon
-              className={classes.icon}
-              onClick={() => handleModalOpen(entry)}
-            />
-          </Grid>
-        </Grid>
-      </ListItem>
-      <Collapse in={openCollapse} timeout="auto" unmountOnExit>
-        {renderListOfAmountsForEntry(entry)}
-      </Collapse>
-    </div>
+    </Box>
   )
 }
 

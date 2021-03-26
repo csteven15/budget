@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "concurrently --kill-others 'yarn run frontend' 'yarn run backend'",
-    "frontend": "cd client && yarn run lint && yarn run start",
+    "frontend": "cd client && yarn run start",
     "backend": "cd server && yarn run start:debug",
     "lintFrontend": "cd client && yarn run lint",
     "lintBackend": "cd server && yarn run lint",
