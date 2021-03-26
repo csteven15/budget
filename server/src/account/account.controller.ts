@@ -22,7 +22,7 @@ import { AccountService } from './account.service';
 
 @Controller('account')
 export class AccountController {
-  constructor(private readonly AccountService: AccountService) {}
+  constructor(private readonly accountService: AccountService) {}
 
   @Post()
   @ApiTags('Account')
@@ -31,7 +31,7 @@ export class AccountController {
   @ApiBody({ type: CreateAccountInput })
   @ApiCreatedResponse({})
   async createUser(@Body() createAccountInput: CreateAccountInput) {
-    return await this.AccountService.createAccount(createAccountInput);
+    return await this.accountService.createAccount(createAccountInput);
   }
 
   @Put()
@@ -41,7 +41,7 @@ export class AccountController {
   @ApiBody({ type: UpdateAccountInput })
   @ApiOkResponse({})
   async updateAccount(@Body() updateAccountInput: UpdateAccountInput) {
-    return await this.AccountService.updateAccount(updateAccountInput);
+    return await this.accountService.updateAccount(updateAccountInput);
   }
 
   @Delete(':id')
@@ -51,6 +51,6 @@ export class AccountController {
   @ApiParam({ name: 'id', description: 'id of Account' })
   @ApiOkResponse({})
   async deleteAccount(@Param('id') id: Types.ObjectId) {
-    return await this.AccountService.deleteAccount(id);
+    return await this.accountService.deleteAccount(id);
   }
 }

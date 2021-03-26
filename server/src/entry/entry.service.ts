@@ -9,6 +9,8 @@ import {
   UpdateEntryInput,
 } from './entry.input';
 import { Entry, EntryDocument } from './entry.schema';
+import { Amount, AmountDocument } from 'src/amount/amount.schema';
+import { CreateAmountInput } from 'src/amount/amount.input';
 
 @Injectable()
 export class EntryService {
@@ -16,7 +18,8 @@ export class EntryService {
 
   constructor(
     @InjectModel(Entry.name) private entryModel: Model<EntryDocument>,
-  ) {}
+    @InjectModel(Amount.name) private amountModel: Model<AmountDocument>,
+  ) { }
 
   async createEntry(createEntryInput: CreateEntryInput): Promise<Entry> {
     const entry = new this.entryModel(createEntryInput);
@@ -29,7 +32,24 @@ export class EntryService {
       entry.endDate.setFullYear(entry.endDate.getFullYear() + 1);
     }
     this.logger.log(`created entry ${entry._id}`);
-    return entry.save();
+    if (createEntryInput?.frequency) {
+      const numberOfAmountsToCreate = createEntryInput.frequency;
+      for (let i = 0; i < numberOfAmountsToCreate; i++) {
+        const amountInput: CreateAmountInput = {
+          entryId: entry.id,
+          date: entry.createdAt,
+          amount: 0,
+          paid: false,
+        };
+        const amount = new this.amountModel(amountInput);
+        amount.save();
+        entry.amounts.push(amount.id);
+      }
+      this.logger.log(
+        `created ${numberOfAmountsToCreate} amounts for ${entry._id}`,
+      );
+    }
+    return (await entry.save()).populate({ path: 'amounts' }).execPopulate();
   }
 
   async getEntryById(_id: Types.ObjectId): Promise<Entry> {
@@ -90,6 +110,7 @@ export class EntryService {
 
   async deleteEntry(id: Types.ObjectId): Promise<Entry> {
     this.logger.log(`deleting ${id}`);
+    this.amountModel.deleteMany({ entryId: id });
     return this.entryModel
       .findByIdAndDelete(id, { useFindAndModify: false })
       .exec();
