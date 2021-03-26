@@ -2,26 +2,10 @@ import React, { FC, useState } from 'react'
 import { gql, useQuery } from '@apollo/client'
 
 import { EInputType } from '../common/enums/index'
-import { Box, Flex, Text } from '@chakra-ui/layout'
-import {
-  Button,
-  ButtonGroup,
-  Editable,
-  EditableInput,
-  EditablePreview,
-  Grid,
-  IconButton,
-  Input,
-  useEditableControls,
-} from '@chakra-ui/react'
-import { CheckIcon, CloseIcon, EditIcon } from '@chakra-ui/icons'
-import {
-  Control,
-  Controller,
-  FieldValues,
-  useForm,
-  UseFormMethods,
-} from 'react-hook-form'
+import { Box, Text } from '@chakra-ui/layout'
+import { Grid, IconButton, Input, theme, useToast } from '@chakra-ui/react'
+import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
+import { Controller, RegisterOptions, useForm } from 'react-hook-form'
 
 const GET_ENTRIES = gql`
   query entries($filter: GetEntryDateFilterInput, $payload: GetEntryInput) {
@@ -119,24 +103,34 @@ interface IEntryInfo {
 // }
 
 interface IHoverableTextField {
-  control: Control<FieldValues>
   refName: string
-  defaultValue: string
+  defaultValue: number | string
+  rules?: Exclude<
+    RegisterOptions,
+    'valueAsNumber' | 'valueAsDate' | 'setValueAs'
+  >
 }
 
 const HoverableTextField: FC<IHoverableTextField> = ({
-  control,
   refName,
   defaultValue,
+  rules,
 }) => {
+  const { errors, handleSubmit, control } = useForm()
+
   const [hover, setHover] = useState(false)
 
-  console.log('control', control)
-  console.log('refname', refName)
-  console.log('value', refName)
+  const errorToast = useToast()
 
+  const onSubmit = (data: any) => {
+    console.log(data)
+  }
+
+  console.log('errors', errors[refName])
+  console.log(errors[refName]?.message)
   return (
-    <div
+    <form
+      onSubmit={handleSubmit(onSubmit)}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -144,26 +138,56 @@ const HoverableTextField: FC<IHoverableTextField> = ({
         control={control}
         name={refName}
         defaultValue={defaultValue}
+        rules={rules}
         render={({ onChange, onBlur, value, ref }) => (
           <div>
-            {hover ? (
+            {hover || value !== defaultValue ? (
               <Input
+                m={-2}
                 variant="filled"
                 onBlur={onBlur}
                 onChange={(e) => onChange(e.target.value)}
                 value={value}
-                inputRef={ref}
+                inputref={ref}
+                isInvalid={errors[refName]}
+                errorBorderColor={theme.colors.red[300]}
               />
             ) : (
               <Text>{value}</Text>
             )}
             {value !== defaultValue ? (
-              <Button onClick={() => onChange(defaultValue)}>reset</Button>
+              <div>
+                <IconButton
+                  aria-label="reset"
+                  icon={<CloseIcon />}
+                  onClick={() => {
+                    setHover(false)
+                    onChange(defaultValue)
+                  }}
+                />
+                <IconButton
+                  aria-label="check"
+                  type="submit"
+                  icon={<CheckIcon />}
+                  onClick={() => {
+                    if (errors[refName]) {
+                      errorToast({
+                        description: errors[refName].message,
+                        status: 'error',
+                        duration: 3e3,
+                        isClosable: true,
+                      })
+                    } else {
+                      setHover(false)
+                    }
+                  }}
+                />
+              </div>
             ) : null}
           </div>
         )}
       />
-    </div>
+    </form>
   )
 }
 
@@ -175,18 +199,27 @@ const EntryInfo: FC<IEntryInfo> = ({
   startDate,
   endDate,
 }) => {
-  const { register, handleSubmit, control } = useForm()
   console.log(name, budgetedAmount, createdAt, startDate, endDate)
   return (
-    <Grid templateColumns="repeat(5, 1fr)">
+    <Grid templateColumns="repeat(5, 1fr)" m={2}>
+      <Box>
+        <HoverableTextField refName="name" defaultValue={name} />
+      </Box>
       <Box>
         <HoverableTextField
-          control={control}
-          refName="name"
-          defaultValue={name}
+          refName="budgetedAmount"
+          defaultValue={budgetedAmount}
+          rules={{
+            min: { value: 0, message: 'No negative numbers' },
+            valueAsNumber: true,
+            required: { value: true, message: 'Required' },
+            pattern: {
+              value: /^\d+\.?\d*$/,
+              message: 'Wrong format: E.g. 100.00',
+            },
+          }}
         />
       </Box>
-      <Box>{budgetedAmount}</Box>
       <Box>{createdAt.toString()}</Box>
       <Box>{startDate.toString()}</Box>
       <Box>{endDate.toString()}</Box>
