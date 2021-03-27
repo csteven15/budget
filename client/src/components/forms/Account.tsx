@@ -16,7 +16,6 @@ import {
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 
-import { useAccount } from '../../context/AccountContext'
 import { IAccount } from '../../common/types'
 import ReactHookFormSelect from './ReactHookFormSelect'
 import { useAuth } from '../../context/AuthContext'
@@ -58,7 +57,6 @@ const AccountForm: FC<IProps> = ({ account, isEditing, handleModalClose }) => {
 
   const classes = useStyles()
   const { user } = useAuth()
-  const { addAccount, deleteAccount, updateAccount } = useAccount()
 
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [formError, setFormError] = useState(false)
@@ -77,12 +75,12 @@ const AccountForm: FC<IProps> = ({ account, isEditing, handleModalClose }) => {
 
     try {
       if (isEditing) {
-        updateAccount(input)
+        // updateAccount(input)
         if (handleModalClose) {
           handleModalClose()
         }
       } else {
-        addAccount(input)
+        // addAccount(input)
       }
       setFormSubmitted(true)
       // reset after 5 seconds
@@ -100,7 +98,7 @@ const AccountForm: FC<IProps> = ({ account, isEditing, handleModalClose }) => {
   }
 
   const onDelete = () => {
-    deleteAccount(account?._id as string)
+    // deleteAccount(account?._id as string)
     if (handleModalClose) {
       handleModalClose()
     }

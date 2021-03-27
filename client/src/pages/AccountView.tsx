@@ -15,7 +15,6 @@ import {
 } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import EditIcon from '@material-ui/icons/Edit'
-import { useAccount } from '../context/AccountContext'
 import { EAccountType } from '../common/enums'
 import { IAccount } from '../common/types'
 import AccountForm from '../components/forms/Account'
@@ -69,7 +68,6 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 const AccountView: FC = () => {
-  const { accounts, updateAccount } = useAccount()
   const [modalState, openModal] = useState<IModalState>(defaultModalState)
   const classes = useStyles()
 
@@ -82,16 +80,16 @@ const AccountView: FC = () => {
     openModal({ isOpen: false, isEditing: false, account: undefined })
   }
 
-  const getTotalAppliedToBudget = () => {
-    let total = 0
-    const accountsApplied = accounts.filter(
-      (account) => account.isAppliedToBudget === true
-    )
-    accountsApplied.forEach((account) => {
-      total += account.total
-    })
-    return total
-  }
+  // const getTotalAppliedToBudget = () => {
+  //   let total = 0
+  //   const accountsApplied = accounts.filter(
+  //     (account) => account.isAppliedToBudget === true
+  //   )
+  //   accountsApplied.forEach((account) => {
+  //     total += account.total
+  //   })
+  //   return total
+  // }
 
   const handleApplyToBudgetCheckBox = (
     account: IAccount,
@@ -99,66 +97,66 @@ const AccountView: FC = () => {
   ) => {
     const input = account
     input.isAppliedToBudget = toggleChecked
-    updateAccount(input)
+    // updateAccount(input)
   }
 
-  const renderAccountsPerType = (type: EAccountType) => {
-    const accountsToRender = accounts.filter((account) => account.type === type)
-    return (
-      <li className={classes.li}>
-        <ul className={classes.ul}>
-          <ListSubheader>
-            <Grid container>
-              <Grid item xs={4} md={4}>
-                {EAccountType[type]}
-              </Grid>
-              <Grid item xs={4} md={4}>
-                Total
-              </Grid>
-              <Grid item xs={2} md={2}>
-                Applied
-              </Grid>
-              <Grid item xs={2} md={2}>
-                Edit
-              </Grid>
-            </Grid>
-          </ListSubheader>
-          {accountsToRender.map((account, i) => (
-            <ListItem key={i}>
-              <Grid container>
-                <Grid item xs={4} md={4}>
-                  {account.name}
-                </Grid>
-                <Grid item xs={4} md={4}>
-                  {account.total}
-                </Grid>
-                <Grid item xs={2} md={2}>
-                  <Checkbox
-                    checked={account.isAppliedToBudget ? true : false}
-                    onClick={() =>
-                      handleApplyToBudgetCheckBox(
-                        account,
-                        !account.isAppliedToBudget
-                      )
-                    }
-                  />
-                </Grid>
-                <EditIcon
-                  className={classes.icon}
-                  onClick={() => handleModalOpen(account)}
-                />
-              </Grid>
-            </ListItem>
-          ))}
-        </ul>
-      </li>
-    )
-  }
+  // const renderAccountsPerType = (type: EAccountType) => {
+  //   const accountsToRender = accounts.filter((account) => account.type === type)
+  //   return (
+  //     <li className={classes.li}>
+  //       <ul className={classes.ul}>
+  //         <ListSubheader>
+  //           <Grid container>
+  //             <Grid item xs={4} md={4}>
+  //               {EAccountType[type]}
+  //             </Grid>
+  //             <Grid item xs={4} md={4}>
+  //               Total
+  //             </Grid>
+  //             <Grid item xs={2} md={2}>
+  //               Applied
+  //             </Grid>
+  //             <Grid item xs={2} md={2}>
+  //               Edit
+  //             </Grid>
+  //           </Grid>
+  //         </ListSubheader>
+  //         {accountsToRender.map((account, i) => (
+  //           <ListItem key={i}>
+  //             <Grid container>
+  //               <Grid item xs={4} md={4}>
+  //                 {account.name}
+  //               </Grid>
+  //               <Grid item xs={4} md={4}>
+  //                 {account.total}
+  //               </Grid>
+  //               <Grid item xs={2} md={2}>
+  //                 <Checkbox
+  //                   checked={account.isAppliedToBudget ? true : false}
+  //                   onClick={() =>
+  //                     handleApplyToBudgetCheckBox(
+  //                       account,
+  //                       !account.isAppliedToBudget
+  //                     )
+  //                   }
+  //                 />
+  //               </Grid>
+  //               <EditIcon
+  //                 className={classes.icon}
+  //                 onClick={() => handleModalOpen(account)}
+  //               />
+  //             </Grid>
+  //           </ListItem>
+  //         ))}
+  //       </ul>
+  //     </li>
+  //   )
+  // }
 
   return (
     <Paper>
       <Typography className={classes.header}>
-        {'Total Applied to Budget: ' + getTotalAppliedToBudget()}
+        {/* {'Total Applied to Budget: ' + getTotalAppliedToBudget()} */}
       </Typography>
       <br />
       <Modal
@@ -174,10 +172,10 @@ const AccountView: FC = () => {
       </Modal>
       <List className={classes.listSection} subheader={<li />}>
         {/* TODO: Make interative */}
-        {renderAccountsPerType(EAccountType.Checking)}
+        {/* {renderAccountsPerType(EAccountType.Checking)}
         {renderAccountsPerType(EAccountType.Savings)}
         {renderAccountsPerType(EAccountType.Investment)}
-        {renderAccountsPerType(EAccountType.Retirement)}
+        {renderAccountsPerType(EAccountType.Retirement)} */}
       </List>
       <div className={classes.add}>
         <Fab color="primary" aria-label="add">
