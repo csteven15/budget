@@ -133,6 +133,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
               name: formData.name,
               type: formData.type,
               budgetedAmount: formData.budgetedAmount,
+              frequency: formData.frequency,
             },
           },
         })

@@ -38,7 +38,7 @@ export class EntryService {
         const amountInput: CreateAmountInput = {
           entryId: entry.id,
           date: entry.createdAt,
-          amount: 0,
+          amount: entry.budgetedAmount,
           paid: false,
         };
         const amount = new this.amountModel(amountInput);
@@ -93,7 +93,6 @@ export class EntryService {
       )
       .populate({
         path: 'amounts',
-        match: matchObject,
       })
       .exec();
   }
