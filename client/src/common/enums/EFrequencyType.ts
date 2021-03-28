@@ -1,7 +1,7 @@
 export enum EFrequencyType {
   Once = 0,
   Annually = 1,
-  SemiAnnually = 6,
+  SemiAnnually = 2,
   Monthly = 12,
   BiWeekly = 26,
   Weekly = 52,

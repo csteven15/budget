@@ -12,9 +12,44 @@ import { Entry, EntryDocument } from './entry.schema';
 import { Amount, AmountDocument } from 'src/amount/amount.schema';
 import { CreateAmountInput } from 'src/amount/amount.input';
 
+require('datejs')
+
 @Injectable()
 export class EntryService {
   private readonly logger = new Logger(EntryService.name);
+
+  private GetNextDatesByFrequency(date: Date, frequency: number) {
+    let dates: Date[] = [ date ]
+    let lastDate = new Date(date)
+    for (let i = 0; i < frequency; i++) {
+      let temp = new Date(lastDate)
+      switch (frequency) {
+        case 1: {
+          temp.addYears(1)
+          break;
+        }
+        case 2:{
+          temp.addMonths(6)
+          break;
+        }
+        case 12: {
+          temp.addMonths(1)
+          break;
+        }
+        case 26: {
+          temp.addDays(14)
+          break;
+        }
+        case 52: {
+          temp.addDays(7)
+          break
+        }
+      }
+      dates.push(new Date(temp))
+      lastDate = temp
+    }
+    return dates
+  }
 
   constructor(
     @InjectModel(Entry.name) private entryModel: Model<EntryDocument>,
@@ -32,12 +67,15 @@ export class EntryService {
       entry.endDate.setFullYear(entry.endDate.getFullYear() + 1);
     }
     this.logger.log(`created entry ${entry._id}`);
-    if (createEntryInput?.frequency) {
-      const numberOfAmountsToCreate = createEntryInput.frequency;
+    if (createEntryInput?.frequency !== undefined) {
+      const numberOfAmountsToCreate = createEntryInput.frequency + 1;
+      const dates = this.GetNextDatesByFrequency(createEntryInput.startDate,
+        createEntryInput.frequency);
+      this.logger.log(`amounts ${numberOfAmountsToCreate}`)
       for (let i = 0; i < numberOfAmountsToCreate; i++) {
         const amountInput: CreateAmountInput = {
           entryId: entry.id,
-          date: entry.createdAt,
+          date: dates[i],
           amount: entry.budgetedAmount,
           paid: false,
         };
@@ -66,7 +104,7 @@ export class EntryService {
     getEntryInput: GetEntryInput,
     getEntryDateFilterInput: GetEntryDateFilterInput,
   ): Promise<Entry[]> {
-    this.logger.log(`getting all entires`);
+    this.logger.log(`getting all entires - ${getEntryDateFilterInput?.startDate}`);
     let matchObject = {};
     if (
       getEntryDateFilterInput?.startDate &&
@@ -93,6 +131,7 @@ export class EntryService {
       )
       .populate({
         path: 'amounts',
+        match: matchObject,
       })
       .exec();
   }

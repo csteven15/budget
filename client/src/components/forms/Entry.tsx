@@ -107,7 +107,7 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
     isRecurring = true
   }
   const onSubmit = async (formData: IEntry) => {
-    console.log(formData)
+    console.log('formData', formData)
     try {
       if (isEditing) {
         updateEntry({
@@ -134,6 +134,8 @@ const EntryForm: FC<IProps> = ({ entry, isEditing, handleModalClose }) => {
               type: formData.type,
               budgetedAmount: formData.budgetedAmount,
               frequency: formData.frequency,
+              startDate: formData.startDate,
+              endDate: formData.endDate,
             },
           },
         })

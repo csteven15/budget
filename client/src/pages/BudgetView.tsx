@@ -1,169 +1,56 @@
-import React, { FC } from 'react'
-import { gql, useQuery } from '@apollo/client'
+import React, { FC, useState } from 'react'
 import {
   Tabs,
   TabList,
   TabPanels,
   Tab,
   TabPanel,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
+  Button,
+  Flex,
+  Spacer,
 } from '@chakra-ui/react'
-import { EInputType } from '../common/enums/index'
-import { IAmount, IEntry } from '../common/types'
+import MonthView from './MonthView'
+import YearView from './YearView'
 
-const MonthView: FC = () => {
-  return <div>Month View</div>
+const dateToday = new Date()
+
+interface DataButtonProps {
+  name: string
+  value: number
+  setValueFunc: React.Dispatch<React.SetStateAction<number>>
 }
 
-const months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-]
-
-const GET_ENTRIES = gql`
-  query entries($filter: GetEntryDateFilterInput, $payload: GetEntryInput) {
-    entries(filter: $filter, payload: $payload) {
-      name
-      _id
-      type
-      budgetedAmount
-      startDate
-      endDate
-      createdAt
-      amounts {
-        amount
-        date
-        paid
-      }
-    }
-  }
-`
-const date = new Date(),
-  y = date.getFullYear(),
-  m = date.getMonth()
-
-const createQueryForType = (type: EInputType) => {
-  return {
-    variables: {
-      filter: {
-        startDate: new Date(y, m, 1),
-        endDate: new Date(y, m + 1, 0),
-      },
-      payload: {
-        type: type,
-      },
-    },
-  }
-}
-
-const YearView: FC = () => {
-  const incomeQuery = useQuery(
-    GET_ENTRIES,
-    createQueryForType(EInputType.Income)
-  )
-  const expenseQuery = useQuery(
-    GET_ENTRIES,
-    createQueryForType(EInputType.Expense)
-  )
-
-  const getBudgetedTotal = (entries: IEntry[]) => {
-    return entries.reduce(
-      (total: number, i: IEntry) => (total += i.budgetedAmount),
-      0
-    )
-  }
-
-  const getActualTotals = (entries: IEntry[]) => {
-    const totals: Array<number> = []
-    entries.map((entry: IEntry) => {
-      let prevMonth = 0
-      let total = 0
-      console.log('amounts', entry.amounts)
-      entry?.amounts?.map((amount: IAmount) => {
-        const amountDate = new Date(amount.date)
-        if (amountDate.getMonth() === prevMonth) {
-          total = total + amount.amount
-        } else {
-          totals.push(total)
-          console.log(totals, prevMonth)
-          prevMonth++
-        }
-      })
-    })
-    return totals
-  }
-
-  let totalBudgetedIncome = 0
-  let totalBudgetedExpenses = 0
-  let totalActualIncome = 0
-  let totalActualExpenses = 0
-  if (incomeQuery.data && expenseQuery.data) {
-    totalBudgetedIncome = getBudgetedTotal(incomeQuery.data?.entries)
-    totalBudgetedExpenses = getBudgetedTotal(expenseQuery.data?.entries)
-    totalActualIncome = getActualTotals(incomeQuery.data?.entries)[0]
-    totalActualExpenses = getActualTotals(expenseQuery.data?.entries)[0]
-    console.log(incomeQuery.data?.entries)
-    console.log(expenseQuery.data?.entries)
-  }
+const DataButtons: FC<DataButtonProps> = ({ name, value, setValueFunc }) => {
   return (
-    <Table variant="striped">
-      <Thead>
-        <Tr>
-          <Th>Month</Th>
-          <Th>Budgeted Income</Th>
-          <Th>Actual Income</Th>
-          <Th>Budgeted Expenses</Th>
-          <Th>Actual Expenses</Th>
-          <Th>Balance</Th>
-          <Th>Total In Bank</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {months.map((month: string, i: number) => {
-          return (
-            <Tr key={i}>
-              <Th>{month}</Th>
-              <Th>{totalBudgetedIncome}</Th>
-              <Th>{totalActualIncome}</Th>
-              <Th>{totalBudgetedExpenses}</Th>
-              <Th>{totalActualExpenses}</Th>
-              <Th>{totalActualIncome - totalActualExpenses}</Th>
-              <Th>-</Th>
-            </Tr>
-          )
-        })}
-      </Tbody>
-    </Table>
+    <Flex>
+      <Button colorScheme="blue" onClick={() => setValueFunc(value - 1)}>
+        Previous {name}
+      </Button>
+      <Spacer />
+      <Button colorScheme="blue" onClick={() => setValueFunc(value + 1)}>
+        Next {name}
+      </Button>
+    </Flex>
   )
 }
 
 const DataTabs: FC = () => {
+  const [year, setYear] = useState(dateToday.getFullYear())
+  const [month, setMonth] = useState(dateToday.getMonth())
   return (
-    <Tabs>
+    <Tabs defaultIndex={0} align="center">
       <TabList>
         <Tab>Month View</Tab>
         <Tab>Year View</Tab>
       </TabList>
       <TabPanels>
         <TabPanel>
-          <MonthView />
+          <DataButtons name={'Month'} value={month} setValueFunc={setMonth} />
+          <MonthView date={new Date(dateToday.setMonth(month))} />
         </TabPanel>
         <TabPanel>
-          <YearView />
+          <DataButtons name={'Year'} value={year} setValueFunc={setYear} />
+          <YearView date={new Date(dateToday.setFullYear(year))} />
         </TabPanel>
       </TabPanels>
     </Tabs>

@@ -1593,6 +1593,11 @@
   dependencies:
     "@types/express" "*"
 
+"@types/datejs@^0.0.31":
+  version "0.0.31"
+  resolved "https://registry.yarnpkg.com/@types/datejs/-/datejs-0.0.31.tgz#921ff76e338a39c5fc2f8a7abdbd3abe9ddd86a0"
+  integrity sha512-Y8z5tvhPcjWBbGByO/PoDnzi4MiVO5Aimh45b7N5iEO7qN8grAfUQYfWIQsr5ugb1IGlPZX4FcMzH6Lb0WBpmw==
+
 "@types/eslint-scope@^3.7.0":
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/@types/eslint-scope/-/eslint-scope-3.7.0.tgz#4792816e31119ebd506902a482caec4951fabd86"
@@ -3501,6 +3506,11 @@ dataloader@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/dataloader/-/dataloader-2.0.0.tgz#41eaf123db115987e21ca93c005cd7753c55fe6f"
   integrity sha512-YzhyDAwA4TaQIhM5go+vCLmU0UikghC/t9DTQYZR2M/UvZ1MdOhPezSDZcjj9uqQJOMqjLcpWtyW2iNINdlatQ==
+
+datejs@^1.0.0-rc3:
+  version "1.0.0-rc3"
+  resolved "https://registry.yarnpkg.com/datejs/-/datejs-1.0.0-rc3.tgz#bffa1efedefeb41fdd8a242af55afa01fb58de57"
+  integrity sha1-v/oe/t7+tB/diiQq9Vr6AftY3lc=
 
 debug@2.6.9, debug@^2.2.0, debug@^2.3.3:
   version "2.6.9"
