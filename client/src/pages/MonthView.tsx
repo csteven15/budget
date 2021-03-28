@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { gql, useQuery } from '@apollo/client'
 import { Box, SimpleGrid, Center } from '@chakra-ui/react'
-import { EInputType, MonthArray } from '../common/enums/index'
+import { EEntryType, MonthArray } from '../common/enums/index'
 import { IAmount, IEntry } from '../common/types'
 
 const daysOfWeek = [
@@ -33,7 +33,7 @@ const GET_ENTRIES = gql`
   }
 `
 
-const queryByTypeByMonth = (type: EInputType, date: Date) => {
+const queryByTypeByMonth = (type: EEntryType, date: Date) => {
   const firstDay = new Date(date.getFullYear(), date.getMonth(), 1)
   const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
   return {
@@ -85,11 +85,11 @@ interface MonthViewProps {
 const MonthView: FC<MonthViewProps> = ({ date }) => {
   const incomeEntries = useQuery(
     GET_ENTRIES,
-    queryByTypeByMonth(EInputType.Income, date)
+    queryByTypeByMonth(EEntryType.Income, date)
   )
   const expenseEntries = useQuery(
     GET_ENTRIES,
-    queryByTypeByMonth(EInputType.Expense, date)
+    queryByTypeByMonth(EEntryType.Expense, date)
   )
   const daysInMonth = new Date(
     date.getFullYear(),

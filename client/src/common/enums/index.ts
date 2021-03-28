@@ -1,5 +1,5 @@
-export { EInputType } from './EInputType'
+export { EEntryType, EEntryValues } from './EEntryType'
 export { EMonth, MonthArray } from './EMonths'
 export { EResponse } from './EResponse'
-export { EAccountType, AccountTypeArray } from './EAccountType'
+export { EAccountType, EAccountValues } from './EAccountType'
 export { EFrequencyType, EFrequencyValues } from './EFrequencyType'

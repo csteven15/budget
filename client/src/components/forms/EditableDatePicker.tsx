@@ -4,7 +4,7 @@ import { Text, Box, Flex, IconButton } from '@chakra-ui/react'
 import 'react-datepicker/dist/react-datepicker.css'
 import './DatePicker.css'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { gql, useMutation } from '@apollo/client'
+import { DocumentNode, gql, useMutation } from '@apollo/client'
 
 const UPDATE_ENTRY_MUTATION = gql`
   mutation updateEntry($payload: UpdateEntryInput!) {
@@ -20,6 +20,7 @@ interface IEditableDatePicker {
   defaultValue: Date
   isClearable?: boolean
   showPopperArrow?: boolean
+  mutationSchema: DocumentNode
 }
 
 const EditableDatePicker: FC<IEditableDatePicker> = ({
@@ -27,13 +28,14 @@ const EditableDatePicker: FC<IEditableDatePicker> = ({
   refName,
   defaultValue,
   showPopperArrow = false,
+  mutationSchema,
 }) => {
   const [hover, setHover] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [trackedValue, setTrackedValue] = useState(new Date(defaultValue))
   const [date, setDate] = useState(new Date(defaultValue))
 
-  const [updateEntry] = useMutation<FormData>(UPDATE_ENTRY_MUTATION)
+  const [updateEntry] = useMutation<FormData>(mutationSchema)
 
   const onSubmit = (newDate: Date) => {
     setTrackedValue(newDate)

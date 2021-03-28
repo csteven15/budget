@@ -1,96 +1,97 @@
-import React, { FC, useState } from 'react'
-import {
-  useToast,
-  theme,
-  IconButton,
-  Input,
-  Text,
-  Box,
-  Flex,
-} from '@chakra-ui/react'
-import { Controller, RegisterOptions, useForm } from 'react-hook-form'
+import React, { FC, useEffect, useRef, useState } from 'react'
+import { theme, IconButton, Text, Box, Flex, Select } from '@chakra-ui/react'
+import { Controller, useForm } from 'react-hook-form'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { DocumentNode, gql, useMutation } from '@apollo/client'
+import { DocumentNode, useMutation } from '@apollo/client'
+import { TextToValue } from '../../common/enums/Generic'
 
-interface IEditableTextField {
+interface IEditableSelect {
   id: string
   refName: string
-  defaultValue: number | string
-  rules?: Exclude<
-    RegisterOptions,
-    'valueAsNumber' | 'valueAsDate' | 'setValueAs'
-  >
+  defaultValue: number
   mutationSchema: DocumentNode
+  textToValueMapping: TextToValue[]
 }
 
-const EditableTextField: FC<IEditableTextField> = ({
+const EditableSelect: FC<IEditableSelect> = ({
   id,
   refName,
   defaultValue,
-  rules,
   mutationSchema,
+  textToValueMapping,
 }) => {
-  const { errors, handleSubmit, control, reset } = useForm()
+  const { errors, handleSubmit, control } = useForm()
 
   const [mutation] = useMutation<FormData>(mutationSchema)
+
+  const [selectOpen, setSelectOpen] = useState(false)
 
   const [hover, setHover] = useState(false)
 
   const [trackedValue, setTrackedValue] = useState(defaultValue)
 
-  const errorToast = useToast()
+  const selectRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function handler(event: any) {
+      if (!selectRef?.current?.contains(event?.target)) {
+        setSelectOpen(false)
+      }
+    }
+    window.addEventListener('click', handler)
+    return () => window.removeEventListener('click', handler)
+  }, [])
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
     setTrackedValue(data[refName])
+    setHover(false)
     mutation({
       variables: {
         payload: {
           _id: id,
-          ...data,
+          type: parseInt(data[refName]),
         },
       },
-    })
-    reset({ ...data })
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onError = (errors: any) => {
-    errorToast({
-      description: errors[refName].message,
-      status: 'error',
-      duration: 3e3,
-      isClosable: true,
     })
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit, onError)}
+    <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      ref={selectRef}
     >
       <Controller
         control={control}
         name={refName}
         defaultValue={defaultValue}
-        rules={rules}
-        render={({ onChange, onBlur, value, ref }) => (
+        render={({ onChange, onBlur, value }) => (
           <Flex>
             <Box>
-              {hover || value !== trackedValue ? (
-                <Input
-                  variant="outline"
+              {hover || selectOpen || value !== trackedValue ? (
+                <Select
                   my={-2}
                   onBlur={onBlur}
                   onChange={(e) => onChange(e.target.value)}
                   value={value}
-                  inputref={ref}
                   isInvalid={errors[refName]}
                   errorBorderColor={theme.colors.red[300]}
-                />
+                  onClick={() => setSelectOpen(true)}
+                >
+                  {textToValueMapping.map((input) => (
+                    <option
+                      onClick={() => setSelectOpen(false)}
+                      key={input.value}
+                      value={input.value}
+                    >
+                      {input.text}
+                    </option>
+                  ))}
+                </Select>
               ) : (
-                <Text>{value}</Text>
+                <Text>{textToValueMapping[value].text}</Text>
               )}
             </Box>
             {value !== trackedValue ? (
@@ -103,6 +104,7 @@ const EditableTextField: FC<IEditableTextField> = ({
                     onClick={() => {
                       setHover(false)
                       onChange(defaultValue)
+                      setSelectOpen(false)
                     }}
                   />
                 </Box>
@@ -110,13 +112,8 @@ const EditableTextField: FC<IEditableTextField> = ({
                   <IconButton
                     my={-3}
                     aria-label="check"
-                    type="submit"
                     icon={<CheckIcon />}
-                    onClick={() => {
-                      if (!!errors[refName]) {
-                        setHover(false)
-                      }
-                    }}
+                    onClick={handleSubmit(onSubmit)}
                   />
                 </Box>
               </>
@@ -124,8 +121,8 @@ const EditableTextField: FC<IEditableTextField> = ({
           </Flex>
         )}
       />
-    </form>
+    </div>
   )
 }
 
-export default EditableTextField
+export default EditableSelect

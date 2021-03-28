@@ -14,14 +14,14 @@ export class AccountResolver {
 
   @Query(() => Account)
   async account(@Args('_id', { type: () => ID }) _id: Types.ObjectId) {
-    this.accountService.getAccountById(_id);
+    return this.accountService.getAccountById(_id);
   }
 
   @Query(() => [Account])
   async accounts(
     @Args('payload', { nullable: true }) payload: GetAccountInput,
   ) {
-    this.accountService.getAccounts(payload);
+    return this.accountService.getAccounts(payload);
   }
 
   @Mutation(() => Account)

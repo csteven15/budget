@@ -1,3 +1,5 @@
+import { TextToValue } from './Generic'
+
 export enum EFrequencyType {
   Once = 0,
   Annually = 1,
@@ -7,7 +9,7 @@ export enum EFrequencyType {
   Weekly = 52,
 }
 
-export const EFrequencyValues = [
+export const EFrequencyValues: TextToValue[] = [
   { text: 'Once', value: EFrequencyType.Once },
   { text: 'Annually', value: EFrequencyType.Annually },
   { text: 'Semi-Annually', value: EFrequencyType.SemiAnnually },

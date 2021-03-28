@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { gql, useQuery } from '@apollo/client'
 import { Table, Thead, Tbody, Tr, Th, TableCaption } from '@chakra-ui/react'
-import { EInputType } from '../common/enums/index'
+import { EEntryType } from '../common/enums/index'
 import { IAmount, IEntry } from '../common/types'
 import { MonthArray } from '../common/enums/index'
 
@@ -24,7 +24,7 @@ const GET_ENTRIES = gql`
   }
 `
 
-const queryByTypeByMonth = (type: EInputType, date: Date) => {
+const queryByTypeByMonth = (type: EEntryType, date: Date) => {
   const firstDay = new Date(date.getFullYear(), date.getMonth(), 1)
   const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
   return {
@@ -52,11 +52,11 @@ interface TotalType {
 const MonthTotals: FC<MonthTotalsProps> = ({ date }) => {
   const incomeEntries = useQuery(
     GET_ENTRIES,
-    queryByTypeByMonth(EInputType.Income, date)
+    queryByTypeByMonth(EEntryType.Income, date)
   )
   const expenseEntries = useQuery(
     GET_ENTRIES,
-    queryByTypeByMonth(EInputType.Expense, date)
+    queryByTypeByMonth(EEntryType.Expense, date)
   )
 
   const getTotals = (entries: IEntry[]) => {

@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
-import EntryForm from '../components/forms/Entry'
-import AccountForm from '../components/forms/Account'
+import EntryForm from '../components/forms/EntryForm'
+import AccountForm from '../components/forms/AccountForm'
 import { useAuth } from '../context/AuthContext'
 
 const Dashboard: FC = () => {

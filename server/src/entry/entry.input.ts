@@ -27,9 +27,6 @@ export class CreateEntryInput {
   @Field(() => GraphQLISODateTime, { nullable: true })
   @ApiProperty({ required: false })
   startDate: Date;
-  @Field(() => GraphQLISODateTime, { nullable: true })
-  @ApiProperty({ required: false })
-  endDate: Date;
 
   // for the form
   @Field(() => Int, { nullable: true })
@@ -84,7 +81,4 @@ export class UpdateEntryInput {
   @Field(() => GraphQLISODateTime, { nullable: true })
   @ApiProperty({ required: false })
   startDate: Date;
-  @Field(() => GraphQLISODateTime, { nullable: true })
-  @ApiProperty({ required: false })
-  endDate: Date;
 }

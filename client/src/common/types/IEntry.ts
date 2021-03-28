@@ -9,7 +9,6 @@ export interface IEntry {
   budgetedAmount: number
   createdAt: Date
   startDate?: Date
-  endDate?: Date
-  frequency?: EFrequencyType
+  frequency?: number
   amounts?: IAmount[]
 }
