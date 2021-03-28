@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC } from 'react'
 
 import { gql, useQuery } from '@apollo/client'
 import { useAuth } from '../context/AuthContext'
@@ -44,7 +44,6 @@ interface IAccountInfo {
 
 const AccountInfo: FC<IAccountInfo> = ({
   _id,
-  userId,
   name,
   total,
   type,
@@ -115,7 +114,7 @@ const HeaderForAccounts: FC = () => (
 const AccountView: FC = () => {
   const { user } = useAuth()
 
-  const accountsQuery = useQuery(GET_ACCOUNTS, {
+  const { data } = useQuery(GET_ACCOUNTS, {
     variables: {
       payload: {
         userId: user.uid,
@@ -123,7 +122,6 @@ const AccountView: FC = () => {
     },
   })
 
-  console.log(accountsQuery.data)
   return (
     <>
       <Text>
@@ -132,7 +130,7 @@ const AccountView: FC = () => {
       </Text>
       <br />
       <HeaderForAccounts />
-      {accountsQuery.data?.accounts?.map((account: IAccountInfo) => (
+      {data?.accounts?.map((account: IAccountInfo) => (
         <AccountInfo key={account._id} {...account} />
       ))}
     </>

@@ -4,15 +4,7 @@ import { Text, Box, Flex, IconButton } from '@chakra-ui/react'
 import 'react-datepicker/dist/react-datepicker.css'
 import './DatePicker.css'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { DocumentNode, gql, useMutation } from '@apollo/client'
-
-const UPDATE_ENTRY_MUTATION = gql`
-  mutation updateEntry($payload: UpdateEntryInput!) {
-    updateEntry(payload: $payload) {
-      _id
-    }
-  }
-`
+import { DocumentNode, useMutation } from '@apollo/client'
 
 interface IEditableDatePicker {
   id: string

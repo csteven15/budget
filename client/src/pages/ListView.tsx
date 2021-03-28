@@ -57,7 +57,7 @@ const EntryInfo: FC<IEntryInfo> = ({
   createdAt,
   startDate,
   endDate,
-  amounts,
+  // amounts,
 }) => {
   const localCreatedAt = new Date(createdAt)
   const { isOpen, onToggle } = useDisclosure()
@@ -179,7 +179,7 @@ const HeaderForEntries: FC = () => (
 
 const ListView: FC = () => {
   const { user } = useAuth()
-  const entriesQuery = useQuery(GET_ENTRIES, {
+  const { data } = useQuery(GET_ENTRIES, {
     variables: {
       payload: {
         userId: user.uid,
@@ -190,7 +190,7 @@ const ListView: FC = () => {
   return (
     <Box w="100%">
       <HeaderForEntries />
-      {entriesQuery.data?.entries?.map((entry: IEntryInfo) => (
+      {data?.entries?.map((entry: IEntryInfo) => (
         <EntryInfo key={entry._id} {...entry} />
       ))}
     </Box>

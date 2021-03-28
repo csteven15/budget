@@ -32,7 +32,9 @@ export class AccountService {
 
   async getAccounts(getAccountInput: GetAccountInput): Promise<Account[]> {
     this.logger.log(`getting all accounts`);
-    return this.accountModel.find({ ...getAccountInput }).exec();
+    return this.accountModel
+      .find({ ...getAccountInput }, null, { sort: { type: 1 } })
+      .exec();
   }
 
   async getAccountsByUserId(userId: string): Promise<Account[]> {

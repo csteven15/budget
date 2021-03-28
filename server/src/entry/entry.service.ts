@@ -12,7 +12,7 @@ import { Entry, EntryDocument } from './entry.schema';
 import { Amount, AmountDocument } from 'src/amount/amount.schema';
 import { CreateAmountInput } from 'src/amount/amount.input';
 
-require('datejs')
+require('datejs');
 
 @Injectable()
 export class EntryService {
@@ -55,7 +55,7 @@ export class EntryService {
   constructor(
     @InjectModel(Entry.name) private entryModel: Model<EntryDocument>,
     @InjectModel(Amount.name) private amountModel: Model<AmountDocument>,
-  ) { }
+  ) {}
 
   async createEntry(createEntryInput: CreateEntryInput): Promise<Entry> {
     const entry = new this.entryModel(createEntryInput);
@@ -68,12 +68,12 @@ export class EntryService {
       const numberOfAmountsToCreate = createEntryInput.frequency + 1;
       // TODO: Fix
       // const dates = this.GetNextDatesByFrequency(createEntryInput.startDate, createEntryInput.frequency);
-      this.logger.log(`amounts ${numberOfAmountsToCreate}`)
+      this.logger.log(`amounts ${numberOfAmountsToCreate}`);
       for (let i = 0; i < numberOfAmountsToCreate; i++) {
         const amountInput: CreateAmountInput = {
           entryId: entry.id,
           // TODO: Fix
-          date: new Date(),//dates[i],
+          date: new Date(), //dates[i],
           amount: entry.budgetedAmount,
           paid: false,
         };
@@ -102,7 +102,16 @@ export class EntryService {
     getEntryInput: GetEntryInput,
     getEntryDateFilterInput: GetEntryDateFilterInput,
   ): Promise<Entry[]> {
-    this.logger.log(`getting all entires - ${getEntryDateFilterInput?.startDate}`);
+    if (getEntryDateFilterInput) {
+      this.logger.log(
+        `getting all entires with date filter`,
+      );
+    } else {
+      this.logger.log(
+        `getting all entires without date filter`,
+      );
+    }
+    
     let matchObject = {};
     if (
       getEntryDateFilterInput?.startDate &&
@@ -123,6 +132,7 @@ export class EntryService {
         null,
         {
           sort: {
+            type: 1,
             date: 1,
           },
         },

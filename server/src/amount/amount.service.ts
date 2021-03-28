@@ -37,7 +37,9 @@ export class AmountService {
 
   async getAmounts(getAmountInput: GetAmountInput): Promise<Amount[]> {
     this.logger.log(`getting all entires`);
-    return this.amountModel.find({ ...getAmountInput }).exec();
+    return this.amountModel
+      .find({ ...getAmountInput }, null, { sort: { date: 1 } })
+      .exec();
   }
 
   async updateAmount(updateAmountInput: UpdateAmountInput): Promise<Amount> {

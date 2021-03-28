@@ -1,7 +1,6 @@
-import React, { FC, useState } from 'react'
+import React, { FC } from 'react'
 import { Checkbox } from '@chakra-ui/react'
-import { RegisterOptions, useForm } from 'react-hook-form'
-import { DocumentNode, gql, useMutation } from '@apollo/client'
+import { DocumentNode, useMutation } from '@apollo/client'
 
 interface IEditableCheckbox {
   id: string
@@ -16,8 +15,6 @@ const EditableCheckbox: FC<IEditableCheckbox> = ({
   defaultValue,
   mutationSchema,
 }) => {
-  const [checked, setChecked] = useState(defaultValue)
-
   const [mutation] = useMutation<FormData>(mutationSchema)
 
   console.log(defaultValue)
@@ -37,12 +34,12 @@ const EditableCheckbox: FC<IEditableCheckbox> = ({
 
   return (
     <Checkbox
-      name="appliedToBudget"
+      name={refName}
       defaultValue={defaultValue === true ? 1 : 0}
       defaultChecked={defaultValue}
       onChange={(event) => {
         const data = {
-          appliedToBudget: event.target.checked,
+          [refName]: event.target.checked,
         }
         onSubmit(data)
       }}

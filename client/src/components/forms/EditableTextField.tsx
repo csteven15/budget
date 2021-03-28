@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react'
 import { Controller, RegisterOptions, useForm } from 'react-hook-form'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { DocumentNode, gql, useMutation } from '@apollo/client'
+import { DocumentNode, useMutation } from '@apollo/client'
 
 interface IEditableTextField {
   id: string
