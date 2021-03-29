@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { gql, useQuery } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import {
   Box,
   Collapse,
@@ -11,44 +11,78 @@ import {
 import { useAuth } from '../context/AuthContext'
 import EditableDatePicker from '../components/forms/EditableDatePicker'
 import EditableTextField from '../components/forms/EditableTextField'
-import { ArrowDownIcon, ArrowUpIcon } from '@chakra-ui/icons'
-import { IAmount } from '../common/types'
-import { UPDATE_ENTRY_MUTATION } from '../common/gql/Mutations'
+import { ArrowDownIcon, ArrowUpIcon, DeleteIcon } from '@chakra-ui/icons'
+import {
+  DELETE_AMOUNT_MUTATION,
+  UPDATE_AMOUNT_MUTATION,
+  UPDATE_ENTRY_MUTATION,
+} from '../common/gql/Mutations'
 import EditableSelect from '../components/forms/EditableSelect'
 import { EEntryValues } from '../common/enums'
+import EditableCheckbox from '../components/forms/EditableCheckbox'
+import { IAmountInfo, IEntryInfo } from '../common/gql/Types'
+import { GET_ENTRIES } from '../common/gql/Queries'
 
-const GET_ENTRIES = gql`
-  query entries($filter: GetEntryDateFilterInput, $payload: GetEntryInput!) {
-    entries(filter: $filter, payload: $payload) {
-      name
-      userId
-      _id
-      type
-      budgetedAmount
-      startDate
-      endDate
-      createdAt
-      amounts {
-        amount
-        date
-        paid
-      }
-    }
-  }
-`
-
-interface IEntryInfo {
-  _id: string
-  name: string
-  type: number
-  budgetedAmount: number
-  createdAt: Date
-  startDate: Date
-  endDate: Date
-  amounts: IAmount[]
+const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
+  const [deleteAmount] = useMutation<FormData>(DELETE_AMOUNT_MUTATION)
+  return (
+    <Grid templateColumns="repeat(4, 1fr)" m={2}>
+      <Box>
+        <EditableTextField
+          refName="amount"
+          id={_id}
+          defaultValue={amount}
+          mutationSchema={UPDATE_AMOUNT_MUTATION}
+          type="float"
+          required
+        />
+      </Box>
+      <Box>
+        <EditableDatePicker
+          id={_id}
+          refName="date"
+          defaultValue={new Date(date)}
+          isClearable={true}
+          showPopperArrow={true}
+          mutationSchema={UPDATE_AMOUNT_MUTATION}
+        />
+      </Box>
+      <Box>
+        <EditableCheckbox
+          id={_id}
+          refName="paid"
+          defaultValue={paid}
+          mutationSchema={UPDATE_AMOUNT_MUTATION}
+        />
+      </Box>
+      <Box>
+        <IconButton
+          onClick={() => deleteAmount({ variables: { _id: _id } })}
+          icon={<DeleteIcon />}
+          aria-label="delete amount"
+        />
+      </Box>
+    </Grid>
+  )
 }
 
-// Fills whole width
+const AccountHeader: FC = () => (
+  <Grid templateColumns="repeat(4, 1fr)" m={2}>
+    <Box>
+      <Text>Amount</Text>
+    </Box>
+    <Box>
+      <Text>Date</Text>
+    </Box>
+    <Box>
+      <Text>Paid</Text>
+    </Box>
+    <Box>
+      <Text>Delete</Text>
+    </Box>
+  </Grid>
+)
+
 const EntryInfo: FC<IEntryInfo> = ({
   _id,
   name,
@@ -57,7 +91,7 @@ const EntryInfo: FC<IEntryInfo> = ({
   createdAt,
   startDate,
   endDate,
-  // amounts,
+  amounts,
 }) => {
   const localCreatedAt = new Date(createdAt)
   const { isOpen, onToggle } = useDisclosure()
@@ -69,10 +103,9 @@ const EntryInfo: FC<IEntryInfo> = ({
             refName="name"
             id={_id}
             defaultValue={name}
-            rules={{
-              required: { value: true, message: 'Required' },
-            }}
             mutationSchema={UPDATE_ENTRY_MUTATION}
+            type="string"
+            required
           />
         </Box>
         <Box>
@@ -89,16 +122,9 @@ const EntryInfo: FC<IEntryInfo> = ({
             refName="budgetedAmount"
             id={_id}
             defaultValue={budgetedAmount}
-            rules={{
-              min: { value: 0, message: 'No negative numbers' },
-              valueAsNumber: true,
-              required: { value: true, message: 'Required' },
-              pattern: {
-                value: /^\d+\.?\d*$/,
-                message: 'Wrong format: E.g. 100.00',
-              },
-            }}
             mutationSchema={UPDATE_ENTRY_MUTATION}
+            type="float"
+            required
           />
         </Box>
         <Box>
@@ -124,27 +150,26 @@ const EntryInfo: FC<IEntryInfo> = ({
             mutationSchema={UPDATE_ENTRY_MUTATION}
           />
         </Box>
-        <Box>
-          <IconButton
-            aria-label="show amounts"
-            onClick={onToggle}
-            icon={isOpen === true ? <ArrowUpIcon /> : <ArrowDownIcon />}
-          />
-        </Box>
+        {amounts?.length > 0 ? (
+          <Box>
+            <IconButton
+              aria-label="show amounts"
+              onClick={onToggle}
+              icon={isOpen === true ? <ArrowUpIcon /> : <ArrowDownIcon />}
+            />
+          </Box>
+        ) : null}
       </Grid>
       <Collapse in={isOpen} animateOpacity>
-        <Box
-          p="40px"
-          color="white"
-          mt="4"
-          bg="teal.500"
-          rounded="md"
-          shadow="md"
-        >
-          Sit nulla est ex deserunt exercitation anim occaecat. Nostrud ullamco
-          deserunt aute id consequat veniam incididunt duis in sint irure nisi.
-          Mollit officia cillum Lorem ullamco minim nostrud elit officia tempor
-          esse quis.
+        <Box m="2" bg="white" rounded="md" boxShadow="md">
+          <AccountHeader />
+          {amounts?.map((amount) => (
+            <AmountInfo
+              key={amount._id}
+              _id={amount?._id as string}
+              {...amount}
+            />
+          ))}
         </Box>
       </Collapse>
     </>
@@ -179,13 +204,17 @@ const HeaderForEntries: FC = () => (
 
 const ListView: FC = () => {
   const { user } = useAuth()
-  const { data } = useQuery(GET_ENTRIES, {
+  const { data, loading } = useQuery(GET_ENTRIES, {
     variables: {
       payload: {
         userId: user.uid,
       },
     },
   })
+
+  if (loading) {
+    return <p>loading</p>
+  }
 
   return (
     <Box w="100%">

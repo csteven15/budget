@@ -17,11 +17,8 @@ const EditableCheckbox: FC<IEditableCheckbox> = ({
 }) => {
   const [mutation] = useMutation<FormData>(mutationSchema)
 
-  console.log(defaultValue)
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
-    console.log(data)
     mutation({
       variables: {
         payload: {

@@ -18,39 +18,38 @@ require('datejs');
 export class EntryService {
   private readonly logger = new Logger(EntryService.name);
 
-  // TODO: Fix
-  // private GetNextDatesByFrequency(date: Date, frequency: number) {
-  //   let dates: Date[] = [ date ]
-  //   let lastDate = new Date(date)
-  //   for (let i = 0; i < frequency; i++) {
-  //     let temp = new Date(lastDate)
-  //     switch (frequency) {
-  //       case 1: {
-  //         temp.addYears(1)
-  //         break;
-  //       }
-  //       case 2:{
-  //         temp.addMonths(6)
-  //         break;
-  //       }
-  //       case 12: {
-  //         temp.addMonths(1)
-  //         break;
-  //       }
-  //       case 26: {
-  //         temp.addDays(14)
-  //         break;
-  //       }
-  //       case 52: {
-  //         temp.addDays(7)
-  //         break
-  //       }
-  //     }
-  //     dates.push(new Date(temp))
-  //     lastDate = temp
-  //   }
-  //   return dates
-  // }
+  private GetNextDatesByFrequency(date: Date, frequency: number) {
+    let dates: Date[] = [ date ]
+    let lastDate = new Date(date)
+    for (let i = 0; i < frequency; i++) {
+      let temp = new Date(lastDate)
+      switch (frequency) {
+        case 1: {
+          temp.addYears(1)
+          break;
+        }
+        case 2:{
+          temp.addMonths(6)
+          break;
+        }
+        case 12: {
+          temp.addMonths(1)
+          break;
+        }
+        case 26: {
+          temp.addDays(14)
+          break;
+        }
+        case 52: {
+          temp.addDays(7)
+          break
+        }
+      }
+      dates.push(new Date(temp))
+      lastDate = temp
+    }
+    return dates
+  }
 
   constructor(
     @InjectModel(Entry.name) private entryModel: Model<EntryDocument>,
@@ -66,14 +65,12 @@ export class EntryService {
     this.logger.log(`created entry ${entry._id}`);
     if (createEntryInput?.frequency !== undefined) {
       const numberOfAmountsToCreate = createEntryInput.frequency + 1;
-      // TODO: Fix
-      // const dates = this.GetNextDatesByFrequency(createEntryInput.startDate, createEntryInput.frequency);
+      const dates = this.GetNextDatesByFrequency(createEntryInput.startDate, createEntryInput.frequency);
       this.logger.log(`amounts ${numberOfAmountsToCreate}`);
       for (let i = 0; i < numberOfAmountsToCreate; i++) {
         const amountInput: CreateAmountInput = {
           entryId: entry.id,
-          // TODO: Fix
-          date: new Date(), //dates[i],
+          date: dates[i],
           amount: entry.budgetedAmount,
           paid: false,
         };

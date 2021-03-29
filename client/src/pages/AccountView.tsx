@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
 
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useAuth } from '../context/AuthContext'
 import { Box, Grid, Text } from '@chakra-ui/react'
 import { UPDATE_ACCOUNT_MUTATION } from '../common/gql/Mutations'
@@ -8,28 +8,8 @@ import EditableTextField from '../components/forms/EditableTextField'
 import { EAccountValues } from '../common/enums'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
 import EditableSelect from '../components/forms/EditableSelect'
-
-const GET_ACCOUNTS = gql`
-  query accounts($payload: GetAccountInput!) {
-    accounts(payload: $payload) {
-      _id
-      userId
-      name
-      total
-      type
-      appliedToBudget
-    }
-  }
-`
-
-interface IAccountInfo {
-  _id: string
-  userId: string
-  name: string
-  total: number
-  type: number
-  appliedToBudget: boolean
-}
+import { GET_ACCOUNTS } from '../common/gql/Queries'
+import { IAccountInfo } from '../common/gql/Types'
 
 // const getTotalAppliedToBudget = () => {
 //   let total = 0
@@ -56,10 +36,9 @@ const AccountInfo: FC<IAccountInfo> = ({
           refName="name"
           id={_id}
           defaultValue={name}
-          rules={{
-            required: { value: true, message: 'Required' },
-          }}
           mutationSchema={UPDATE_ACCOUNT_MUTATION}
+          type="string"
+          required
         />
       </Box>
       <Box>
@@ -76,10 +55,9 @@ const AccountInfo: FC<IAccountInfo> = ({
           refName="total"
           id={_id}
           defaultValue={total}
-          rules={{
-            required: { value: true, message: 'Required' },
-          }}
           mutationSchema={UPDATE_ACCOUNT_MUTATION}
+          type="float"
+          required
         />
       </Box>
       <Box>

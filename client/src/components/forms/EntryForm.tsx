@@ -17,17 +17,10 @@ import {
   EFrequencyValues,
   EEntryValues,
 } from '../../common/enums/index'
-import { gql, useMutation } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import DatePicker from './DatePicker'
+import { CREATE_ENTRY_MUTATION } from '../../common/gql/Mutations'
 
-const CREATE_ENTRY_MUTATION = gql`
-  mutation createEntry($payload: CreateEntryInput!) {
-    createEntry(payload: $payload) {
-      _id
-      userId
-    }
-  }
-`
 const today = new Date()
 
 const EntryForm: FC = () => {
@@ -120,7 +113,7 @@ const EntryForm: FC = () => {
             ))}
           </Select>
         </Box>
-        <Box>
+        <Box my="2">
           <DatePicker
             selectedDate={startDate}
             onChange={(date) => setStartDate(date)}
@@ -132,6 +125,7 @@ const EntryForm: FC = () => {
             onClick={handleSubmit(onSubmit, onError)}
             type="submit"
             variant="solid"
+            boxShadow="md"
           >
             Add Entry
           </Button>

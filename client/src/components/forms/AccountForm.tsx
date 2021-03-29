@@ -16,16 +16,8 @@ import {
   Text,
   theme,
 } from '@chakra-ui/react'
-import { gql, useMutation } from '@apollo/client'
-
-const CREATE_ACCOUNT_MUTATION = gql`
-  mutation createAccount($payload: CreateAccountInput!) {
-    createAccount(payload: $payload) {
-      _id
-      userId
-    }
-  }
-`
+import { useMutation } from '@apollo/client'
+import { CREATE_ACCOUNT_MUTATION } from '../../common/gql/Mutations'
 
 const AccountForm: FC = () => {
   const { register, errors, handleSubmit } = useForm<IAccount>()
@@ -36,8 +28,6 @@ const AccountForm: FC = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (formData: any) => {
-    console.log(formData)
-
     addAccount({
       variables: {
         payload: {
@@ -121,6 +111,7 @@ const AccountForm: FC = () => {
             ref={register}
             type="submit"
             variant="solid"
+            boxShadow="md"
           >
             Add Account
           </Button>

@@ -1,88 +1,81 @@
 import React, { FC } from 'react'
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { Table, Thead, Tbody, Tr, Th, TableCaption } from '@chakra-ui/react'
 import { EEntryType } from '../common/enums/index'
-import { IAmount, IEntry } from '../common/types'
 import { MonthArray } from '../common/enums/index'
-
-const GET_ENTRIES = gql`
-  query entries($filter: GetEntryDateFilterInput, $payload: GetEntryInput) {
-    entries(filter: $filter, payload: $payload) {
-      name
-      _id
-      type
-      budgetedAmount
-      startDate
-      endDate
-      createdAt
-      amounts {
-        amount
-        date
-        paid
-      }
-    }
-  }
-`
-
-const queryByTypeByMonth = (type: EEntryType, date: Date) => {
-  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1)
-  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-  return {
-    variables: {
-      filter: {
-        startDate: firstDay,
-        endDate: lastDay,
-      },
-      payload: {
-        type: type,
-      },
-    },
-  }
-}
+import { GET_ENTRIES } from '../common/gql/Queries'
+import { IEntryInfo } from '../common/gql/Types'
 
 interface MonthTotalsProps {
   date: Date
 }
 
-interface TotalType {
-  budgetedTotal: number
-  actualTotal: number
-}
-
 const MonthTotals: FC<MonthTotalsProps> = ({ date }) => {
-  const incomeEntries = useQuery(
-    GET_ENTRIES,
-    queryByTypeByMonth(EEntryType.Income, date)
-  )
-  const expenseEntries = useQuery(
-    GET_ENTRIES,
-    queryByTypeByMonth(EEntryType.Expense, date)
-  )
+  const filter = {
+    startDate: new Date(date.getFullYear(), date.getMonth(), 1),
+    endDate: new Date(date.getFullYear(), date.getMonth() + 1, 0),
+  }
+  const { data, loading } = useQuery(GET_ENTRIES, {
+    variables: {
+      filter: filter,
+      payload: {
+        type: EEntryType.Income,
+      },
+    },
+    fetchPolicy: 'no-cache',
+  })
 
-  const getTotals = (entries: IEntry[]) => {
-    const total: TotalType = { budgetedTotal: 0, actualTotal: 0 }
-    entries?.forEach((entry: IEntry) => {
-      total.budgetedTotal = entry.budgetedAmount
-      if (entry.amounts) {
-        total.actualTotal += entry?.amounts.reduce(
-          (total: number, i: IAmount) => (total += i.amount),
-          0
-        )
-      }
-    })
-    return total
+  if (loading) {
+    return (
+      <Tr>
+        <Th>0</Th>
+        <Th>0</Th>
+        <Th>0</Th>
+        <Th>0</Th>
+        <Th>0</Th>
+        <Th>0</Th>
+        <Th>-</Th>
+      </Tr>
+    )
   }
 
-  const totalIncome = getTotals(incomeEntries.data?.entries)
-  const totalExpenses = getTotals(expenseEntries.data?.entries)
+  const getBudgetedTotal = (entries?: IEntryInfo[]) => {
+    return entries?.reduce(
+      (accumulator, cur) => accumulator + cur.budgetedAmount,
+      0
+    )
+  }
+
+  const getActualTotal = (entries?: IEntryInfo[]) => {
+    const totals = entries?.map((entry: IEntryInfo) =>
+      entry.amounts.reduce((accumulator, cur) => accumulator + cur.amount, 0)
+    )
+    return totals?.reduce((accumulator, cur) => accumulator + cur, 0)
+  }
+
+  const incomes = data?.entries?.filter(
+    (entry: IEntryInfo) => entry.type === EEntryType.Income
+  )
+  const expenses = data?.entries?.filter(
+    (entry: IEntryInfo) => entry.type === EEntryType.Expense
+  )
+
+  const budgetedTotalIncomes = getBudgetedTotal(incomes)
+  const actualTotalIncomes = getActualTotal(incomes)
+
+  const budgetedTotalExpenses = getBudgetedTotal(expenses)
+  const actualTotalExpenses = getActualTotal(expenses)
+
+  const balance = (actualTotalIncomes ?? 0) - (actualTotalExpenses ?? 0)
+
   return (
     <Tr>
       <Th>{MonthArray[date.getMonth()]}</Th>
-      <Th>{totalIncome.budgetedTotal}</Th>
-      <Th>{totalIncome.actualTotal}</Th>
-      <Th>{totalExpenses.budgetedTotal}</Th>
-      <Th>{totalExpenses.actualTotal}</Th>
-      <Th>{totalIncome.actualTotal - totalExpenses.actualTotal}</Th>
+      <Th>{budgetedTotalIncomes ?? 0}</Th>
+      <Th>{actualTotalIncomes ?? 0}</Th>
+      <Th>{budgetedTotalExpenses ?? 0}</Th>
+      <Th>{actualTotalExpenses ?? 0}</Th>
+      <Th>{balance}</Th>
       <Th>-</Th>
     </Tr>
   )
@@ -108,16 +101,14 @@ const YearView: FC<YearViewProps> = ({ date }) => {
         </Tr>
       </Thead>
       <Tbody>
-        {MonthArray.map((month: string, i: number) => {
-          return (
-            <MonthTotals
-              key={i}
-              date={
-                new Date(date.getFullYear(), MonthArray.indexOf(month) + 1, 0)
-              }
-            />
-          )
-        })}
+        {MonthArray.map((month: string, i: number) => (
+          <MonthTotals
+            key={i}
+            date={
+              new Date(date.getFullYear(), MonthArray.indexOf(month) + 1, 0)
+            }
+          />
+        ))}
       </Tbody>
     </Table>
   )

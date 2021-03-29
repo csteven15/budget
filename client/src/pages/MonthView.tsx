@@ -14,7 +14,7 @@ const daysOfWeek = [
   'Saturday',
 ]
 
-const GET_ENTRIES = gql`
+const GET_ENTRIES_MONTH = gql`
   query entries($filter: GetEntryDateFilterInput, $payload: GetEntryInput) {
     entries(filter: $filter, payload: $payload) {
       name
@@ -45,7 +45,9 @@ const queryByTypeByMonth = (type: EEntryType, date: Date) => {
       payload: {
         type: type,
       },
-      fetchPolicy: 'no-cache',
+    },
+    options: {
+      fetchPolicy: 'network-only',
     },
   }
 }
@@ -84,11 +86,11 @@ interface MonthViewProps {
 
 const MonthView: FC<MonthViewProps> = ({ date }) => {
   const incomeEntries = useQuery(
-    GET_ENTRIES,
+    GET_ENTRIES_MONTH,
     queryByTypeByMonth(EEntryType.Income, date)
   )
   const expenseEntries = useQuery(
-    GET_ENTRIES,
+    GET_ENTRIES_MONTH,
     queryByTypeByMonth(EEntryType.Expense, date)
   )
   const daysInMonth = new Date(
@@ -112,31 +114,24 @@ const MonthView: FC<MonthViewProps> = ({ date }) => {
     return amounts
   }
 
-  const dayComponents: JSX.Element[] = []
-  for (let i = 0; i < daysInMonth; i++) {
-    dayComponents.push(
-      <DayComponent
-        key={i}
-        day={new Date(date.getFullYear(), date.getMonth(), i)}
-        income={getAmountsOnDay(incomeEntries.data?.entries, i)}
-        expenses={getAmountsOnDay(expenseEntries.data?.entries, i)}
-      />
-    )
-  }
+  const dayComponents = Array.from(Array(daysInMonth).keys()).map((i) => (
+    <DayComponent
+      key={i}
+      day={new Date(date.getFullYear(), date.getMonth(), i)}
+      income={getAmountsOnDay(incomeEntries.data?.entries, i)}
+      expenses={getAmountsOnDay(expenseEntries.data?.entries, i)}
+    />
+  ))
   return (
     <div>
       <Center>{MonthArray[date.getMonth()]}</Center>
       <SimpleGrid columns={7}>
-        {daysOfWeek.map((day: string) => {
-          return (
-            <Box key={day} textAlign="center">
-              {day}
-            </Box>
-          )
-        })}
-        {dayComponents.map((day: JSX.Element) => {
-          return day
-        })}
+        {daysOfWeek.map((day: string) => (
+          <Box key={day} textAlign="center">
+            {day}
+          </Box>
+        ))}
+        {dayComponents}
       </SimpleGrid>
     </div>
   )

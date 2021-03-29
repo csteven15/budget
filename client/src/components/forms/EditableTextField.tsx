@@ -16,19 +16,18 @@ interface IEditableTextField {
   id: string
   refName: string
   defaultValue: number | string
-  rules?: Exclude<
-    RegisterOptions,
-    'valueAsNumber' | 'valueAsDate' | 'setValueAs'
-  >
   mutationSchema: DocumentNode
+  type: 'string' | 'number' | 'float'
+  required?: boolean
 }
 
 const EditableTextField: FC<IEditableTextField> = ({
   id,
   refName,
   defaultValue,
-  rules,
   mutationSchema,
+  type,
+  required,
 }) => {
   const { errors, handleSubmit, control, reset } = useForm()
 
@@ -42,6 +41,8 @@ const EditableTextField: FC<IEditableTextField> = ({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
+    if (type === 'number') data[refName] = parseInt(data[refName])
+    if (type === 'float') data[refName] = parseFloat(data[refName])
     setTrackedValue(data[refName])
     mutation({
       variables: {
@@ -51,6 +52,7 @@ const EditableTextField: FC<IEditableTextField> = ({
         },
       },
     })
+
     reset({ ...data })
   }
 
@@ -62,6 +64,26 @@ const EditableTextField: FC<IEditableTextField> = ({
       duration: 3e3,
       isClosable: true,
     })
+  }
+
+  const rules: Exclude<
+    RegisterOptions,
+    'valueAsNumber' | 'valueAsDate' | 'setValueAs'
+  > = {}
+
+  if (type === 'number' || type === 'float') {
+    rules.min = {
+      value: 0,
+      message: 'No negative value',
+    }
+    rules.pattern = {
+      value: /^\d+\.?\d*$/,
+      message: 'Wrong format: E.g. 100.00',
+    }
+  }
+
+  if (required) {
+    rules.required = { value: true, message: 'Required' }
   }
 
   return (
