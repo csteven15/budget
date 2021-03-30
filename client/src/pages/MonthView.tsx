@@ -1,8 +1,9 @@
 import React, { FC } from 'react'
-import { gql, useQuery } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { Box, SimpleGrid, Center } from '@chakra-ui/react'
 import { EEntryType, MonthArray } from '../common/enums/index'
-import { IAmount, IEntry } from '../common/types'
+import { IAmount, IEntry } from '../common/types/index'
+import { GET_ENTRIES } from '../common/gql/Queries'
 
 const daysOfWeek = [
   'Sunday',
@@ -14,46 +15,8 @@ const daysOfWeek = [
   'Saturday',
 ]
 
-const GET_ENTRIES_MONTH = gql`
-  query entries($filter: GetEntryDateFilterInput, $payload: GetEntryInput) {
-    entries(filter: $filter, payload: $payload) {
-      name
-      _id
-      type
-      budgetedAmount
-      startDate
-      endDate
-      createdAt
-      amounts {
-        amount
-        date
-        paid
-      }
-    }
-  }
-`
-
-const queryByTypeByMonth = (type: EEntryType, date: Date) => {
-  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1)
-  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-  return {
-    variables: {
-      filter: {
-        startDate: firstDay,
-        endDate: lastDay,
-      },
-      payload: {
-        type: type,
-      },
-    },
-    options: {
-      fetchPolicy: 'no-cache',
-    },
-  }
-}
-
 interface DayComponentProps {
-  day: Date
+  day?: Date
   income?: number[]
   expenses?: number[]
 }
@@ -61,7 +24,7 @@ interface DayComponentProps {
 const DayComponent: FC<DayComponentProps> = ({ day, income, expenses }) => {
   return (
     <Box borderWidth="1px" minW="50px" h="125px">
-      <Box textAlign="right">{day.getDate()}</Box>
+      <Box textAlign="right">{day?.getDate()}</Box>
       {income?.map((amount: number, i: number) => {
         return (
           <Box key={i} textAlign="center">
@@ -85,14 +48,15 @@ interface MonthViewProps {
 }
 
 const MonthView: FC<MonthViewProps> = ({ date }) => {
-  const incomeEntries = useQuery(
-    GET_ENTRIES_MONTH,
-    queryByTypeByMonth(EEntryType.Income, date)
-  )
-  const expenseEntries = useQuery(
-    GET_ENTRIES_MONTH,
-    queryByTypeByMonth(EEntryType.Expense, date)
-  )
+  const { data: entriesForMonth } = useQuery(GET_ENTRIES, {
+    variables: {
+      filter: {
+        startDate: new Date(date.getFullYear(), date.getMonth(), 1),
+        endDate: new Date(date.getFullYear(), date.getMonth() + 1, 0),
+      },
+      payload: {},
+    },
+  })
   const daysInMonth = new Date(
     date.getFullYear(),
     date.getMonth() + 1,
@@ -114,12 +78,32 @@ const MonthView: FC<MonthViewProps> = ({ date }) => {
     return amounts
   }
 
+  const income = entriesForMonth?.entries?.filter(
+    (entry: IEntry) => entry.type === EEntryType.Income
+  )
+  const expenses = entriesForMonth?.entries?.filter(
+    (entry: IEntry) => entry.type === EEntryType.Expense
+  )
+
+  date.setDate(1)
+  const daysComponentsPriorToMonth: Array<JSX.Element> = []
+  for (let i = 0; i < date.getDay() - 1; i++) {
+    daysComponentsPriorToMonth.push(
+      <DayComponent
+        key={i}
+        day={
+          new Date(date.getFullYear(), date.getMonth(), -(date.getDay() - i))
+        }
+      />
+    )
+  }
+
   const dayComponents = Array.from(Array(daysInMonth).keys()).map((i) => (
     <DayComponent
       key={i}
       day={new Date(date.getFullYear(), date.getMonth(), i)}
-      income={getAmountsOnDay(incomeEntries.data?.entries, i)}
-      expenses={getAmountsOnDay(expenseEntries.data?.entries, i)}
+      income={getAmountsOnDay(income, i)}
+      expenses={getAmountsOnDay(expenses, i)}
     />
   ))
   return (
@@ -131,6 +115,7 @@ const MonthView: FC<MonthViewProps> = ({ date }) => {
             {day}
           </Box>
         ))}
+        {daysComponentsPriorToMonth}
         {dayComponents}
       </SimpleGrid>
     </div>
