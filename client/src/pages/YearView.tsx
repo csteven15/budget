@@ -2,10 +2,9 @@ import React, { FC } from 'react'
 import { useQuery } from '@apollo/client'
 import { useAuth } from '../context/AuthContext'
 import { Table, Thead, Tbody, Tr, Th, TableCaption } from '@chakra-ui/react'
-import { EEntryType } from '../common/enums/index'
-import { MonthArray } from '../common/enums/index'
-import { GET_ENTRIES, GET_ACCOUNTS } from '../common/gql/Queries'
+import { EEntryType, MonthArray } from '../common/enums/index'
 import { IEntry, IAmount, IAccount } from '../common/types/index'
+import { GET_ENTRIES, GET_ACCOUNTS } from '../common/gql/Queries'
 
 interface TotalType {
   budgeted: number
@@ -69,7 +68,7 @@ const YearView: FC<YearViewProps> = ({ date }) => {
   })
   const getTotalsForEachMonth = (entries: IEntry[]) => {
     const totals: TotalType[] = []
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < MonthArray.length; i++) {
       const total: TotalType = { budgeted: 0, actual: 0 }
       entries?.forEach((entry: IEntry) => {
         entry?.amounts?.forEach((amount: IAmount) => {
@@ -90,7 +89,7 @@ const YearView: FC<YearViewProps> = ({ date }) => {
   ) => {
     const totals: number[] = []
     let lastMonthTotal = totalInBank
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < MonthArray.length; i++) {
       const endOfMonthBankTotal =
         lastMonthTotal + (income[i].actual - expense[i].actual)
       totals.push(endOfMonthBankTotal)
@@ -133,7 +132,7 @@ const YearView: FC<YearViewProps> = ({ date }) => {
           return (
             <MonthInfo
               key={i}
-              header={MonthArray[i].toString()}
+              header={month}
               budgetedIncome={incomeTotals[i].budgeted.toString()}
               actualIncome={incomeTotals[i].actual.toString()}
               budgetedExpenses={expenseTotals[i].budgeted.toString()}
