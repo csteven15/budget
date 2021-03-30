@@ -47,7 +47,7 @@ const queryByTypeByMonth = (type: EEntryType, date: Date) => {
       },
     },
     options: {
-      fetchPolicy: 'network-only',
+      fetchPolicy: 'no-cache',
     },
   }
 }

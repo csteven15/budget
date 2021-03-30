@@ -38,7 +38,7 @@ const DataTabs: FC = () => {
   const [year, setYear] = useState(dateToday.getFullYear())
   const [month, setMonth] = useState(dateToday.getMonth())
   return (
-    <Tabs defaultIndex={0} align="center">
+    <Tabs isManual align="center">
       <TabList>
         <Tab>Month View</Tab>
         <Tab>Year View</Tab>

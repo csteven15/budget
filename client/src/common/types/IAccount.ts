@@ -4,5 +4,5 @@ export interface IAccount {
   name: string
   type: number
   total: number
-  isAppliedToBudget: boolean
+  appliedToBudget: boolean
 }

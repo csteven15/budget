@@ -11,17 +11,6 @@ import EditableSelect from '../components/forms/EditableSelect'
 import { GET_ACCOUNTS } from '../common/gql/Queries'
 import { IAccountInfo } from '../common/gql/Types'
 
-// const getTotalAppliedToBudget = () => {
-//   let total = 0
-//   const accountsApplied = accounts.filter(
-//     (account) => account.isAppliedToBudget === true
-//   )
-//   accountsApplied.forEach((account) => {
-//     total += account.total
-//   })
-//   return total
-// }
-
 const AccountInfo: FC<IAccountInfo> = ({
   _id,
   name,
