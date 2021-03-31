@@ -1,17 +1,29 @@
 import React, { FC } from 'react'
-import { useMutation, useQuery } from '@apollo/client'
+import { useMutation } from '@apollo/client'
 import {
   Box,
   Collapse,
+  Container,
+  Flex,
   Grid,
   IconButton,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverTrigger,
   Text,
   useDisclosure,
 } from '@chakra-ui/react'
-import { useAuth } from '../context/AuthContext'
 import EditableDatePicker from '../components/forms/EditableDatePicker'
 import EditableTextField from '../components/forms/EditableTextField'
-import { ArrowDownIcon, ArrowUpIcon, DeleteIcon } from '@chakra-ui/icons'
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  DeleteIcon,
+  EditIcon,
+} from '@chakra-ui/icons'
 import {
   DELETE_AMOUNT_MUTATION,
   UPDATE_AMOUNT_MUTATION,
@@ -21,7 +33,8 @@ import EditableSelect from '../components/forms/EditableSelect'
 import { EEntryValues } from '../common/enums'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
 import { IAmountInfo, IEntryInfo } from '../common/gql/Types'
-import { GET_ENTRIES } from '../common/gql/Queries'
+import EntryForm from '../components/forms/EntryForm'
+import { useEntriesQueryCached } from '../hooks/useEntriesQuery'
 
 const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
   const [deleteAmount] = useMutation<FormData>(DELETE_AMOUNT_MUTATION)
@@ -202,22 +215,44 @@ const HeaderForEntries: FC = () => (
   </Grid>
 )
 
+const EntryFormPopoverContent: FC = () => (
+  <PopoverContent>
+    <PopoverArrow />
+    <PopoverCloseButton />
+    <PopoverBody>
+      <Container
+        maxW="container.md"
+        boxShadow="base"
+        p="6"
+        rounded="md"
+        bg="white"
+      >
+        <EntryForm refetchQuery={true} />
+      </Container>
+    </PopoverBody>
+  </PopoverContent>
+)
+
 const ListView: FC = () => {
-  const { user } = useAuth()
-  const { data, loading } = useQuery(GET_ENTRIES, {
-    variables: {
-      payload: {
-        userId: user.uid,
-      },
-    },
-  })
+  const { data, loading } = useEntriesQueryCached()
 
   if (loading) {
     return <p>loading</p>
   }
 
   return (
-    <Box w="100%">
+    <Box w="95%" rounded="md" boxShadow="md" mx="auto">
+      <Flex>
+        <Text size="md">Add Entry</Text>
+        &nbsp;&nbsp;
+        <Popover isLazy placement="bottom-end">
+          <PopoverTrigger>
+            <IconButton aria-label="Add Entry" size="sm" icon={<EditIcon />} />
+          </PopoverTrigger>
+          <EntryFormPopoverContent />
+        </Popover>
+      </Flex>
+
       <HeaderForEntries />
       {data?.entries?.map((entry: IEntryInfo) => (
         <EntryInfo key={entry._id} {...entry} />

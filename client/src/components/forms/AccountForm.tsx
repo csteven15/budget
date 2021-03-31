@@ -8,7 +8,6 @@ import {
   Button,
   Center,
   Checkbox,
-  Container,
   Flex,
   Input,
   Select,
@@ -46,78 +45,70 @@ const AccountForm: FC = () => {
   }
 
   return (
-    <Container
-      maxW="container.md"
-      boxShadow="base"
-      p="6"
-      rounded="md"
-      bg="white"
-    >
-      <SimpleGrid columns={2} spacing={3}>
-        <Box>
-          <Input
-            name="name"
-            placeholder="Account Name"
-            ref={register({ required: true })}
-            isInvalid={!!errors.name}
-            errorBorderColor={theme.colors.red[300]}
-          />
-        </Box>
-        <Box>
-          <Select
-            name="type"
-            ref={register({ required: true })}
-            defaultValue={0}
-            placeholder="Acount Type"
-          >
-            {EAccountValues.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.text}
-              </option>
-            ))}
-          </Select>
-        </Box>
-        <Box>
-          <Input
-            name="total"
-            placeholder="Account Total"
-            ref={register({
-              required: true,
-              pattern: {
-                value: /^\d+\.?\d*$/,
-                message: 'Wrong format: E.g. 100.00',
-              },
-              min: 0,
-            })}
-            isInvalid={!!errors.total}
-            errorBorderColor={theme.colors.red[300]}
-          />
-        </Box>
-        <Center>
-          <Flex>
-            <Text>Applied to Budget</Text>
-            &nbsp; &nbsp;
-            <Checkbox
-              name="appliedToBudget"
-              ref={register}
-              defaultValue={0}
-              defaultChecked={false}
-            />
-          </Flex>
-        </Center>
-        <Box>
-          <Button
-            onClick={handleSubmit(onSubmit, onError)}
+    <SimpleGrid columns={2} spacing={3}>
+      <Box>
+        <Input
+          name="name"
+          placeholder="Account Name"
+          ref={register({ required: true })}
+          isInvalid={!!errors.name}
+          errorBorderColor={theme.colors.red[300]}
+        />
+      </Box>
+      <Box>
+        <Select
+          name="type"
+          ref={register({ required: true })}
+          defaultValue={0}
+          placeholder="Acount Type"
+        >
+          {EAccountValues.map((type) => (
+            <option key={type.value} value={type.value}>
+              {type.text}
+            </option>
+          ))}
+        </Select>
+      </Box>
+      <Box>
+        <Input
+          name="total"
+          placeholder="Account Total"
+          ref={register({
+            required: true,
+            pattern: {
+              value: /^\d+\.?\d*$/,
+              message: 'Wrong format: E.g. 100.00',
+            },
+            min: 0,
+          })}
+          isInvalid={!!errors.total}
+          errorBorderColor={theme.colors.red[300]}
+        />
+      </Box>
+      <Center>
+        <Flex>
+          <Text>Applied to Budget</Text>
+          &nbsp; &nbsp;
+          <Checkbox
+            name="appliedToBudget"
             ref={register}
-            type="submit"
-            variant="solid"
-            boxShadow="md"
-          >
-            Add Account
-          </Button>
-        </Box>
-      </SimpleGrid>
-    </Container>
+            defaultValue={0}
+            defaultChecked={false}
+          />
+        </Flex>
+      </Center>
+      <Box>
+        <Button
+          onClick={handleSubmit(onSubmit, onError)}
+          ref={register}
+          type="submit"
+          variant="solid"
+          boxShadow="md"
+        >
+          Add Account
+        </Button>
+      </Box>
+    </SimpleGrid>
   )
 }
 
