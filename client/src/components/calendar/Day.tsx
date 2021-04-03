@@ -4,12 +4,18 @@ import { IAmountInfo } from '../../common/gql/Types'
 
 interface IDayProps {
   date: Date
+  month: number
   incomeAmounts: IAmountInfo[]
   expenseAmounts: IAmountInfo[]
 }
 
-const Day: FC<IDayProps> = ({ date, incomeAmounts, expenseAmounts }) => (
-  <Box borderWidth="1px" minW="50px" h="125px">
+const Day: FC<IDayProps> = ({ date, month, incomeAmounts, expenseAmounts }) => (
+  <Box
+    borderWidth="1px"
+    minW="50px"
+    h="125px"
+    backgroundColor={date.getMonth() === month ? 'white' : 'whitesmoke'}
+  >
     <Box textAlign="right">{date.getDate()}</Box>
     {incomeAmounts?.map((amountInfo: IAmountInfo) => (
       <Box key={amountInfo._id} textAlign="center">

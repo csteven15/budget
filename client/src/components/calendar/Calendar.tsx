@@ -70,6 +70,7 @@ const Calendar: FC<ICalendarProps> = ({ month, startDate, endDate }) => {
   const days = dates.map((date) => (
     <Day
       key={date.toString()}
+      month={month}
       date={new Date(date)}
       incomeAmounts={getAmountsOnDay(incomeEntries, date)}
       expenseAmounts={getAmountsOnDay(expenseEntries, date)}
