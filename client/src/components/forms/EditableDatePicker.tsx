@@ -40,7 +40,7 @@ const EditableDatePicker: FC<IEditableDatePicker> = ({
       variables: {
         payload: {
           _id: id,
-          [refName]: newDate,
+          [refName]: new Date(newDate.setHours(0, 0, 0, 0)),
         },
       },
     })

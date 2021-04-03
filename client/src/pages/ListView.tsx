@@ -177,11 +177,7 @@ const EntryInfo: FC<IEntryInfo> = ({
         <Box m="2" bg="white" rounded="md" boxShadow="md">
           <AccountHeader />
           {amounts?.map((amount) => (
-            <AmountInfo
-              key={amount._id}
-              _id={amount?._id as string}
-              {...amount}
-            />
+            <AmountInfo key={amount._id} {...amount} />
           ))}
         </Box>
       </Collapse>

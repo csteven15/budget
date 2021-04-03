@@ -5,10 +5,10 @@ export interface IEntryInfo {
   name: string
   type: number
   budgetedAmount: number
-  createdAt: Date
-  startDate: Date
-  endDate: Date
-  amounts: IAmount[]
+  createdAt: string
+  startDate: string
+  endDate: string
+  amounts: IAmountInfo[]
 }
 
 export interface IAccountInfo {
@@ -23,6 +23,6 @@ export interface IAccountInfo {
 export interface IAmountInfo {
   _id: string
   amount: number
-  date: Date
+  date: string
   paid: boolean
 }

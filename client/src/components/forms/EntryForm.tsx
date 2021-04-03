@@ -35,7 +35,7 @@ const EntryForm: FC<{ refetchQuery?: boolean }> = ({ refetchQuery }) => {
           type: parseInt(formData!.type, 10),
           budgetedAmount: parseFloat(formData!.budgetedAmount),
           frequency: parseInt(formData!.frequency, 10),
-          startDate: startDate,
+          startDate: new Date(startDate.setHours(0, 0, 0, 0)),
         },
       },
     })
@@ -97,7 +97,7 @@ const EntryForm: FC<{ refetchQuery?: boolean }> = ({ refetchQuery }) => {
           defaultValue={EFrequencyType.Once}
         >
           {EFrequencyValues.map((frequency) => (
-            <option key={frequency.value} value={frequency.value}>
+            <option key={frequency.text} value={frequency.value}>
               {frequency.text}
             </option>
           ))}

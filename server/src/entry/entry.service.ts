@@ -19,7 +19,7 @@ export class EntryService {
   private readonly logger = new Logger(EntryService.name);
 
   private GetNextDatesByFrequency(date: Date, frequency: number) {
-    let dates: Date[] = [ date ]
+    let dates: Date[] = [new Date(date)]
     let lastDate = new Date(date)
     for (let i = 0; i < frequency; i++) {
       let temp = new Date(lastDate)
@@ -45,7 +45,7 @@ export class EntryService {
           break
         }
       }
-      dates.push(new Date(temp))
+      dates.push(temp)
       lastDate = temp
     }
     return dates
