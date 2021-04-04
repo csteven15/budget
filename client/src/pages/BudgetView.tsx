@@ -36,7 +36,7 @@ const DataButtons: FC<DataButtonProps> = ({ name, value, setValueFunc }) => {
       <Spacer />
       <Center>
         <Heading as="h6" fontSize="md">
-          {name === 'month' ? MonthArray[value] : value}
+          {name === 'Month' ? MonthArray[value] : value}
         </Heading>
       </Center>
       <Spacer />
