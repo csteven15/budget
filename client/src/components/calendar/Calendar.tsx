@@ -1,22 +1,14 @@
 import React, { FC } from 'react'
-import { Box, Center, SimpleGrid } from '@chakra-ui/react'
+import { Box, SimpleGrid, Text } from '@chakra-ui/react'
 import { useQuery } from '@apollo/client'
-import { EEntryType, MonthArray } from '../../common/enums'
+import { EEntryType } from '../../common/enums'
 import { GET_ENTRIES } from '../../common/gql/Queries'
 import { IAmountInfo, IEntryInfo } from '../../common/gql/Types'
 import Day from './Day'
 
 const secondsInDay = 86400000
 
-const daysOfWeek = [
-  'Sunday',
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-]
+const daysOfWeek = ['Sun.', 'Mon.', 'Tue.', 'Wed.', 'Thur', 'Fri.', 'Sat.']
 
 const getAmountsOnDay = (entries: IEntryInfo[], date: Date): IAmountInfo[] =>
   entries
@@ -78,17 +70,14 @@ const Calendar: FC<ICalendarProps> = ({ month, startDate, endDate }) => {
   ))
 
   return (
-    <div>
-      <Center>{MonthArray[month]}</Center>
-      <SimpleGrid columns={7}>
-        {daysOfWeek.map((dayOfWeek: string) => (
-          <Box key={dayOfWeek} textAlign="center">
-            {dayOfWeek}
-          </Box>
-        ))}
-        {days}
-      </SimpleGrid>
-    </div>
+    <SimpleGrid columns={7}>
+      {daysOfWeek.map((dayOfWeek: string) => (
+        <Box key={dayOfWeek} textAlign="center">
+          <Text>{dayOfWeek}</Text>
+        </Box>
+      ))}
+      {days}
+    </SimpleGrid>
   )
 }
 

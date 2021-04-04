@@ -5,12 +5,17 @@ import {
   TabPanels,
   Tab,
   TabPanel,
-  Button,
   Flex,
+  IconButton,
   Spacer,
+  Heading,
+  Center,
+  Box,
 } from '@chakra-ui/react'
 import MonthView from './MonthView'
 import YearView from './YearView'
+import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons'
+import { MonthArray } from '../common/enums'
 
 const dateToday = new Date()
 
@@ -23,13 +28,23 @@ interface DataButtonProps {
 const DataButtons: FC<DataButtonProps> = ({ name, value, setValueFunc }) => {
   return (
     <Flex>
-      <Button colorScheme="blue" onClick={() => setValueFunc(value - 1)}>
-        Previous {name}
-      </Button>
+      <IconButton
+        onClick={() => setValueFunc(value - 1)}
+        aria-label="prev"
+        icon={<ArrowBackIcon />}
+      />
       <Spacer />
-      <Button colorScheme="blue" onClick={() => setValueFunc(value + 1)}>
-        Next {name}
-      </Button>
+      <Center>
+        <Heading as="h6" fontSize="md">
+          {name === 'month' ? MonthArray[value] : value}
+        </Heading>
+      </Center>
+      <Spacer />
+      <IconButton
+        onClick={() => setValueFunc(value + 1)}
+        aria-label="next"
+        icon={<ArrowForwardIcon />}
+      />
     </Flex>
   )
 }
@@ -38,22 +53,24 @@ const DataTabs: FC = () => {
   const [year, setYear] = useState(dateToday.getFullYear())
   const [month, setMonth] = useState(dateToday.getMonth())
   return (
-    <Tabs isManual align="center">
-      <TabList>
-        <Tab>Month View</Tab>
-        <Tab>Year View</Tab>
-      </TabList>
-      <TabPanels>
-        <TabPanel>
-          <DataButtons name={'Month'} value={month} setValueFunc={setMonth} />
-          <MonthView date={new Date(dateToday.setMonth(month))} />
-        </TabPanel>
-        <TabPanel>
-          <DataButtons name={'Year'} value={year} setValueFunc={setYear} />
-          <YearView date={new Date(dateToday.setFullYear(year))} />
-        </TabPanel>
-      </TabPanels>
-    </Tabs>
+    <Box width="95%">
+      <Tabs isManual align="center">
+        <TabList>
+          <Tab>Month View</Tab>
+          <Tab>Year View</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <DataButtons name={'Month'} value={month} setValueFunc={setMonth} />
+            <MonthView date={new Date(dateToday.setMonth(month))} />
+          </TabPanel>
+          <TabPanel>
+            <DataButtons name={'Year'} value={year} setValueFunc={setYear} />
+            <YearView date={new Date(dateToday.setFullYear(year))} />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Box>
   )
 }
 

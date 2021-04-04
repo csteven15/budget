@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { Box } from '@chakra-ui/react'
+import { Badge, Box, Text } from '@chakra-ui/react'
 import { IAmountInfo } from '../../common/gql/Types'
 
 interface IDayProps {
@@ -16,15 +16,20 @@ const Day: FC<IDayProps> = ({ date, month, incomeAmounts, expenseAmounts }) => (
     h="125px"
     backgroundColor={date.getMonth() === month ? 'white' : 'whitesmoke'}
   >
-    <Box textAlign="right">{date.getDate()}</Box>
+    <Text
+      textAlign={['center', 'right', 'right', 'right']}
+      fontSize={['sm', 'md', 'lg', 'xl']}
+    >
+      {date.getDate()}
+    </Text>
     {incomeAmounts?.map((amountInfo: IAmountInfo) => (
-      <Box key={amountInfo._id} textAlign="center">
-        + {amountInfo.amount}
+      <Box key={amountInfo._id}>
+        <Badge colorScheme="green">{amountInfo.amount}</Badge>
       </Box>
     ))}
     {expenseAmounts?.map((amountInfo: IAmountInfo) => (
-      <Box key={amountInfo._id} textAlign="center">
-        - {amountInfo.amount}
+      <Box key={amountInfo._id}>
+        <Badge colorScheme="red">{amountInfo.amount}</Badge>
       </Box>
     ))}
   </Box>

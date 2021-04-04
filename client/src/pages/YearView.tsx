@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { useQuery } from '@apollo/client'
 import { useAuth } from '../context/AuthContext'
-import { Table, Thead, Tbody, Tr, Th, TableCaption } from '@chakra-ui/react'
+import { Table, Thead, Tbody, Tr, Th } from '@chakra-ui/react'
 import { EEntryType, MonthArray } from '../common/enums/index'
 import { IEntry, IAmount, IAccount } from '../common/types/index'
 import { GET_ENTRIES, GET_ACCOUNTS } from '../common/gql/Queries'
@@ -115,7 +115,6 @@ const YearView: FC<YearViewProps> = ({ date }) => {
   )
   return (
     <Table variant="striped" size="md">
-      <TableCaption placement="top">{date.getFullYear()}</TableCaption>
       <Thead>
         <MonthInfo
           header={'Month'}
