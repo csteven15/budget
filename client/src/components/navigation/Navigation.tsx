@@ -1,3 +1,4 @@
+import { Center } from '@chakra-ui/layout'
 import React, { FC } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -24,10 +25,6 @@ const protectedRoutes = [
   {
     path: '/accountview',
     name: 'Account View',
-  },
-  {
-    path: '/listview',
-    name: 'List View',
   },
   {
     path: '/budgetview',
@@ -64,7 +61,7 @@ const Navigation: FC = ({ children }) => {
           ))}
         </ul>
       </div>
-      <div>{children}</div>
+      <Center>{children}</Center>
     </div>
   )
 }

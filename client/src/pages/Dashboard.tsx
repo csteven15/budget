@@ -17,10 +17,14 @@ const Dashboard: FC = () => {
         </Center>
       </GridItem>
       <GridItem rowSpan={1} colSpan={1}>
-        <ListView />
+        <Center>
+          <ListView />
+        </Center>
       </GridItem>
       <GridItem rowSpan={1} colSpan={1}>
-        <AccountView />
+        <Center>
+          <AccountView />
+        </Center>
       </GridItem>
     </Grid>
   )
