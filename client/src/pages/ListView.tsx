@@ -86,7 +86,7 @@ const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
   )
 }
 
-const AccountHeader: FC = () => (
+const AmountHeader: FC = () => (
   <Grid templateColumns="repeat(4, 1fr)" m={2}>
     <Box>
       <Text>Amount</Text>
@@ -150,7 +150,7 @@ const EntryInfo: FC<IEntryInfo> = ({
         </GridItem>
         <GridItem rowSpan={1}>
           <Flex>
-            <Badge color={type === EEntryType.Income ? 'blue' : 'red'}>
+            <Badge colorScheme={type === EEntryType.Income ? 'green' : 'red'}>
               <Box>
                 <EditableSelect
                   refName="type"
@@ -169,9 +169,9 @@ const EntryInfo: FC<IEntryInfo> = ({
         </GridItem>
       </Grid>
       <Collapse in={isOpen} animateOpacity>
-        <Box m="2" bg="white" rounded="md" boxShadow="md">
+        <Box m="2" bg="white" rounded="md" boxShadow="md" p="1">
           <Divider />
-          <AccountHeader />
+          <AmountHeader />
           {amounts?.map((amount) => (
             <AmountInfo key={amount._id} {...amount} />
           ))}

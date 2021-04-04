@@ -76,6 +76,7 @@ const EditableSelect: FC<IEditableSelect> = ({
                   onBlur={onBlur}
                   onChange={(e) => onChange(e.target.value)}
                   value={value}
+                  variant="unstyled"
                   isInvalid={errors[refName]}
                   errorBorderColor={theme.colors.red[300]}
                   onClick={() => setSelectOpen(true)}
