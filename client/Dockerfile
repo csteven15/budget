@@ -9,6 +9,7 @@ RUN yarn install
 COPY . .
 
 # build
+RUN yarn run lint
 RUN yarn run build
 
 # pull and run nginx

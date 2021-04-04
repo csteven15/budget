@@ -5,6 +5,7 @@ import {
   ApolloProvider,
   InMemoryCache,
   DefaultOptions,
+  createHttpLink,
 } from '@apollo/client'
 import { isDevelopment } from './util/Api'
 import { ChakraProvider } from '@chakra-ui/react'
@@ -18,9 +19,10 @@ const defaultOptions: DefaultOptions = {
 }
 
 const client = new ApolloClient({
-  uri: 'http://localhost:3001/graphql',
+  uri: isDevelopment ? 'http://localhost:3001/graphql' : undefined,
   cache: new InMemoryCache(),
   defaultOptions: defaultOptions,
+  link: isDevelopment ? undefined : createHttpLink({ uri: '/graphql' })
 })
 
 const App: FC = () => (

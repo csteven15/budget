@@ -1,8 +1,7 @@
 #!/bin/sh
 
-set -a
-. ./development.env
-set +a
+cmd="./environment.sh &"
+echo "$cmd" && $cmd
 
 cmd="./database.sh &"
 echo "$cmd" && $cmd
