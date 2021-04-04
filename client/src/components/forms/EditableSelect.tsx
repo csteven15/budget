@@ -2,14 +2,17 @@ import React, { FC, useEffect, useRef, useState } from 'react'
 import { theme, IconButton, Text, Box, Flex, Select } from '@chakra-ui/react'
 import { Controller, useForm } from 'react-hook-form'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { DocumentNode, useMutation } from '@apollo/client'
 import { TextToValue } from '../../common/enums/Generic'
+import { useMutation } from 'react-query'
+import { Variables } from 'graphql-request/dist/types'
+import request from 'graphql-request'
+import { endpoint } from '../../util/Api'
 
 interface IEditableSelect {
   id: string
   refName: string
   defaultValue: number
-  mutationSchema: DocumentNode
+  mutationSchema: string
   textToValueMapping: TextToValue[]
 }
 
@@ -22,7 +25,9 @@ const EditableSelect: FC<IEditableSelect> = ({
 }) => {
   const { errors, handleSubmit, control } = useForm()
 
-  const [mutation] = useMutation<FormData>(mutationSchema)
+  const { mutate } = useMutation((variables: Variables) =>
+    request(endpoint, mutationSchema, variables)
+  )
 
   const [selectOpen, setSelectOpen] = useState(false)
 
@@ -47,12 +52,10 @@ const EditableSelect: FC<IEditableSelect> = ({
   const onSubmit = (data: any) => {
     setTrackedValue(data[refName])
     setHover(false)
-    mutation({
-      variables: {
-        payload: {
-          _id: id,
-          type: parseInt(data[refName]),
-        },
+    mutate({
+      payload: {
+        _id: id,
+        type: parseInt(data[refName]),
       },
     })
   }

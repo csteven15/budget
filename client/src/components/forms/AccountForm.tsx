@@ -15,27 +15,33 @@ import {
   Text,
   theme,
 } from '@chakra-ui/react'
-import { useMutation } from '@apollo/client'
 import { CREATE_ACCOUNT_MUTATION } from '../../common/gql/Mutations'
+import request from 'graphql-request'
+import { useMutation, useQueryClient } from 'react-query'
+import { endpoint } from '../../util/Api'
+import { Variables } from 'graphql-request/dist/types'
 
 const AccountForm: FC = () => {
+  const { user } = useAuth()
+
+  const queryClient = useQueryClient()
   const { register, errors, handleSubmit } = useForm<IAccount>()
 
-  const [addAccount] = useMutation<IAccount>(CREATE_ACCOUNT_MUTATION)
-
-  const { user } = useAuth()
+  const { mutate } = useMutation(
+    (variables: Variables) =>
+      request(endpoint, CREATE_ACCOUNT_MUTATION, variables),
+    { onSuccess: () => queryClient.invalidateQueries('accounts') }
+  )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (formData: any) => {
-    addAccount({
-      variables: {
-        payload: {
-          userId: user.uid as string,
-          name: formData.name,
-          type: parseInt(formData.type, 10),
-          total: parseFloat(formData.total),
-          appliedToBudget: formData.appliedToBudget,
-        },
+    mutate({
+      payload: {
+        userId: user.uid as string,
+        name: formData.name,
+        type: parseInt(formData.type, 10),
+        total: parseFloat(formData.total),
+        appliedToBudget: formData.appliedToBudget,
       },
     })
   }

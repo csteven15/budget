@@ -13,7 +13,7 @@ if [ $( docker ps -a -f name=$container_name | wc -l ) -eq 2 ]; then
   docker stop $container_name
   docker container start $container_name
 else
-  docker run --name $container_name \
+  docker run -d --name $container_name \
     -e MONGO_INITDB_DATABASE=$MONGO_DEV_CONTAINER_INITDB \
     --network $DOCKER_DEV_NETWORK \
     -p 27017:$MONGO_DEV_CONTAINER_PORT \

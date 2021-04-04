@@ -1,10 +1,10 @@
 import React, { FC } from 'react'
 import { Box, SimpleGrid, Text } from '@chakra-ui/react'
-import { useQuery } from '@apollo/client'
 import { EEntryType } from '../../common/enums'
 import { GET_ENTRIES } from '../../common/gql/Queries'
 import { IAmountInfo, IEntryInfo } from '../../common/gql/Types'
 import Day from './Day'
+import { useEntriesQueryCalendar } from '../../hooks/useEntriesQuery'
 
 const secondsInDay = 86400000
 
@@ -26,17 +26,16 @@ interface ICalendarProps {
 }
 
 const Calendar: FC<ICalendarProps> = ({ month, startDate, endDate }) => {
-  const { loading, data } = useQuery(GET_ENTRIES, {
-    variables: {
-      filter: {
-        ...startDate,
-        ...endDate,
-      },
-      payload: {},
+  const variables = {
+    filter: {
+      ...startDate,
+      ...endDate,
     },
-  })
+    payload: {},
+  }
+  const { isLoading, data } = useEntriesQueryCalendar(variables)
 
-  if (loading) {
+  if (isLoading) {
     return <p>loading...</p>
   }
 

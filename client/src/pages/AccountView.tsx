@@ -1,6 +1,5 @@
 import React, { FC } from 'react'
 
-import { useQuery } from '@apollo/client'
 import { useAuth } from '../context/AuthContext'
 import { Box, Grid, Text } from '@chakra-ui/react'
 import { UPDATE_ACCOUNT_MUTATION } from '../common/gql/Mutations'
@@ -8,8 +7,8 @@ import EditableTextField from '../components/forms/EditableTextField'
 import { EAccountValues } from '../common/enums'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
 import EditableSelect from '../components/forms/EditableSelect'
-import { GET_ACCOUNTS } from '../common/gql/Queries'
 import { IAccountInfo } from '../common/gql/Types'
+import { useAccountsQuery } from '../hooks/useAccountsQuery'
 
 const AccountInfo: FC<IAccountInfo> = ({
   _id,
@@ -79,15 +78,7 @@ const HeaderForAccounts: FC = () => (
 )
 
 const AccountView: FC = () => {
-  const { user } = useAuth()
-
-  const { data } = useQuery(GET_ACCOUNTS, {
-    variables: {
-      payload: {
-        userId: user.uid,
-      },
-    },
-  })
+  const { data } = useAccountsQuery()
 
   return (
     <>

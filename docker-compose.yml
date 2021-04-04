@@ -9,7 +9,7 @@ services:
       - ${MONGO_PROD_CONTAINER_PORT}:${MONGO_PROD_CONTAINER_PORT}
     volumes:
       - ./db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - ./db/mongo-volume:/data/db
+      - mongodb:/data/db
     networks:
       - network
   client:
@@ -56,3 +56,5 @@ networks:
     name: ${DOCKER_PROD_NETWORK}
   reverse-proxy:
     external: true
+volumes:
+  mongodb:

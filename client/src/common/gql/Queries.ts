@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client'
+import { gql } from 'graphql-request'
 
 export const GET_ENTRIES = gql`
   query entries($filter: GetEntryDateFilterInput, $payload: GetEntryInput!) {

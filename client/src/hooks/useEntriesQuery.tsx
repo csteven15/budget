@@ -1,16 +1,39 @@
-import { useQuery } from '@apollo/client'
 import { GET_ENTRIES } from '../common/gql/Queries'
 import { useAuth } from '../context/AuthContext'
+import { endpoint } from '../util/Api'
+import { request } from 'graphql-request'
+import { useQuery } from 'react-query'
+import { Variables } from 'graphql-request/dist/types'
 
-export const useEntriesQueryCached = () => {
+export const useEntriesQuery = () => {
   const { user } = useAuth()
 
-  const { data, loading, refetch } = useQuery(GET_ENTRIES, {
-    variables: {
-      payload: {
-        userId: user.uid,
-      },
+  const variables = {
+    payload: {
+      userId: user.uid,
     },
-  })
-  return { data, loading, refetch }
+  }
+
+  return useQuery(
+    'entries',
+    async () => await request(endpoint, GET_ENTRIES, variables)
+  )
+}
+
+export const useEntriesQueryCalendar = (variables: Variables) => {
+  return useQuery(
+    'entries-calendar',
+    async () => await request(endpoint, GET_ENTRIES, variables)
+  )
+}
+
+export const useEntriesQueryYear = (variables: Variables) => {
+  const { user } = useAuth()
+
+  variables.payload.userId = user.uid
+
+  return useQuery(
+    'entries-year',
+    async () => await request(endpoint, GET_ENTRIES, variables)
+  )
 }

@@ -41,7 +41,7 @@ import { EEntryType, EEntryValues } from '../common/enums'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
 import { IAmountInfo, IEntryInfo } from '../common/gql/Types'
 import EntryForm from '../components/forms/EntryForm'
-import { useEntriesQueryCached } from '../hooks/useEntriesQuery'
+import { useEntriesQuery } from '../hooks/useEntriesQuery'
 
 const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
   const [deleteAmount] = useMutation<FormData>(DELETE_AMOUNT_MUTATION)
@@ -195,7 +195,7 @@ const EntryFormPopoverContent: FC<{ closePopover?: () => void }> = ({
         rounded="md"
         bg="white"
       >
-        <EntryForm refetchQuery={true} closePopover={closePopover} />
+        <EntryForm closePopover={closePopover} />
       </Container>
     </PopoverBody>
   </PopoverContent>
@@ -203,12 +203,12 @@ const EntryFormPopoverContent: FC<{ closePopover?: () => void }> = ({
 
 const ListView: FC = () => {
   const [popoverOpen, setPopoverOpen] = useState(false)
-  const { data, loading } = useEntriesQueryCached()
+  const { data, isLoading } = useEntriesQuery()
 
   const openPopover = () => setPopoverOpen(true)
   const closePopover = () => setPopoverOpen(false)
 
-  if (loading) {
+  if (isLoading) {
     return <p>loading</p>
   }
 

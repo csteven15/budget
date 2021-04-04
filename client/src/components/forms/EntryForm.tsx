@@ -1,7 +1,6 @@
 import React, { FC, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Box, Button, Input, Select, SimpleGrid, theme } from '@chakra-ui/react'
-
 import { IEntry } from '../../common/types'
 import { useAuth } from '../../context/AuthContext'
 import {
@@ -9,30 +8,37 @@ import {
   EFrequencyValues,
   EEntryValues,
 } from '../../common/enums/index'
-import { useMutation } from '@apollo/client'
 import DatePicker from './DatePicker'
 import { CREATE_ENTRY_MUTATION } from '../../common/gql/Mutations'
-import { useEntriesQueryCached } from '../../hooks/useEntriesQuery'
+import { useEntriesQuery } from '../../hooks/useEntriesQuery'
+import { useMutation, useQueryClient } from 'react-query'
+import { request } from 'graphql-request'
+import { endpoint } from '../../util/Api'
+import { Variables } from 'graphql-request/dist/types'
 
 const today = new Date()
 
 interface IEntryFormProps {
-  refetchQuery?: boolean
   closePopover?: () => void
 }
 
-const EntryForm: FC<IEntryFormProps> = ({ refetchQuery, closePopover }) => {
+const EntryForm: FC<IEntryFormProps> = ({ closePopover }) => {
+  const { user } = useAuth()
+
+  const queryClient = useQueryClient()
+
   const { register, errors, handleSubmit } = useForm<IEntry>()
-  const { refetch } = useEntriesQueryCached()
   const [startDate, setStartDate] = useState(today)
 
-  const [addEntry] = useMutation<IEntry>(CREATE_ENTRY_MUTATION)
-
-  const { user } = useAuth()
+  const { mutate } = useMutation(
+    (variables: Variables) =>
+      request(endpoint, CREATE_ENTRY_MUTATION, variables),
+    { onSuccess: () => queryClient.invalidateQueries('entries') }
+  )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (formData: any) => {
-    addEntry({
+    mutate({
       variables: {
         payload: {
           userId: user.uid as string,
@@ -44,12 +50,8 @@ const EntryForm: FC<IEntryFormProps> = ({ refetchQuery, closePopover }) => {
         },
       },
     })
-    if (refetchQuery) {
-      console.log('refetching')
-      refetch()
-    }
     if (closePopover !== undefined) {
-      console.log('closing')
+      console.log('closing popover')
       closePopover()
     }
   }

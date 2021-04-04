@@ -10,13 +10,16 @@ import {
 } from '@chakra-ui/react'
 import { Controller, RegisterOptions, useForm } from 'react-hook-form'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { DocumentNode, useMutation } from '@apollo/client'
+import { Variables } from 'graphql-request/dist/types'
+import request from 'graphql-request'
+import { endpoint } from '../../util/Api'
+import { useMutation, useQueryClient } from 'react-query'
 
 interface IEditableTextField {
   id: string
   refName: string
   defaultValue: number | string
-  mutationSchema: DocumentNode
+  mutationSchema: string
   type: 'string' | 'number' | 'float'
   required?: boolean
 }
@@ -31,7 +34,9 @@ const EditableTextField: FC<IEditableTextField> = ({
 }) => {
   const { errors, handleSubmit, control, reset } = useForm()
 
-  const [mutation] = useMutation<FormData>(mutationSchema)
+  const { mutate } = useMutation((variables: Variables) =>
+    request(endpoint, mutationSchema, variables)
+  )
 
   const [hover, setHover] = useState(false)
 
@@ -44,12 +49,10 @@ const EditableTextField: FC<IEditableTextField> = ({
     if (type === 'number') data[refName] = parseInt(data[refName])
     if (type === 'float') data[refName] = parseFloat(data[refName])
     setTrackedValue(data[refName])
-    mutation({
-      variables: {
-        payload: {
-          _id: id,
-          ...data,
-        },
+    mutate({
+      payload: {
+        _id: id,
+        ...data,
       },
     })
 

@@ -5,6 +5,8 @@ import { Table, Thead, Tbody, Tr, Th } from '@chakra-ui/react'
 import { EEntryType, MonthArray } from '../common/enums/index'
 import { IEntry, IAmount, IAccount } from '../common/types/index'
 import { GET_ENTRIES, GET_ACCOUNTS } from '../common/gql/Queries'
+import { useAccountsYearQuery } from '../hooks/useAccountsQuery'
+import { useEntriesQueryYear } from '../hooks/useEntriesQuery'
 
 interface TotalType {
   budgeted: number
@@ -48,24 +50,24 @@ interface YearViewProps {
 }
 
 const YearView: FC<YearViewProps> = ({ date }) => {
-  const { user } = useAuth()
-  const { data: appliedAccounts } = useQuery(GET_ACCOUNTS, {
-    variables: {
-      payload: {
-        userId: user.uid,
-        appliedToBudget: true,
-      },
+  const {
+    data: appliedAccounts,
+    isLoading: isLoadingAppliedAccounts,
+  } = useAccountsYearQuery()
+
+  const variables = {
+    filter: {
+      startDate: new Date(date.getFullYear(), 0, 1),
+      endDate: new Date(date.getFullYear() + 1, 0, 0),
     },
-  })
-  const { data: entriesForYear } = useQuery(GET_ENTRIES, {
-    variables: {
-      filter: {
-        startDate: new Date(date.getFullYear(), 0, 1),
-        endDate: new Date(date.getFullYear() + 1, 0, 0),
-      },
-      payload: {},
-    },
-  })
+    payload: {},
+  }
+
+  const {
+    data: entriesForYear,
+    isLoading: isLoadingEntriesForYear,
+  } = useEntriesQueryYear(variables)
+
   const getTotalsForEachMonth = (entries: IEntry[]) => {
     const totals: TotalType[] = []
     for (let i = 0; i < MonthArray.length; i++) {
