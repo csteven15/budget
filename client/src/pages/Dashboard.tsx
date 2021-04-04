@@ -1,36 +1,28 @@
 import React, { FC } from 'react'
-import EntryForm from '../components/forms/EntryForm'
-import AccountForm from '../components/forms/AccountForm'
 import { useAuth } from '../context/AuthContext'
-import { Container, Text } from '@chakra-ui/react'
+import { Center, Grid, GridItem, Heading } from '@chakra-ui/react'
+import ListView from './ListView'
+import AccountView from './AccountView'
 
 const Dashboard: FC = () => {
   const { user } = useAuth()
 
   return (
-    <Container>
-      <Text>Welcome {user.name}</Text>
-      <br />
-      <Container
-        maxW="container.md"
-        boxShadow="base"
-        p="6"
-        rounded="md"
-        bg="white"
-      >
-        <EntryForm />
-      </Container>
-      <br />
-      <Container
-        maxW="container.md"
-        boxShadow="base"
-        p="6"
-        rounded="md"
-        bg="white"
-      >
-        <AccountForm />
-      </Container>
-    </Container>
+    <Grid templateColumns="repeat(2, 1fr)" width="100%" padding="1">
+      <GridItem rowSpan={1} colSpan={2}>
+        <Center my="3">
+          <Heading as="h6" size="md">
+            Welcome {user.name}
+          </Heading>
+        </Center>
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={1}>
+        <ListView />
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={1}>
+        <AccountView />
+      </GridItem>
+    </Grid>
   )
 }
 

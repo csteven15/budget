@@ -22,7 +22,7 @@ const client = new ApolloClient({
   uri: isDevelopment ? 'http://localhost:3001/graphql' : undefined,
   cache: new InMemoryCache(),
   defaultOptions: defaultOptions,
-  link: isDevelopment ? undefined : createHttpLink({ uri: '/graphql' })
+  link: isDevelopment ? undefined : createHttpLink({ uri: '/graphql' }),
 })
 
 const App: FC = () => (

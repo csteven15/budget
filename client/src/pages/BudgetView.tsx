@@ -35,8 +35,6 @@ const DataButtons: FC<DataButtonProps> = ({ name, value, setValueFunc }) => {
 }
 
 const DataTabs: FC = () => {
-  // TODO: Calculate start and end month should render whole month given range
-  // month then uses start and end as filter
   const [year, setYear] = useState(dateToday.getFullYear())
   const [month, setMonth] = useState(dateToday.getMonth())
   return (

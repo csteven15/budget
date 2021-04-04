@@ -1,11 +1,17 @@
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import { useMutation } from '@apollo/client'
 import {
+  Badge,
   Box,
+  Button,
+  Center,
   Collapse,
   Container,
+  Divider,
   Flex,
   Grid,
+  GridItem,
+  Heading,
   IconButton,
   Popover,
   PopoverArrow,
@@ -13,6 +19,7 @@ import {
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
+  Spacer,
   Text,
   useDisclosure,
 } from '@chakra-ui/react'
@@ -30,7 +37,7 @@ import {
   UPDATE_ENTRY_MUTATION,
 } from '../common/gql/Mutations'
 import EditableSelect from '../components/forms/EditableSelect'
-import { EEntryValues } from '../common/enums'
+import { EEntryType, EEntryValues } from '../common/enums'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
 import { IAmountInfo, IEntryInfo } from '../common/gql/Types'
 import EntryForm from '../components/forms/EntryForm'
@@ -102,116 +109,81 @@ const EntryInfo: FC<IEntryInfo> = ({
   type,
   budgetedAmount,
   createdAt,
-  startDate,
-  endDate,
   amounts,
 }) => {
   const localCreatedAt = new Date(createdAt)
   const { isOpen, onToggle } = useDisclosure()
   return (
-    <>
-      <Grid templateColumns="repeat(7, 1fr)" m={2}>
-        <Box>
-          <EditableTextField
-            refName="name"
-            id={_id}
-            defaultValue={name}
-            mutationSchema={UPDATE_ENTRY_MUTATION}
-            type="string"
-            required
-          />
-        </Box>
-        <Box>
-          <EditableSelect
-            refName="type"
-            id={_id}
-            defaultValue={type}
-            mutationSchema={UPDATE_ENTRY_MUTATION}
-            textToValueMapping={EEntryValues}
-          />
-        </Box>
-        <Box>
-          <EditableTextField
-            refName="budgetedAmount"
-            id={_id}
-            defaultValue={budgetedAmount}
-            mutationSchema={UPDATE_ENTRY_MUTATION}
-            type="float"
-            required
-          />
-        </Box>
-        <Box>
-          <Text>{localCreatedAt.toLocaleDateString()}</Text>
-        </Box>
-        <Box>
-          <EditableDatePicker
-            id={_id}
-            refName="startDate"
-            defaultValue={new Date(startDate)}
-            isClearable={true}
-            showPopperArrow={true}
-            mutationSchema={UPDATE_ENTRY_MUTATION}
-          />
-        </Box>
-        <Box>
-          <EditableDatePicker
-            id={_id}
-            refName="endDate"
-            defaultValue={new Date(endDate)}
-            isClearable={true}
-            showPopperArrow={true}
-            mutationSchema={UPDATE_ENTRY_MUTATION}
-          />
-        </Box>
-        {amounts?.length > 0 ? (
-          <Box>
-            <IconButton
-              aria-label="show amounts"
-              onClick={onToggle}
-              icon={isOpen === true ? <ArrowUpIcon /> : <ArrowDownIcon />}
+    <Box rounded="md" boxShadow="md">
+      <Grid templateRows="repeat(3, 1fr)" m={2}>
+        <GridItem rowSpan={1}>
+          <Flex fontWeight="bold" fontSize="lg">
+            <EditableTextField
+              refName="name"
+              id={_id}
+              defaultValue={name}
+              mutationSchema={UPDATE_ENTRY_MUTATION}
+              type="string"
+              required
             />
-          </Box>
-        ) : null}
+            <Spacer />
+            {amounts?.length > 0 ? (
+              <Button size="xs" onClick={onToggle}>
+                {isOpen === true ? <ArrowUpIcon /> : <ArrowDownIcon />}
+              </Button>
+            ) : null}
+          </Flex>
+        </GridItem>
+        <GridItem rowSpan={1}>
+          <Flex fontWeight="medium">
+            <Text>$</Text>
+            &nbsp;
+            <EditableTextField
+              refName="budgetedAmount"
+              id={_id}
+              defaultValue={budgetedAmount.toFixed(2)}
+              mutationSchema={UPDATE_ENTRY_MUTATION}
+              type="float"
+              required
+            />
+          </Flex>
+        </GridItem>
+        <GridItem rowSpan={1}>
+          <Flex>
+            <Badge color={type === EEntryType.Income ? 'blue' : 'red'}>
+              <Box>
+                <EditableSelect
+                  refName="type"
+                  id={_id}
+                  defaultValue={type}
+                  mutationSchema={UPDATE_ENTRY_MUTATION}
+                  textToValueMapping={EEntryValues}
+                />
+              </Box>
+            </Badge>
+            <Spacer />
+            <Flex>
+              <Text>{localCreatedAt.toLocaleDateString()}</Text>
+            </Flex>
+          </Flex>
+        </GridItem>
       </Grid>
       <Collapse in={isOpen} animateOpacity>
         <Box m="2" bg="white" rounded="md" boxShadow="md">
+          <Divider />
           <AccountHeader />
           {amounts?.map((amount) => (
             <AmountInfo key={amount._id} {...amount} />
           ))}
         </Box>
       </Collapse>
-    </>
+    </Box>
   )
 }
 
-const HeaderForEntries: FC = () => (
-  <Grid templateColumns="repeat(7, 1fr)" m={2}>
-    <Box>
-      <Text>Name</Text>
-    </Box>
-    <Box>
-      <Text>Type</Text>
-    </Box>
-    <Box>
-      <Text>Budgeted Amount</Text>
-    </Box>
-    <Box>
-      <Text>Created On</Text>
-    </Box>
-    <Box>
-      <Text>Start Date</Text>
-    </Box>
-    <Box>
-      <Text>End Date</Text>
-    </Box>
-    <Box>
-      <Text>Expand</Text>
-    </Box>
-  </Grid>
-)
-
-const EntryFormPopoverContent: FC = () => (
+const EntryFormPopoverContent: FC<{ closePopover?: () => void }> = ({
+  closePopover,
+}) => (
   <PopoverContent>
     <PopoverArrow />
     <PopoverCloseButton />
@@ -223,33 +195,52 @@ const EntryFormPopoverContent: FC = () => (
         rounded="md"
         bg="white"
       >
-        <EntryForm refetchQuery={true} />
+        <EntryForm refetchQuery={true} closePopover={closePopover} />
       </Container>
     </PopoverBody>
   </PopoverContent>
 )
 
 const ListView: FC = () => {
+  const [popoverOpen, setPopoverOpen] = useState(false)
   const { data, loading } = useEntriesQueryCached()
+
+  const openPopover = () => setPopoverOpen(true)
+  const closePopover = () => setPopoverOpen(false)
 
   if (loading) {
     return <p>loading</p>
   }
 
   return (
-    <Box w="95%" rounded="md" boxShadow="md" mx="auto">
-      <Flex>
-        <Text size="md">Add Entry</Text>
-        &nbsp;&nbsp;
-        <Popover isLazy placement="bottom-end">
+    <Box w="95%">
+      <Center mt="3">
+        <Heading as="h6" size="md">
+          Entries
+        </Heading>
+      </Center>
+      <Flex my="3">
+        <Popover
+          isLazy
+          isOpen={popoverOpen}
+          onClose={closePopover}
+          placement="bottom-end"
+        >
           <PopoverTrigger>
-            <IconButton aria-label="Add Entry" size="sm" icon={<EditIcon />} />
+            <Button
+              onClick={openPopover}
+              rounded="md"
+              boxShadow="md"
+              padding="2"
+            >
+              <Text size="md">
+                Add Entry <EditIcon />
+              </Text>
+            </Button>
           </PopoverTrigger>
-          <EntryFormPopoverContent />
+          <EntryFormPopoverContent {...closePopover} />
         </Popover>
       </Flex>
-
-      <HeaderForEntries />
       {data?.entries?.map((entry: IEntryInfo) => (
         <EntryInfo key={entry._id} {...entry} />
       ))}

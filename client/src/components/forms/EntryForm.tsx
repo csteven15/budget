@@ -16,7 +16,12 @@ import { useEntriesQueryCached } from '../../hooks/useEntriesQuery'
 
 const today = new Date()
 
-const EntryForm: FC<{ refetchQuery?: boolean }> = ({ refetchQuery }) => {
+interface IEntryFormProps {
+  refetchQuery?: boolean
+  closePopover?: () => void
+}
+
+const EntryForm: FC<IEntryFormProps> = ({ refetchQuery, closePopover }) => {
   const { register, errors, handleSubmit } = useForm<IEntry>()
   const { refetch } = useEntriesQueryCached()
   const [startDate, setStartDate] = useState(today)
@@ -40,7 +45,12 @@ const EntryForm: FC<{ refetchQuery?: boolean }> = ({ refetchQuery }) => {
       },
     })
     if (refetchQuery) {
+      console.log('refetching')
       refetch()
+    }
+    if (closePopover !== undefined) {
+      console.log('closing')
+      closePopover()
     }
   }
 
