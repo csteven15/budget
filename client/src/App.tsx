@@ -3,9 +3,8 @@ import AppRouter from './components/navigation/AppRouter'
 import { isDevelopment } from './util/Api'
 import { ChakraProvider } from '@chakra-ui/react'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import { ReactQueryDevtools } from 'react-query/devtools'
 
-console.log('isdevelopment', isDevelopment)
+console.log('development:', isDevelopment)
 
 const queryClient = new QueryClient()
 
@@ -14,7 +13,6 @@ const App: FC = () => (
     <ChakraProvider>
       <AppRouter />
     </ChakraProvider>
-    <ReactQueryDevtools />
   </QueryClientProvider>
 )
 

@@ -30,7 +30,13 @@ const AccountForm: FC = () => {
   const { mutate } = useMutation(
     (variables: Variables) =>
       request(endpoint, CREATE_ACCOUNT_MUTATION, variables),
-    { onSuccess: () => queryClient.invalidateQueries('accounts') }
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('entries')
+        queryClient.invalidateQueries('amounts')
+        queryClient.invalidateQueries('accounts')
+      },
+    }
   )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

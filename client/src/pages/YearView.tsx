@@ -1,10 +1,7 @@
 import React, { FC } from 'react'
-import { useQuery } from '@apollo/client'
-import { useAuth } from '../context/AuthContext'
 import { Table, Thead, Tbody, Tr, Th } from '@chakra-ui/react'
 import { EEntryType, MonthArray } from '../common/enums/index'
 import { IEntry, IAmount, IAccount } from '../common/types/index'
-import { GET_ENTRIES, GET_ACCOUNTS } from '../common/gql/Queries'
 import { useAccountsYearQuery } from '../hooks/useAccountsQuery'
 import { useEntriesQueryYear } from '../hooks/useEntriesQuery'
 
@@ -50,10 +47,7 @@ interface YearViewProps {
 }
 
 const YearView: FC<YearViewProps> = ({ date }) => {
-  const {
-    data: appliedAccounts,
-    isLoading: isLoadingAppliedAccounts,
-  } = useAccountsYearQuery()
+  const { data: appliedAccounts } = useAccountsYearQuery()
 
   const variables = {
     filter: {
@@ -63,10 +57,7 @@ const YearView: FC<YearViewProps> = ({ date }) => {
     payload: {},
   }
 
-  const {
-    data: entriesForYear,
-    isLoading: isLoadingEntriesForYear,
-  } = useEntriesQueryYear(variables)
+  const { data: entriesForYear } = useEntriesQueryYear(variables)
 
   const getTotalsForEachMonth = (entries: IEntry[]) => {
     const totals: TotalType[] = []

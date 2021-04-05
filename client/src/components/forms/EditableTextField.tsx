@@ -34,8 +34,17 @@ const EditableTextField: FC<IEditableTextField> = ({
 }) => {
   const { errors, handleSubmit, control, reset } = useForm()
 
-  const { mutate } = useMutation((variables: Variables) =>
-    request(endpoint, mutationSchema, variables)
+  const queryClient = useQueryClient()
+
+  const { mutate } = useMutation(
+    (variables: Variables) => request(endpoint, mutationSchema, variables),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('entries')
+        queryClient.invalidateQueries('amounts')
+        queryClient.invalidateQueries('accounts')
+      },
+    }
   )
 
   const [hover, setHover] = useState(false)

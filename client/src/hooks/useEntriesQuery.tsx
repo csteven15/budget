@@ -16,14 +16,16 @@ export const useEntriesQuery = () => {
 
   return useQuery(
     'entries',
-    async () => await request(endpoint, GET_ENTRIES, variables)
+    async () => await request(endpoint, GET_ENTRIES, variables),
+    { enabled: !!variables.payload.userId }
   )
 }
 
 export const useEntriesQueryCalendar = (variables: Variables) => {
   return useQuery(
     'entries-calendar',
-    async () => await request(endpoint, GET_ENTRIES, variables)
+    async () => await request(endpoint, GET_ENTRIES, variables),
+    { enabled: !!variables.payload.userId }
   )
 }
 
@@ -34,6 +36,7 @@ export const useEntriesQueryYear = (variables: Variables) => {
 
   return useQuery(
     'entries-year',
-    async () => await request(endpoint, GET_ENTRIES, variables)
+    async () => await request(endpoint, GET_ENTRIES, variables),
+    { enabled: !!variables.payload.userId }
   )
 }

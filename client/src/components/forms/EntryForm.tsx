@@ -10,7 +10,6 @@ import {
 } from '../../common/enums/index'
 import DatePicker from './DatePicker'
 import { CREATE_ENTRY_MUTATION } from '../../common/gql/Mutations'
-import { useEntriesQuery } from '../../hooks/useEntriesQuery'
 import { useMutation, useQueryClient } from 'react-query'
 import { request } from 'graphql-request'
 import { endpoint } from '../../util/Api'
@@ -33,27 +32,28 @@ const EntryForm: FC<IEntryFormProps> = ({ closePopover }) => {
   const { mutate } = useMutation(
     (variables: Variables) =>
       request(endpoint, CREATE_ENTRY_MUTATION, variables),
-    { onSuccess: () => queryClient.invalidateQueries('entries') }
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('entries')
+        queryClient.invalidateQueries('amounts')
+        queryClient.invalidateQueries('accounts')
+      },
+    }
   )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (formData: any) => {
     mutate({
-      variables: {
-        payload: {
-          userId: user.uid as string,
-          name: formData!.name,
-          type: parseInt(formData!.type, 10),
-          budgetedAmount: parseFloat(formData!.budgetedAmount),
-          frequency: parseInt(formData!.frequency, 10),
-          startDate: new Date(startDate.setHours(0, 0, 0, 0)),
-        },
+      payload: {
+        userId: user.uid as string,
+        name: formData!.name,
+        type: parseInt(formData!.type, 10),
+        budgetedAmount: parseFloat(formData!.budgetedAmount),
+        frequency: parseInt(formData!.frequency, 10),
+        startDate: new Date(startDate.setHours(0, 0, 0, 0)),
       },
     })
-    if (closePopover !== undefined) {
-      console.log('closing popover')
-      closePopover()
-    }
+    if (closePopover) closePopover()
   }
 
   const onError = () => {

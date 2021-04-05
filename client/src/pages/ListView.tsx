@@ -1,5 +1,4 @@
 import React, { FC, useState } from 'react'
-import { useMutation } from '@apollo/client'
 import {
   Badge,
   Box,
@@ -42,9 +41,23 @@ import EditableCheckbox from '../components/forms/EditableCheckbox'
 import { IAmountInfo, IEntryInfo } from '../common/gql/Types'
 import EntryForm from '../components/forms/EntryForm'
 import { useEntriesQuery } from '../hooks/useEntriesQuery'
+import { useMutation, useQueryClient } from 'react-query'
+import request from 'graphql-request'
+import { endpoint } from '../util/Api'
+import { Variables } from 'graphql-request/dist/types'
 
 const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
-  const [deleteAmount] = useMutation<FormData>(DELETE_AMOUNT_MUTATION)
+  const queryClient = useQueryClient()
+
+  const { mutate } = useMutation(
+    (variables: Variables) =>
+      request(endpoint, DELETE_AMOUNT_MUTATION, variables),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('entries')
+      },
+    }
+  )
   return (
     <Grid templateColumns="repeat(4, 1fr)" m={2}>
       <Box>
@@ -77,7 +90,7 @@ const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
       </Box>
       <Box>
         <IconButton
-          onClick={() => deleteAmount({ variables: { _id: _id } })}
+          onClick={() => mutate({ _id: _id })}
           icon={<DeleteIcon />}
           aria-label="delete amount"
         />
@@ -238,7 +251,7 @@ const ListView: FC = () => {
               </Text>
             </Button>
           </PopoverTrigger>
-          <EntryFormPopoverContent {...closePopover} />
+          <EntryFormPopoverContent closePopover={closePopover} />
         </Popover>
       </Flex>
       {data?.entries?.map((entry: IEntryInfo) => (

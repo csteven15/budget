@@ -1,6 +1,4 @@
 import React, { FC } from 'react'
-
-import { useAuth } from '../context/AuthContext'
 import { Box, Grid, Text } from '@chakra-ui/react'
 import { UPDATE_ACCOUNT_MUTATION } from '../common/gql/Mutations'
 import EditableTextField from '../components/forms/EditableTextField'

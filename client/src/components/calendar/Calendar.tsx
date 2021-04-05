@@ -1,7 +1,6 @@
 import React, { FC } from 'react'
 import { Box, SimpleGrid, Text } from '@chakra-ui/react'
 import { EEntryType } from '../../common/enums'
-import { GET_ENTRIES } from '../../common/gql/Queries'
 import { IAmountInfo, IEntryInfo } from '../../common/gql/Types'
 import Day from './Day'
 import { useEntriesQueryCalendar } from '../../hooks/useEntriesQuery'

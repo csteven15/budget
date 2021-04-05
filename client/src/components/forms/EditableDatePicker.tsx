@@ -4,7 +4,10 @@ import { Text, Box, Flex, IconButton } from '@chakra-ui/react'
 import 'react-datepicker/dist/react-datepicker.css'
 import './DatePicker.css'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { DocumentNode, useMutation } from '@apollo/client'
+import { Variables } from 'graphql-request/dist/types'
+import { endpoint } from '../../util/Api'
+import request from 'graphql-request'
+import { useMutation, useQueryClient } from 'react-query'
 
 interface IEditableDatePicker {
   id: string
@@ -12,7 +15,7 @@ interface IEditableDatePicker {
   defaultValue: Date
   isClearable?: boolean
   showPopperArrow?: boolean
-  mutationSchema: DocumentNode
+  mutationSchema: string
 }
 
 const EditableDatePicker: FC<IEditableDatePicker> = ({
@@ -22,26 +25,30 @@ const EditableDatePicker: FC<IEditableDatePicker> = ({
   showPopperArrow = false,
   mutationSchema,
 }) => {
+  const queryClient = useQueryClient()
+
   const [hover, setHover] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [trackedValue, setTrackedValue] = useState(new Date(defaultValue))
   const [date, setDate] = useState(new Date(defaultValue))
 
-  const [updateEntry] = useMutation<FormData>(mutationSchema)
+  const { mutate } = useMutation(
+    (variables: Variables) => request(endpoint, mutationSchema, variables),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('entries')
+        queryClient.invalidateQueries('amounts')
+        queryClient.invalidateQueries('accounts')
+      },
+    }
+  )
 
   const onSubmit = (newDate: Date) => {
     setTrackedValue(newDate)
-    const test = {
-      _id: id,
-      [refName]: newDate,
-    }
-    console.log(test)
-    updateEntry({
-      variables: {
-        payload: {
-          _id: id,
-          [refName]: new Date(newDate.setHours(0, 0, 0, 0)),
-        },
+    mutate({
+      payload: {
+        _id: id,
+        [refName]: new Date(newDate.setHours(0, 0, 0, 0)),
       },
     })
   }
