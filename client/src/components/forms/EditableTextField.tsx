@@ -10,10 +10,7 @@ import {
 } from '@chakra-ui/react'
 import { Controller, RegisterOptions, useForm } from 'react-hook-form'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { Variables } from 'graphql-request/dist/types'
-import request from 'graphql-request'
-import { endpoint } from '../../util/Api'
-import { useMutation, useQueryClient } from 'react-query'
+import { useGenericMutation } from '../../hooks/useGenericMutation'
 
 interface IEditableTextField {
   id: string
@@ -34,18 +31,7 @@ const EditableTextField: FC<IEditableTextField> = ({
 }) => {
   const { errors, handleSubmit, control, reset } = useForm()
 
-  const queryClient = useQueryClient()
-
-  const { mutate } = useMutation(
-    (variables: Variables) => request(endpoint, mutationSchema, variables),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('entries')
-        queryClient.invalidateQueries('amounts')
-        queryClient.invalidateQueries('accounts')
-      },
-    }
-  )
+  const { mutate } = useGenericMutation(mutationSchema)
 
   const [hover, setHover] = useState(false)
 

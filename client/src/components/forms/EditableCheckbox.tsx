@@ -1,9 +1,6 @@
 import React, { FC } from 'react'
 import { Checkbox } from '@chakra-ui/react'
-import { useMutation, useQueryClient } from 'react-query'
-import { Variables } from 'graphql-request/dist/types'
-import { endpoint } from '../../util/Api'
-import request from 'graphql-request'
+import { useGenericMutation } from '../../hooks/useGenericMutation'
 
 interface IEditableCheckbox {
   id: string
@@ -18,18 +15,7 @@ const EditableCheckbox: FC<IEditableCheckbox> = ({
   defaultValue,
   mutationSchema,
 }) => {
-  const queryClient = useQueryClient()
-
-  const { mutate } = useMutation(
-    (variables: Variables) => request(endpoint, mutationSchema, variables),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('entries')
-        queryClient.invalidateQueries('amounts')
-        queryClient.invalidateQueries('accounts')
-      },
-    }
-  )
+  const { mutate } = useGenericMutation(mutationSchema)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {

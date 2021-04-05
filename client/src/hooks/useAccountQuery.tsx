@@ -4,7 +4,7 @@ import { endpoint } from '../util/Api'
 import { request } from 'graphql-request'
 import { useQuery } from 'react-query'
 
-export const useAccountsQuery = () => {
+export const useAccountQuery = () => {
   const { user } = useAuth()
 
   const variables = {
@@ -19,7 +19,7 @@ export const useAccountsQuery = () => {
   )
 }
 
-export const useAccountsYearQuery = () => {
+export const useAccountYearQuery = () => {
   const { user } = useAuth()
 
   const variables = {

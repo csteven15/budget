@@ -3,10 +3,7 @@ import { theme, IconButton, Text, Box, Flex, Select } from '@chakra-ui/react'
 import { Controller, useForm } from 'react-hook-form'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
 import { TextToValue } from '../../common/enums/Generic'
-import { useMutation, useQueryClient } from 'react-query'
-import { Variables } from 'graphql-request/dist/types'
-import request from 'graphql-request'
-import { endpoint } from '../../util/Api'
+import { useGenericMutation } from '../../hooks/useGenericMutation'
 
 interface IEditableSelect {
   id: string
@@ -23,20 +20,9 @@ const EditableSelect: FC<IEditableSelect> = ({
   mutationSchema,
   textToValueMapping,
 }) => {
-  const queryClient = useQueryClient()
-
   const { errors, handleSubmit, control } = useForm()
 
-  const { mutate } = useMutation(
-    (variables: Variables) => request(endpoint, mutationSchema, variables),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('entries')
-        queryClient.invalidateQueries('amounts')
-        queryClient.invalidateQueries('accounts')
-      },
-    }
-  )
+  const { mutate } = useGenericMutation(mutationSchema)
 
   const [selectOpen, setSelectOpen] = useState(false)
 

@@ -31,7 +31,6 @@ import {
   EditIcon,
 } from '@chakra-ui/icons'
 import {
-  DELETE_AMOUNT_MUTATION,
   UPDATE_AMOUNT_MUTATION,
   UPDATE_ENTRY_MUTATION,
 } from '../common/gql/Mutations'
@@ -40,24 +39,11 @@ import { EEntryType, EEntryValues } from '../common/enums'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
 import { IAmountInfo, IEntryInfo } from '../common/gql/Types'
 import EntryForm from '../components/forms/EntryForm'
-import { useEntriesQuery } from '../hooks/useEntriesQuery'
-import { useMutation, useQueryClient } from 'react-query'
-import request from 'graphql-request'
-import { endpoint } from '../util/Api'
-import { Variables } from 'graphql-request/dist/types'
+import { useEntryQuery } from '../hooks/useEntryQuery'
+import { useDeleteAmountMutation } from '../hooks/useAmountMutation'
 
 const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
-  const queryClient = useQueryClient()
-
-  const { mutate } = useMutation(
-    (variables: Variables) =>
-      request(endpoint, DELETE_AMOUNT_MUTATION, variables),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('entries')
-      },
-    }
-  )
+  const { mutate } = useDeleteAmountMutation()
   return (
     <Grid templateColumns="repeat(4, 1fr)" m={2}>
       <Box>
@@ -216,7 +202,7 @@ const EntryFormPopoverContent: FC<{ closePopover?: () => void }> = ({
 
 const ListView: FC = () => {
   const [popoverOpen, setPopoverOpen] = useState(false)
-  const { data, isLoading } = useEntriesQuery()
+  const { data, isLoading } = useEntryQuery()
 
   const openPopover = () => setPopoverOpen(true)
   const closePopover = () => setPopoverOpen(false)

@@ -4,10 +4,7 @@ import { Text, Box, Flex, IconButton } from '@chakra-ui/react'
 import 'react-datepicker/dist/react-datepicker.css'
 import './DatePicker.css'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { Variables } from 'graphql-request/dist/types'
-import { endpoint } from '../../util/Api'
-import request from 'graphql-request'
-import { useMutation, useQueryClient } from 'react-query'
+import { useGenericMutation } from '../../hooks/useGenericMutation'
 
 interface IEditableDatePicker {
   id: string
@@ -25,23 +22,12 @@ const EditableDatePicker: FC<IEditableDatePicker> = ({
   showPopperArrow = false,
   mutationSchema,
 }) => {
-  const queryClient = useQueryClient()
-
   const [hover, setHover] = useState(false)
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [trackedValue, setTrackedValue] = useState(new Date(defaultValue))
   const [date, setDate] = useState(new Date(defaultValue))
 
-  const { mutate } = useMutation(
-    (variables: Variables) => request(endpoint, mutationSchema, variables),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('entries')
-        queryClient.invalidateQueries('amounts')
-        queryClient.invalidateQueries('accounts')
-      },
-    }
-  )
+  const { mutate } = useGenericMutation(mutationSchema)
 
   const onSubmit = (newDate: Date) => {
     setTrackedValue(newDate)

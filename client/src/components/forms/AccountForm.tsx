@@ -15,29 +15,14 @@ import {
   Text,
   theme,
 } from '@chakra-ui/react'
-import { CREATE_ACCOUNT_MUTATION } from '../../common/gql/Mutations'
-import request from 'graphql-request'
-import { useMutation, useQueryClient } from 'react-query'
-import { endpoint } from '../../util/Api'
-import { Variables } from 'graphql-request/dist/types'
+import { useCreateAccountMutation } from '../../hooks/useAccountMutation'
 
 const AccountForm: FC = () => {
   const { user } = useAuth()
 
-  const queryClient = useQueryClient()
   const { register, errors, handleSubmit } = useForm<IAccount>()
 
-  const { mutate } = useMutation(
-    (variables: Variables) =>
-      request(endpoint, CREATE_ACCOUNT_MUTATION, variables),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('entries')
-        queryClient.invalidateQueries('amounts')
-        queryClient.invalidateQueries('accounts')
-      },
-    }
-  )
+  const { mutate } = useCreateAccountMutation()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (formData: any) => {

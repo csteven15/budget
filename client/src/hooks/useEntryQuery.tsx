@@ -3,9 +3,8 @@ import { useAuth } from '../context/AuthContext'
 import { endpoint } from '../util/Api'
 import { request } from 'graphql-request'
 import { useQuery } from 'react-query'
-import { Variables } from 'graphql-request/dist/types'
 
-export const useEntriesQuery = () => {
+export const useEntryQuery = () => {
   const { user } = useAuth()
 
   const variables = {
@@ -21,7 +20,19 @@ export const useEntriesQuery = () => {
   )
 }
 
-export const useEntriesQueryCalendar = (variables: Variables) => {
+export const useEntryQueryCalendar = (startDate: Date, endDate: Date) => {
+  const { user } = useAuth()
+
+  const variables = {
+    filter: {
+      ...startDate,
+      ...endDate,
+    },
+    payload: {
+      userId: user.uid,
+    },
+  }
+
   return useQuery(
     'entries-calendar',
     async () => await request(endpoint, GET_ENTRIES, variables),
@@ -29,10 +40,18 @@ export const useEntriesQueryCalendar = (variables: Variables) => {
   )
 }
 
-export const useEntriesQueryYear = (variables: Variables) => {
+export const useEntryQueryYear = (date: Date) => {
   const { user } = useAuth()
 
-  variables.payload.userId = user.uid
+  const variables = {
+    filter: {
+      startDate: new Date(date.getFullYear(), 0, 1),
+      endDate: new Date(date.getFullYear() + 1, 0, 0),
+    },
+    payload: {
+      userId: user.uid,
+    },
+  }
 
   return useQuery(
     'entries-year',

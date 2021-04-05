@@ -2,8 +2,8 @@ import React, { FC } from 'react'
 import { Table, Thead, Tbody, Tr, Th } from '@chakra-ui/react'
 import { EEntryType, MonthArray } from '../common/enums/index'
 import { IEntry, IAmount, IAccount } from '../common/types/index'
-import { useAccountsYearQuery } from '../hooks/useAccountsQuery'
-import { useEntriesQueryYear } from '../hooks/useEntriesQuery'
+import { useAccountYearQuery } from '../hooks/useAccountQuery'
+import { useEntryQueryYear } from '../hooks/useEntryQuery'
 
 interface TotalType {
   budgeted: number
@@ -47,17 +47,9 @@ interface YearViewProps {
 }
 
 const YearView: FC<YearViewProps> = ({ date }) => {
-  const { data: appliedAccounts } = useAccountsYearQuery()
+  const { data: appliedAccounts } = useAccountYearQuery()
 
-  const variables = {
-    filter: {
-      startDate: new Date(date.getFullYear(), 0, 1),
-      endDate: new Date(date.getFullYear() + 1, 0, 0),
-    },
-    payload: {},
-  }
-
-  const { data: entriesForYear } = useEntriesQueryYear(variables)
+  const { data: entriesForYear } = useEntryQueryYear(date)
 
   const getTotalsForEachMonth = (entries: IEntry[]) => {
     const totals: TotalType[] = []

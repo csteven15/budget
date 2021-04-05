@@ -3,7 +3,7 @@ import { Box, SimpleGrid, Text } from '@chakra-ui/react'
 import { EEntryType } from '../../common/enums'
 import { IAmountInfo, IEntryInfo } from '../../common/gql/Types'
 import Day from './Day'
-import { useEntriesQueryCalendar } from '../../hooks/useEntriesQuery'
+import { useEntryQueryCalendar } from '../../hooks/useEntryQuery'
 
 const secondsInDay = 86400000
 
@@ -25,14 +25,7 @@ interface ICalendarProps {
 }
 
 const Calendar: FC<ICalendarProps> = ({ month, startDate, endDate }) => {
-  const variables = {
-    filter: {
-      ...startDate,
-      ...endDate,
-    },
-    payload: {},
-  }
-  const { isLoading, data } = useEntriesQueryCalendar(variables)
+  const { isLoading, data } = useEntryQueryCalendar(startDate, endDate)
 
   if (isLoading) {
     return <p>loading...</p>

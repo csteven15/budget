@@ -6,7 +6,7 @@ import { EAccountValues } from '../common/enums'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
 import EditableSelect from '../components/forms/EditableSelect'
 import { IAccountInfo } from '../common/gql/Types'
-import { useAccountsQuery } from '../hooks/useAccountsQuery'
+import { useAccountQuery } from '../hooks/useAccountQuery'
 
 const AccountInfo: FC<IAccountInfo> = ({
   _id,
@@ -76,7 +76,7 @@ const HeaderForAccounts: FC = () => (
 )
 
 const AccountView: FC = () => {
-  const { data } = useAccountsQuery()
+  const { data } = useAccountQuery()
 
   return (
     <>

@@ -9,11 +9,7 @@ import {
   EEntryValues,
 } from '../../common/enums/index'
 import DatePicker from './DatePicker'
-import { CREATE_ENTRY_MUTATION } from '../../common/gql/Mutations'
-import { useMutation, useQueryClient } from 'react-query'
-import { request } from 'graphql-request'
-import { endpoint } from '../../util/Api'
-import { Variables } from 'graphql-request/dist/types'
+import { useCreateEntryMutation } from '../../hooks/useEntryMutation'
 
 const today = new Date()
 
@@ -24,22 +20,10 @@ interface IEntryFormProps {
 const EntryForm: FC<IEntryFormProps> = ({ closePopover }) => {
   const { user } = useAuth()
 
-  const queryClient = useQueryClient()
-
   const { register, errors, handleSubmit } = useForm<IEntry>()
   const [startDate, setStartDate] = useState(today)
 
-  const { mutate } = useMutation(
-    (variables: Variables) =>
-      request(endpoint, CREATE_ENTRY_MUTATION, variables),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('entries')
-        queryClient.invalidateQueries('amounts')
-        queryClient.invalidateQueries('accounts')
-      },
-    }
-  )
+  const { mutate } = useCreateEntryMutation()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (formData: any) => {
