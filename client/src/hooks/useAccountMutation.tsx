@@ -1,7 +1,10 @@
 import request from 'graphql-request'
 import { Variables } from 'graphql-request/dist/types'
 import { useMutation, useQueryClient } from 'react-query'
-import { CREATE_ACCOUNT_MUTATION } from '../common/gql/Mutations'
+import {
+  CREATE_ACCOUNT_MUTATION,
+  DELETE_ACCOUNT_MUTATION,
+} from '../common/gql/Mutations'
 import { endpoint } from '../util/Api'
 
 export const useCreateAccountMutation = () => {
@@ -13,6 +16,22 @@ export const useCreateAccountMutation = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries('entries')
+        queryClient.invalidateQueries('accounts')
+      },
+    }
+  )
+}
+
+export const useDeleteAccountMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation(
+    (variables: Variables) =>
+      request(endpoint, DELETE_ACCOUNT_MUTATION, variables),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('entries')
+        queryClient.invalidateQueries('accounts')
       },
     }
   )

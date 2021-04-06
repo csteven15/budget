@@ -18,7 +18,9 @@ import {
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
+  Progress,
   Spacer,
+  Stack,
   Text,
   useDisclosure,
 } from '@chakra-ui/react'
@@ -41,6 +43,7 @@ import { IAmountInfo, IEntryInfo } from '../common/gql/Types'
 import EntryForm from '../components/forms/EntryForm'
 import { useEntryQuery } from '../hooks/useEntryQuery'
 import { useDeleteAmountMutation } from '../hooks/useAmountMutation'
+import { useDeleteEntryMutation } from '../hooks/useEntryMutation'
 
 const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
   const { mutate } = useDeleteAmountMutation()
@@ -77,7 +80,7 @@ const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
       <Box>
         <IconButton
           onClick={() => mutate({ _id: _id })}
-          icon={<DeleteIcon />}
+          icon={<DeleteIcon color="red" />}
           aria-label="delete amount"
         />
       </Box>
@@ -112,6 +115,30 @@ const EntryInfo: FC<IEntryInfo> = ({
 }) => {
   const localCreatedAt = new Date(createdAt)
   const { isOpen, onToggle } = useDisclosure()
+  const { mutate } = useDeleteEntryMutation()
+
+  const DeleteButton: FC = () => (
+    <IconButton
+      onClick={() => mutate({ _id: _id })}
+      icon={<DeleteIcon color="red" />}
+      aria-label="delete entry"
+      size="xs"
+    />
+  )
+
+  const ActionButtons: FC = () => {
+    if (amounts === undefined || amounts?.length === 0) return <DeleteButton />
+    return (
+      <>
+        <Button size="xs" onClick={onToggle}>
+          {isOpen ? <ArrowUpIcon /> : <ArrowDownIcon />}
+        </Button>
+        &nbsp;
+        <DeleteButton />
+      </>
+    )
+  }
+
   return (
     <Box rounded="md" boxShadow="md">
       <Grid templateRows="repeat(3, 1fr)" m={2}>
@@ -126,11 +153,7 @@ const EntryInfo: FC<IEntryInfo> = ({
               required
             />
             <Spacer />
-            {amounts?.length > 0 ? (
-              <Button size="xs" onClick={onToggle}>
-                {isOpen === true ? <ArrowUpIcon /> : <ArrowDownIcon />}
-              </Button>
-            ) : null}
+            <ActionButtons />
           </Flex>
         </GridItem>
         <GridItem rowSpan={1}>
@@ -150,15 +173,13 @@ const EntryInfo: FC<IEntryInfo> = ({
         <GridItem rowSpan={1}>
           <Flex>
             <Badge colorScheme={type === EEntryType.Income ? 'green' : 'red'}>
-              <Box>
-                <EditableSelect
-                  refName="type"
-                  id={_id}
-                  defaultValue={type}
-                  mutationSchema={UPDATE_ENTRY_MUTATION}
-                  textToValueMapping={EEntryValues}
-                />
-              </Box>
+              <EditableSelect
+                refName="type"
+                id={_id}
+                defaultValue={type}
+                mutationSchema={UPDATE_ENTRY_MUTATION}
+                textToValueMapping={EEntryValues}
+              />
             </Badge>
             <Spacer />
             <Flex>
@@ -207,12 +228,17 @@ const ListView: FC = () => {
   const openPopover = () => setPopoverOpen(true)
   const closePopover = () => setPopoverOpen(false)
 
-  if (isLoading) {
-    return <p>loading</p>
+  const EntryCards: FC = () => {
+    if (isLoading) return <Progress size="sm" isIndeterminate />
+    if (data === undefined) return null
+    if (data?.entries?.length === 0) return <Text>No Entries</Text>
+    return data?.entries?.map((entry: IEntryInfo) => (
+      <EntryInfo key={entry._id} {...entry} />
+    ))
   }
 
   return (
-    <Box w="95%">
+    <Stack w="100%" px="1">
       <Center mt="3">
         <Heading as="h6" size="md">
           Entries
@@ -240,10 +266,8 @@ const ListView: FC = () => {
           <EntryFormPopoverContent closePopover={closePopover} />
         </Popover>
       </Flex>
-      {data?.entries?.map((entry: IEntryInfo) => (
-        <EntryInfo key={entry._id} {...entry} />
-      ))}
-    </Box>
+      <EntryCards />
+    </Stack>
   )
 }
 

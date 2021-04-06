@@ -1,5 +1,5 @@
-import { Center } from '@chakra-ui/layout'
 import React, { FC } from 'react'
+import { Flex } from '@chakra-ui/react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
@@ -61,7 +61,9 @@ const Navigation: FC = ({ children }) => {
           ))}
         </ul>
       </div>
-      <Center>{children}</Center>
+      <Flex justifyContent="center" w="98%" mx="auto">
+        {children}
+      </Flex>
     </div>
   )
 }

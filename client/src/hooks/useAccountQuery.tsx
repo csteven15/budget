@@ -15,7 +15,8 @@ export const useAccountQuery = () => {
 
   return useQuery(
     'accounts',
-    async () => await request(endpoint, GET_ACCOUNTS, variables)
+    async () => await request(endpoint, GET_ACCOUNTS, variables),
+    { enabled: !!variables.payload.userId }
   )
 }
 
@@ -31,6 +32,7 @@ export const useAccountYearQuery = () => {
 
   return useQuery(
     'accounts-year',
-    async () => await request(endpoint, GET_ACCOUNTS, variables)
+    async () => await request(endpoint, GET_ACCOUNTS, variables),
+    { enabled: !!variables.payload.userId }
   )
 }

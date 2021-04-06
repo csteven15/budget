@@ -16,6 +16,14 @@ export const UPDATE_ENTRY_MUTATION = gql`
     }
   }
 `
+
+export const DELETE_ENTRY_MUTATION = gql`
+  mutation deleteEntry($_id: ID!) {
+    deleteEntry(_id: $_id) {
+      _id
+    }
+  }
+`
 export const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccount($payload: CreateAccountInput!) {
     createAccount(payload: $payload) {
@@ -28,6 +36,14 @@ export const CREATE_ACCOUNT_MUTATION = gql`
 export const UPDATE_ACCOUNT_MUTATION = gql`
   mutation updateAccount($payload: UpdateAccountInput!) {
     updateAccount(payload: $payload) {
+      _id
+    }
+  }
+`
+
+export const DELETE_ACCOUNT_MUTATION = gql`
+  mutation deleteAccount($_id: ID!) {
+    deleteAccount(_id: $_id) {
       _id
     }
   }

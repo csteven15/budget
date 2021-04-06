@@ -17,7 +17,11 @@ import {
 } from '@chakra-ui/react'
 import { useCreateAccountMutation } from '../../hooks/useAccountMutation'
 
-const AccountForm: FC = () => {
+interface IAccountFormProps {
+  closePopover?: () => void
+}
+
+const AccountForm: FC<IAccountFormProps> = ({ closePopover }) => {
   const { user } = useAuth()
 
   const { register, errors, handleSubmit } = useForm<IAccount>()
@@ -35,6 +39,7 @@ const AccountForm: FC = () => {
         appliedToBudget: formData.appliedToBudget,
       },
     })
+    if (closePopover) closePopover()
   }
 
   const onError = () => {
