@@ -5,8 +5,18 @@ import SignIn from '../forms/SignIn'
 import AccountView from '../../pages/AccountView'
 import ListView from '../../pages/ListView'
 import BudgetView from '../../pages/BudgetView'
+import Home from '../../pages/Home'
 
-const routes = [
+interface IRoute {
+  path: string
+  component: JSX.Element
+}
+
+const routes: IRoute[] = [
+  {
+    path: '/',
+    component: <Home />,
+  },
   {
     path: '/signin',
     component: <SignIn />,
@@ -33,7 +43,7 @@ const Routes: FC = () => {
   return (
     <Switch>
       {routes.map((route) => (
-        <Route key={route.path} path={route.path}>
+        <Route key={route.path} path={route.path} exact>
           {route.component}
         </Route>
       ))}
