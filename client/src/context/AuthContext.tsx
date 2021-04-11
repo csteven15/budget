@@ -36,14 +36,14 @@ const useProvideAuth = () => {
 
   const getUser = () => {
     if (!state.isLoggedIn) setState({ ...state, isLoading: true })
-    fire.auth().onAuthStateChanged((user) => {
+    fire.auth().onAuthStateChanged((user) =>
       setState({
         uid: user?.uid,
         name: user?.displayName ?? '',
         isLoggedIn: user ? true : false,
         isLoading: false,
       })
-    })
+    )
   }
 
   const signIn = (uid: string, name: string) => {
@@ -56,18 +56,22 @@ const useProvideAuth = () => {
   }
 
   const signOut = () => {
+    setState({
+      ...state,
+      uid: undefined,
+      name: undefined,
+      isLoggedIn: false,
+      isLoading: true,
+    })
     fire.auth().signOut()
     setState({
       ...state,
       uid: undefined,
       name: undefined,
       isLoggedIn: false,
+      isLoading: false,
     })
   }
-
-  console.log(fire.auth().currentUser)
-
-  console.log(state)
 
   return {
     user: state,
