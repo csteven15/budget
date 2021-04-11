@@ -6,6 +6,7 @@ import AccountView from '../../pages/AccountView'
 import ListView from '../../pages/ListView'
 import BudgetView from '../../pages/BudgetView'
 import Home from '../../pages/Home'
+import SignUp from '../forms/SignUp'
 
 interface IRoute {
   path: string
@@ -20,6 +21,10 @@ const routes: IRoute[] = [
   {
     path: '/signin',
     component: <SignIn />,
+  },
+  {
+    path: '/signup',
+    component: <SignUp />,
   },
   {
     path: '/dashboard',

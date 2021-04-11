@@ -11,6 +11,7 @@ import { IUser } from '../common/types'
 
 interface IContextProps {
   user: IUser
+  signIn: (uid: string, name: string) => void
   signOut: () => void
 }
 
@@ -48,6 +49,15 @@ const useProvideAuth = () => {
     })
   }
 
+  const signIn = (uid: string, name: string) => {
+    setState({
+      ...state,
+      uid: uid,
+      name: name,
+      isLoggedIn: true,
+    })
+  }
+
   const signOut = () => {
     fire.auth().signOut()
     setState({
@@ -60,6 +70,7 @@ const useProvideAuth = () => {
 
   return {
     user: state,
+    signIn,
     signOut,
   }
 }
