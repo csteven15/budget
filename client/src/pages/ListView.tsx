@@ -191,7 +191,7 @@ const EntryInfo: FC<IEntryInfo> = ({
         </GridItem>
       </Grid>
       <Collapse in={isOpen} animateOpacity>
-        <Box m="2" bg="white" rounded="md" boxShadow="md" p="1">
+        <Box m="2" rounded="md" boxShadow="md" p="1">
           <Divider />
           <AmountHeader />
           {amounts?.map((amount) => (
@@ -210,13 +210,7 @@ const EntryFormPopoverContent: FC<{ closePopover?: () => void }> = ({
     <PopoverArrow />
     <PopoverCloseButton />
     <PopoverBody>
-      <Container
-        maxW="container.md"
-        boxShadow="base"
-        p="6"
-        rounded="md"
-        bg="white"
-      >
+      <Container maxW="container.md" boxShadow="base" p="6" rounded="md">
         <EntryForm closePopover={closePopover} />
       </Container>
     </PopoverBody>

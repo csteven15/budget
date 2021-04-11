@@ -174,7 +174,9 @@ const Navigation: FC = ({ children }) => {
       </Collapse>
       <DefaultMenu />
       <Divider marginBottom={4} />
-      <Container centerContent>{children}</Container>
+      <Container centerContent maxW="container.xl">
+        {children}
+      </Container>
       {/* <Footer /> */}
     </Container>
   )
