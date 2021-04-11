@@ -15,6 +15,7 @@ export const INITIAL_USER: IUser = {
   uid: '',
   name: '',
   isLoggedIn: false,
+  isLoading: true,
 }
 
 export const AuthProvider: FC = ({ children }) => {
@@ -34,11 +35,13 @@ const useProvideAuth = () => {
   }, [state.isLoggedIn])
 
   const getUser = () => {
+    if (!state.isLoggedIn) setState({ ...state, isLoading: true })
     fire.auth().onAuthStateChanged((user) => {
       setState({
         uid: user?.uid,
         name: user?.displayName ?? '',
         isLoggedIn: user ? true : false,
+        isLoading: false,
       })
     })
   }
@@ -61,6 +64,10 @@ const useProvideAuth = () => {
       isLoggedIn: false,
     })
   }
+
+  console.log(fire.auth().currentUser)
+
+  console.log(state)
 
   return {
     user: state,

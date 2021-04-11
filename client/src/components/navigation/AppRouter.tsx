@@ -40,7 +40,7 @@ const AppRouter: FC = () => {
   return (
     <Suspense
       fallback={
-        <Center>
+        <Center height="100vh">
           <Spinner />
         </Center>
       }

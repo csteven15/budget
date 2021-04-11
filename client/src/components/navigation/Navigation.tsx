@@ -11,6 +11,8 @@ import {
   Collapse,
   Divider,
   Container,
+  Center,
+  Spinner,
 } from '@chakra-ui/react'
 import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from '@chakra-ui/icons'
 import { Link, useLocation } from 'react-router-dom'
@@ -64,6 +66,14 @@ const Navigation: FC = ({ children }) => {
   const iconBreakpoint = useBreakpointValue({ base: 'sm', md: 'md' })
 
   let combinedRoutes = routes
+
+  if (user.isLoading) {
+    return (
+      <Center height="100vh">
+        <Spinner />
+      </Center>
+    )
+  }
 
   if (user.isLoggedIn) {
     combinedRoutes = combinedRoutes.concat(protectedRoutes)
