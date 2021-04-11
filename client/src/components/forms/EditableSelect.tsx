@@ -1,9 +1,11 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { theme, IconButton, Text, Box, Flex, Select } from '@chakra-ui/react'
-import { Controller, useForm } from 'react-hook-form'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { TextToValue } from '../../common/enums/Generic'
+import { Controller, useForm } from 'react-hook-form'
+
 import { useGenericMutation } from '../../hooks/useGenericMutation'
+
+import { TextToValue } from '../../common/enums/Generic'
 
 interface IEditableSelect {
   id: string

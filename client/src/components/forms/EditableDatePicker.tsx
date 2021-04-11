@@ -1,10 +1,12 @@
-import React, { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import ReactDatePicker from 'react-datepicker'
 import { Text, Box, Flex, IconButton } from '@chakra-ui/react'
+import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
+
+import { useGenericMutation } from '../../hooks/useGenericMutation'
+
 import 'react-datepicker/dist/react-datepicker.css'
 import './DatePicker.css'
-import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
-import { useGenericMutation } from '../../hooks/useGenericMutation'
 
 interface IEditableDatePicker {
   id: string

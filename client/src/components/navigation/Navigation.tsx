@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import {
   Flex,
   IconButton,
@@ -12,9 +12,10 @@ import {
   Divider,
   Container,
 } from '@chakra-ui/react'
-import { Link, useLocation } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
 import { CloseIcon, HamburgerIcon, MoonIcon, SunIcon } from '@chakra-ui/icons'
+import { Link, useLocation } from 'react-router-dom'
+
+import { useAuth } from '../../context/AuthContext'
 
 interface IRoute {
   path: string

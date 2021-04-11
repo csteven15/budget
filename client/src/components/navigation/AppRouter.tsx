@@ -1,16 +1,65 @@
-import React, { FC } from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import { FC, lazy, LazyExoticComponent, Suspense } from 'react'
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { Center, Spinner } from '@chakra-ui/react'
 
 import Navigation from './Navigation'
-import Routes from './Routes'
+
+interface IRoute {
+  path: string
+  component: LazyExoticComponent<FC>
+}
+
+const routes: IRoute[] = [
+  {
+    path: '/',
+    component: lazy(() => import('../../pages/HomeView')),
+  },
+  {
+    path: '/signin',
+    component: lazy(() => import('../../pages/SignInView')),
+  },
+  {
+    path: '/dashboard',
+    component: lazy(() => import('../../pages/DashboardView')),
+  },
+  {
+    path: '/accountview',
+    component: lazy(() => import('../../pages/AccountView')),
+  },
+  {
+    path: '/listview',
+    component: lazy(() => import('../../pages/ListView')),
+  },
+  {
+    path: '/budgetview',
+    component: lazy(() => import('../../pages/BudgetView')),
+  },
+]
 
 const AppRouter: FC = () => {
   return (
-    <BrowserRouter>
-      <Navigation>
-        <Routes />
-      </Navigation>
-    </BrowserRouter>
+    <Suspense
+      fallback={
+        <Center>
+          <Spinner />
+        </Center>
+      }
+    >
+      <BrowserRouter>
+        <Navigation>
+          <Switch>
+            {routes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                exact
+                component={route.component}
+              />
+            ))}
+          </Switch>
+        </Navigation>
+      </BrowserRouter>
+    </Suspense>
   )
 }
 

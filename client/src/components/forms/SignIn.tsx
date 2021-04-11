@@ -1,22 +1,24 @@
-import React, { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import {
   Button,
-  Flex,
+  Center,
   Input,
   InputGroup,
   InputRightElement,
-  Spacer,
   Stack,
   useToast,
 } from '@chakra-ui/react'
 import { useForm } from 'react-hook-form'
 import { useHistory } from 'react-router-dom'
-import fire from '../../util/fire'
+
 import { useAuth } from '../../context/AuthContext'
+
+import fire from '../../util/fire'
 
 interface IFormData {
   email: string
-  password: string
+  name?: string
+  password?: string
 }
 
 const SignIn: FC = () => {
@@ -30,54 +32,73 @@ const SignIn: FC = () => {
   const handleClick = () => setShow(!show)
 
   const onSubmit = async (formData: IFormData) => {
-    try {
-      const res = await fire
-        .auth()
-        .signInWithEmailAndPassword(formData.email, formData.password)
-      signIn(res.user!.uid, res.additionalUserInfo!.username as string)
-      toast({
-        title: `Successfully signed in.`,
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      })
-      history.push('/dashboard')
-    } catch (error) {
-      if (process === 'signin') {
-        switch (error.code) {
-          case 'auth/email-already-in-use':
-            setProcess('signin')
-            break
-          case 'auth/user-not-found':
-            setProcess('signup')
-            break
-          case 'auth/wrong-password':
-            toast({
-              title: error.message,
-              status: 'error',
-              duration: 5000,
-              isClosable: true,
-            })
-            break
-          default:
-            break
-        }
+    if (process === 'start') {
+      try {
+        const res = await fire.auth().fetchSignInMethodsForEmail(formData.email)
+        if (res.length === 0) setProcess('signup')
+        if (res[0] === 'password') setProcess('signin')
+      } catch (error) {
+        console.error(error)
+        toast({
+          title: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
       }
-      if (process === 'signup') {
-        switch (error.code) {
-          case 'auth/email-already-in-use':
-            setProcess('signup')
-            break
-          default:
-            break
-        }
+    }
+    if (process === 'signup') {
+      try {
+        const res = await fire
+          .auth()
+          .createUserWithEmailAndPassword(formData.email, formData!.password!)
+        await fire
+          .auth()
+          .currentUser?.updateProfile({ displayName: formData!.name })
+        signIn(res.user!.uid!, formData!.name!)
+        toast({
+          title: `Successfully signed in.`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        })
+        history.push('/dashboard')
+      } catch (error) {
+        console.error(error)
+        toast({
+          title: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
       }
-
-      console.log(error)
+    }
+    if (process === 'signin') {
+      try {
+        const res = await fire
+          .auth()
+          .signInWithEmailAndPassword(formData.email, formData!.password!)
+        signIn(res.user!.uid!, res.user!.displayName!)
+        toast({
+          title: `Successfully signed in.`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        })
+        history.push('/dashboard')
+      } catch (error) {
+        console.error(error)
+        toast({
+          title: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
     }
   }
 
-  const ActionButtons = () => {
+  const ProcessText = () => {
     if (process === 'start') return 'Next'
     if (process === 'signin') return 'Sign In'
     if (process === 'signup') return 'Sign Up'
@@ -90,6 +111,13 @@ const SignIn: FC = () => {
         name="email"
         ref={register({ required: true })}
       />
+      {process === 'signin' || process === 'start' ? null : (
+        <Input
+          placeholder="Full Name"
+          name="name"
+          ref={register({ required: true })}
+        />
+      )}
       {process === 'start' ? null : (
         <InputGroup size="md">
           <Input
@@ -103,15 +131,11 @@ const SignIn: FC = () => {
           </InputRightElement>
         </InputGroup>
       )}
-      <Flex>
-        <Button w="48%" onClick={() => history.push('/signup')}>
-          Sign Up
+      <Center>
+        <Button w="full" onClick={handleSubmit(onSubmit)}>
+          {ProcessText()}
         </Button>
-        <Spacer />
-        <Button w="48%" onClick={handleSubmit(onSubmit)}>
-          {ActionButtons()}
-        </Button>
-      </Flex>
+      </Center>
     </Stack>
   )
 }

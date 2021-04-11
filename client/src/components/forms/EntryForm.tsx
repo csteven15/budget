@@ -1,15 +1,17 @@
-import React, { FC, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { FC, useState } from 'react'
 import { Box, Button, Input, Select, SimpleGrid, theme } from '@chakra-ui/react'
-import { IEntry } from '../../common/types'
+import { useForm } from 'react-hook-form'
+
+import DatePicker from './DatePicker'
 import { useAuth } from '../../context/AuthContext'
+import { useCreateEntryMutation } from '../../hooks/useEntryMutation'
+
 import {
   EFrequencyType,
   EFrequencyValues,
   EEntryValues,
 } from '../../common/enums/index'
-import DatePicker from './DatePicker'
-import { useCreateEntryMutation } from '../../hooks/useEntryMutation'
+import { IEntry } from '../../common/types'
 
 const today = new Date()
 
@@ -29,7 +31,7 @@ const EntryForm: FC<IEntryFormProps> = ({ closePopover }) => {
   const onSubmit = async (formData: any) => {
     mutate({
       payload: {
-        userId: user.uid as string,
+        userId: user.uid!,
         name: formData!.name,
         type: parseInt(formData!.type, 10),
         budgetedAmount: parseFloat(formData!.budgetedAmount),

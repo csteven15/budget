@@ -1,10 +1,11 @@
-import React, { FC } from 'react'
-import { useAuth } from '../context/AuthContext'
+import { FC } from 'react'
 import { Center, Flex, Heading, SimpleGrid, Stack } from '@chakra-ui/react'
-import ListView from './ListView'
-import AccountView from './AccountView'
 
-const Dashboard: FC = () => {
+import AccountView from './AccountView'
+import ListView from './ListView'
+import { useAuth } from '../context/AuthContext'
+
+const DashboardView: FC = () => {
   const { user } = useAuth()
 
   return (
@@ -26,4 +27,4 @@ const Dashboard: FC = () => {
   )
 }
 
-export default Dashboard
+export default DashboardView

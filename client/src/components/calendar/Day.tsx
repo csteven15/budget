@@ -1,5 +1,6 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { Badge, Box, Text, useColorModeValue } from '@chakra-ui/react'
+
 import { IAmountInfo } from '../../common/gql/Types'
 
 interface IDayProps {

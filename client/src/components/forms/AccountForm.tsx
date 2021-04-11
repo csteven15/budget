@@ -1,8 +1,5 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { useForm } from 'react-hook-form'
-import { IAccount } from '../../common/types'
-import { useAuth } from '../../context/AuthContext'
-import { EAccountValues } from '../../common/enums'
 import {
   Box,
   Button,
@@ -15,7 +12,12 @@ import {
   Text,
   theme,
 } from '@chakra-ui/react'
+
+import { useAuth } from '../../context/AuthContext'
 import { useCreateAccountMutation } from '../../hooks/useAccountMutation'
+
+import { IAccount } from '../../common/types'
+import { EAccountValues } from '../../common/enums'
 
 interface IAccountFormProps {
   closePopover?: () => void
@@ -32,7 +34,7 @@ const AccountForm: FC<IAccountFormProps> = ({ closePopover }) => {
   const onSubmit = async (formData: any) => {
     mutate({
       payload: {
-        userId: user.uid as string,
+        userId: user.uid!,
         name: formData.name,
         type: parseInt(formData.type, 10),
         total: parseFloat(formData.total),

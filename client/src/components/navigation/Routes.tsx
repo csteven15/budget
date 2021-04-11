@@ -1,46 +1,35 @@
-import React, { FC } from 'react'
+import React, { FC, lazy, LazyExoticComponent } from 'react'
 import { Switch, Route } from 'react-router-dom'
-import Dashboard from '../../pages/Dashboard'
-import SignIn from '../forms/SignIn'
-import AccountView from '../../pages/AccountView'
-import ListView from '../../pages/ListView'
-import BudgetView from '../../pages/BudgetView'
-import Home from '../../pages/Home'
-import SignUp from '../forms/SignUp'
 
 interface IRoute {
   path: string
-  component: JSX.Element
+  component: LazyExoticComponent<FC>
 }
 
 const routes: IRoute[] = [
   {
     path: '/',
-    component: <Home />,
+    component: lazy(() => import('../../pages/HomeView')),
   },
   {
     path: '/signin',
-    component: <SignIn />,
-  },
-  {
-    path: '/signup',
-    component: <SignUp />,
+    component: lazy(() => import('../../pages/SignInView')),
   },
   {
     path: '/dashboard',
-    component: <Dashboard />,
+    component: lazy(() => import('../../pages/DashboardView')),
   },
   {
     path: '/accountview',
-    component: <AccountView />,
+    component: lazy(() => import('../../pages/AccountView')),
   },
   {
     path: '/listview',
-    component: <ListView />,
+    component: lazy(() => import('../../pages/ListView')),
   },
   {
     path: '/budgetview',
-    component: <BudgetView />,
+    component: lazy(() => import('../../pages/BudgetView')),
   },
 ]
 
@@ -48,9 +37,12 @@ const Routes: FC = () => {
   return (
     <Switch>
       {routes.map((route) => (
-        <Route key={route.path} path={route.path} exact>
-          {route.component}
-        </Route>
+        <Route
+          key={route.path}
+          path={route.path}
+          exact
+          component={route.component}
+        />
       ))}
     </Switch>
   )

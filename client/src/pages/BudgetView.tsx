@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import {
   Tabs,
   TabList,
@@ -12,9 +12,11 @@ import {
   Center,
   Box,
 } from '@chakra-ui/react'
+import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons'
+
 import MonthView from './MonthView'
 import YearView from './YearView'
-import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons'
+
 import { MonthArray } from '../common/enums'
 
 const dateToday = new Date()

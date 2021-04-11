@@ -1,5 +1,6 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { Checkbox } from '@chakra-ui/react'
+
 import { useGenericMutation } from '../../hooks/useGenericMutation'
 
 interface IEditableCheckbox {

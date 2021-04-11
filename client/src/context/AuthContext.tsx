@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useContext,
-  createContext,
-  FC,
-  useEffect,
-} from 'react'
+import { useState, useContext, createContext, FC, useEffect } from 'react'
 
 import fire from '../util/fire'
 import { IUser } from '../common/types'
@@ -43,7 +37,7 @@ const useProvideAuth = () => {
     fire.auth().onAuthStateChanged((user) => {
       setState({
         uid: user?.uid,
-        name: user?.displayName,
+        name: user?.displayName ?? '',
         isLoggedIn: user ? true : false,
       })
     })

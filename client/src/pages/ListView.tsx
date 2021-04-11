@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import {
   Badge,
   Box,
@@ -24,26 +24,28 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react'
-import EditableDatePicker from '../components/forms/EditableDatePicker'
-import EditableTextField from '../components/forms/EditableTextField'
+
 import {
   ArrowDownIcon,
   ArrowUpIcon,
   DeleteIcon,
   EditIcon,
 } from '@chakra-ui/icons'
-import {
-  UPDATE_AMOUNT_MUTATION,
-  UPDATE_ENTRY_MUTATION,
-} from '../common/gql/Mutations'
+import EditableDatePicker from '../components/forms/EditableDatePicker'
+import EditableTextField from '../components/forms/EditableTextField'
 import EditableSelect from '../components/forms/EditableSelect'
-import { EEntryType, EEntryValues } from '../common/enums'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
-import { IAmountInfo, IEntryInfo } from '../common/gql/Types'
 import EntryForm from '../components/forms/EntryForm'
 import { useEntryQuery } from '../hooks/useEntryQuery'
 import { useDeleteAmountMutation } from '../hooks/useAmountMutation'
 import { useDeleteEntryMutation } from '../hooks/useEntryMutation'
+
+import {
+  UPDATE_AMOUNT_MUTATION,
+  UPDATE_ENTRY_MUTATION,
+} from '../common/gql/Mutations'
+import { EEntryType, EEntryValues } from '../common/enums'
+import { IAmountInfo, IEntryInfo } from '../common/gql/Types'
 
 const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
   const { mutate } = useDeleteAmountMutation()

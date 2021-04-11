@@ -1,9 +1,11 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { Table, Thead, Tbody, Tr, Th } from '@chakra-ui/react'
-import { EEntryType, MonthArray } from '../common/enums/index'
-import { IEntry, IAmount, IAccount } from '../common/types/index'
+
 import { useAccountYearQuery } from '../hooks/useAccountQuery'
 import { useEntryQueryYear } from '../hooks/useEntryQuery'
+
+import { EEntryType, MonthArray } from '../common/enums/index'
+import { IEntry, IAmount, IAccount } from '../common/types/index'
 
 interface TotalType {
   budgeted: number

@@ -1,8 +1,10 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { Box, SimpleGrid, Text } from '@chakra-ui/react'
+
+import Day from './Day'
+
 import { EEntryType } from '../../common/enums'
 import { IAmountInfo, IEntryInfo } from '../../common/gql/Types'
-import Day from './Day'
 import { useEntryQueryCalendar } from '../../hooks/useEntryQuery'
 
 const secondsInDay = 86400000

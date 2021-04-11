@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import {
   useToast,
   theme,
@@ -8,8 +8,9 @@ import {
   Box,
   Flex,
 } from '@chakra-ui/react'
-import { Controller, RegisterOptions, useForm } from 'react-hook-form'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
+import { Controller, RegisterOptions, useForm } from 'react-hook-form'
+
 import { useGenericMutation } from '../../hooks/useGenericMutation'
 
 interface IEditableTextField {

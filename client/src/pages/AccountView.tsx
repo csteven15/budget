@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import {
   Badge,
   Box,
@@ -21,16 +21,18 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react'
-import { UPDATE_ACCOUNT_MUTATION } from '../common/gql/Mutations'
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+
+import AccountForm from '../components/forms/AccountForm'
 import EditableTextField from '../components/forms/EditableTextField'
-import { EAccountType, EAccountValues } from '../common/enums'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
 import EditableSelect from '../components/forms/EditableSelect'
-import { IAccountInfo } from '../common/gql/Types'
 import { useAccountQuery } from '../hooks/useAccountQuery'
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
-import AccountForm from '../components/forms/AccountForm'
 import { useDeleteAccountMutation } from '../hooks/useAccountMutation'
+
+import { EAccountType, EAccountValues } from '../common/enums'
+import { UPDATE_ACCOUNT_MUTATION } from '../common/gql/Mutations'
+import { IAccountInfo } from '../common/gql/Types'
 
 const AccountInfo: FC<IAccountInfo> = ({
   _id,
