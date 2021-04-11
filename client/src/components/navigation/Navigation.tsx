@@ -110,7 +110,9 @@ const Navigation: FC = ({ children }) => {
   const DefaultMenu: FC = () => (
     <Flex hidden={!menuBreakpoint} p={2}>
       <Link to="/">
-        <Text fontWeight="bold">Budget</Text>
+        <Text fontWeight="bold" p={2}>
+          Budget
+        </Text>
       </Link>
       <Spacer />
       {combinedRoutes.map((menuItem: IRoute) => (
@@ -172,7 +174,7 @@ const Navigation: FC = ({ children }) => {
       </Collapse>
       <DefaultMenu />
       <Divider marginBottom={4} />
-      {children}
+      <Container centerContent>{children}</Container>
       {/* <Footer /> */}
     </Container>
   )
