@@ -7,8 +7,7 @@
     "**/node_modules": true,
     "**/build": true,
     "**/coverage": true
-  },
-  "editor.formatOnSave": false, // auto format the file on each save
+  }, // auto format the file on each save
   "eslint.validate": [
     "typescript",
     "typescriptreact"
@@ -19,6 +18,11 @@
   "eslint.packageManager": "yarn", // change to npm if you use npm
   "eslint.quiet": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  }
+    "source.fixAll.eslint": true,
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "prettier.packageManager": "yarn",
+  "editor.tabSize": 2,
+  "editor.renderWhitespace": "all"
 }

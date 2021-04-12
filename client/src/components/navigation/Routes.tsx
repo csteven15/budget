@@ -1,36 +1,35 @@
-import React, { FC } from 'react'
+import React, { FC, lazy, LazyExoticComponent } from 'react'
 import { Switch, Route } from 'react-router-dom'
-import Dashboard from '../../pages/Dashboard'
-import SignIn from '../forms/SignIn'
-import YearView from '../../pages/YearView'
-import TotalView from '../../pages/TotalView'
-import MonthView from '../../pages/MonthView'
-import AccountView from '../../pages/AccountView'
 
-const routes = [
+interface IRoute {
+  path: string
+  component: LazyExoticComponent<FC>
+}
+
+const routes: IRoute[] = [
+  {
+    path: '/',
+    component: lazy(() => import('../../pages/HomeView')),
+  },
   {
     path: '/signin',
-    component: <SignIn />,
+    component: lazy(() => import('../../pages/SignInView')),
   },
   {
     path: '/dashboard',
-    component: <Dashboard />,
+    component: lazy(() => import('../../pages/DashboardView')),
   },
   {
     path: '/accountview',
-    component: <AccountView />,
+    component: lazy(() => import('../../pages/AccountView')),
   },
   {
-    path: '/monthview',
-    component: <MonthView renderHeaders={true} />,
+    path: '/listview',
+    component: lazy(() => import('../../pages/ListView')),
   },
   {
-    path: '/yearview',
-    component: <YearView />,
-  },
-  {
-    path: '/totalView',
-    component: <TotalView />,
+    path: '/budgetview',
+    component: lazy(() => import('../../pages/BudgetView')),
   },
 ]
 
@@ -38,9 +37,12 @@ const Routes: FC = () => {
   return (
     <Switch>
       {routes.map((route) => (
-        <Route key={route.path} path={route.path}>
-          {route.component}
-        </Route>
+        <Route
+          key={route.path}
+          path={route.path}
+          exact
+          component={route.component}
+        />
       ))}
     </Switch>
   )

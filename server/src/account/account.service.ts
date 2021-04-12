@@ -1,9 +1,13 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Account, AccountDocument } from './account.schema';
-import { CreateAccountInputs, UpdateAccountInputs } from './account.inputs';
+import {
+  CreateAccountInput,
+  GetAccountInput,
+  UpdateAccountInput,
+} from './account.input';
 
 @Injectable()
 export class AccountService {
@@ -14,39 +18,45 @@ export class AccountService {
   ) {}
 
   async createAccount(
-    createAccountInputs: CreateAccountInputs,
+    createAccountInput: CreateAccountInput,
   ): Promise<Account> {
-    const Account = new this.accountModel(createAccountInputs);
+    const Account = new this.accountModel(createAccountInput);
     this.logger.log(`created account ${Account._id}`);
     return Account.save();
   }
 
-  async getAllAccounts(): Promise<Account[]> {
-    this.logger.log(`getting all accounts`);
-    return this.accountModel.find().exec();
+  async getAccountById(_id: Types.ObjectId): Promise<Account> {
+    this.logger.log(`getting account with id ${_id}`);
+    return this.accountModel.findById(_id).exec();
   }
 
-  async getAllAccountsForUser(uid: string): Promise<Account[]> {
-    this.logger.log(`getting all accounts for ${uid}`);
-    return this.accountModel.find({ uid: uid }, null).exec();
+  async getAccounts(getAccountInput: GetAccountInput): Promise<Account[]> {
+    this.logger.log(`getting all accounts`);
+    return this.accountModel
+      .find({ ...getAccountInput }, null, { sort: { type: 1 } })
+      .exec();
+  }
+
+  async getAccountsByUserId(userId: string): Promise<Account[]> {
+    this.logger.log(`getting all accounts for ${userId}`);
+    return this.accountModel.find({ userId: userId }, null).exec();
   }
 
   async updateAccount(
-    id: string,
-    updateAccountInputs: UpdateAccountInputs,
+    updateAccountInput: UpdateAccountInput,
   ): Promise<Account> {
-    this.logger.log(`updating ${id}`);
+    this.logger.log(`updating ${updateAccountInput._id}`);
     return this.accountModel
-      .findByIdAndUpdate(id, updateAccountInputs, {
+      .findByIdAndUpdate(updateAccountInput._id, updateAccountInput, {
         useFindAndModify: false,
       })
       .exec();
   }
 
-  async deleteAccount(id: string): Promise<Account> {
-    this.logger.log(`deleting ${id}`);
+  async deleteAccount(_id: Types.ObjectId): Promise<Account> {
+    this.logger.log(`deleting ${_id}`);
     return this.accountModel
-      .findByIdAndDelete(id, {
+      .findByIdAndDelete(_id, {
         useFindAndModify: false,
       })
       .exec();

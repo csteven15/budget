@@ -1,9 +1,13 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Amount, AmountDocument } from './amount.schema';
-import { CreateAmountInputs, UpdateAmountInputs } from './amount.inputs';
+import {
+  CreateAmountInput,
+  GetAmountInput,
+  UpdateAmountInput,
+} from './amount.input';
 import { Entry, EntryDocument } from 'src/entry/entry.schema';
 
 @Injectable()
@@ -15,51 +19,52 @@ export class AmountService {
     @InjectModel(Entry.name) private entryModel: Model<EntryDocument>,
   ) {}
 
-  async createAmount(createAmountInputs: CreateAmountInputs): Promise<Amount> {
-    const amount = new this.amountModel(createAmountInputs);
+  async createAmount(createAmountInput: CreateAmountInput): Promise<Amount> {
+    const amount = new this.amountModel(createAmountInput);
     this.logger.log(`created amount ${amount._id}`);
     const entry = await this.entryModel.findOne({
-      _id: createAmountInputs.entryId,
+      _id: createAmountInput.entryId,
     });
     entry.amounts.push(amount.id);
     entry.save();
     return amount.save();
   }
 
-  async getAllAmounts(): Promise<Amount[]> {
-    this.logger.log(`getting all amounts`);
-    return this.amountModel.find().exec();
+  async getAmountById(_id: Types.ObjectId): Promise<Amount> {
+    this.logger.log(`getting amount with id ${_id}`);
+    return this.amountModel.findById(_id).exec();
   }
 
-  async getAllAmountsForEntry(entryId: string): Promise<Amount[]> {
-    this.logger.log(`getting all entries for ${entryId}`);
-    return this.amountModel.find({ entryId: entryId }, null).exec();
-  }
-
-  async updateAmount(
-    id: string,
-    updateAmountInputs: UpdateAmountInputs,
-  ): Promise<Amount> {
-    this.logger.log(`updating ${id}`);
+  async getAmounts(getAmountInput: GetAmountInput): Promise<Amount[]> {
+    this.logger.log(`getting all entires`);
     return this.amountModel
-      .findByIdAndUpdate(id, updateAmountInputs, { useFindAndModify: false })
+      .find({ ...getAmountInput }, null, { sort: { date: 1 } })
       .exec();
   }
 
-  async deleteAmount(id: string): Promise<Amount> {
-    this.logger.log(`deleting ${id}`);
-    const amount = await this.amountModel.findById(id);
+  async updateAmount(updateAmountInput: UpdateAmountInput): Promise<Amount> {
+    this.logger.log(`updating ${updateAmountInput._id}`);
+    return this.amountModel
+      .findByIdAndUpdate(updateAmountInput._id, updateAmountInput, {
+        useFindAndModify: false,
+      })
+      .exec();
+  }
+
+  async deleteAmount(_id: Types.ObjectId): Promise<Amount> {
+    this.logger.log(`deleting ${_id}`);
+    const amount = await this.amountModel.findById(_id);
     const entry = await this.entryModel.findById(amount.entryId);
     const index = entry.amounts.indexOf(amount);
     entry.amounts.splice(index, 1);
     entry.save();
     return this.amountModel
-      .findByIdAndDelete(id, { useFindAndModify: false })
+      .findByIdAndDelete(_id, { useFindAndModify: false })
       .exec();
   }
 
   async deleteAllAmounts(): Promise<Amount> {
     this.logger.log(`deleting all amounts`);
-    return this.amountModel.deleteMany({}).exec();
+    return this.amountModel.remove().exec();
   }
 }

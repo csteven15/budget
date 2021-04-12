@@ -1,16 +1,11 @@
-import React, {
-  useState,
-  useContext,
-  createContext,
-  FC,
-  useEffect,
-} from 'react'
+import { useState, useContext, createContext, FC, useEffect } from 'react'
 
 import fire from '../util/fire'
 import { IUser } from '../common/types'
 
 interface IContextProps {
   user: IUser
+  signIn: (uid: string, name: string) => void
   signOut: () => void
 }
 
@@ -20,6 +15,7 @@ export const INITIAL_USER: IUser = {
   uid: '',
   name: '',
   isLoggedIn: false,
+  isLoading: true,
 }
 
 export const AuthProvider: FC = ({ children }) => {
@@ -39,27 +35,47 @@ const useProvideAuth = () => {
   }, [state.isLoggedIn])
 
   const getUser = () => {
-    fire.auth().onAuthStateChanged((user) => {
+    if (!state.isLoggedIn) setState({ ...state, isLoading: true })
+    fire.auth().onAuthStateChanged((user) =>
       setState({
         uid: user?.uid,
-        name: user?.displayName,
+        name: user?.displayName ?? '',
         isLoggedIn: user ? true : false,
+        isLoading: false,
       })
+    )
+  }
+
+  const signIn = (uid: string, name: string) => {
+    setState({
+      ...state,
+      uid: uid,
+      name: name,
+      isLoggedIn: true,
     })
   }
 
   const signOut = () => {
+    setState({
+      ...state,
+      uid: undefined,
+      name: undefined,
+      isLoggedIn: false,
+      isLoading: true,
+    })
     fire.auth().signOut()
     setState({
       ...state,
       uid: undefined,
       name: undefined,
       isLoggedIn: false,
+      isLoading: false,
     })
   }
 
   return {
     user: state,
+    signIn,
     signOut,
   }
 }

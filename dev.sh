@@ -1,12 +1,12 @@
 #!/bin/sh
 
-set -a
-. ./development.env
-set +a
+cmd="./environment.sh &"
+echo "$cmd" && $cmd
+
+cmd="./setup.sh &"
+echo "$cmd" && $cmd
 
 cmd="./database.sh &"
 echo "$cmd" && $cmd
-
-yarn run lint
 
 yarn run dev

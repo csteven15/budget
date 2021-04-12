@@ -1,31 +1,143 @@
-import { FC, useEffect, useState } from 'react'
-import { StyledFirebaseAuth } from 'react-firebaseui'
+import { FC, useState } from 'react'
+import {
+  Button,
+  Center,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Stack,
+  useToast,
+} from '@chakra-ui/react'
+import { useForm } from 'react-hook-form'
+import { useHistory } from 'react-router-dom'
+
+import { useAuth } from '../../context/AuthContext'
+
 import fire from '../../util/fire'
 
-// Configure FirebaseUI
-const uiConfig = {
-  signInFlow: 'popup',
-  signInOptions: [fire.auth.EmailAuthProvider.PROVIDER_ID],
-  callbacks: {
-    signInSuccessWithAuthResult: () => false,
-  },
+interface IFormData {
+  email: string
+  name?: string
+  password?: string
 }
 
 const SignIn: FC = () => {
-  const [isSignedIn, setIsSignedIn] = useState(false) // Local signed-in state.
+  const { signIn } = useAuth()
+  const history = useHistory()
+  const toast = useToast()
+  const [show, setShow] = useState(false)
+  const [process, setProcess] = useState('start')
+  const { register, handleSubmit } = useForm()
 
-  // Listen to the Firebase Auth state and set the local state.
-  useEffect(() => {
-    const unregisterAuthObserver = fire.auth().onAuthStateChanged((user) => {
-      setIsSignedIn(!!user)
-    })
-    return () => unregisterAuthObserver() // Make sure we un-register Firebase observers when the component unmounts.
-  }, [])
+  const handleClick = () => setShow(!show)
 
-  if (!isSignedIn) {
-    return <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={fire.auth()} />
+  const onSubmit = async (formData: IFormData) => {
+    if (process === 'start') {
+      try {
+        const res = await fire.auth().fetchSignInMethodsForEmail(formData.email)
+        if (res.length === 0) setProcess('signup')
+        if (res[0] === 'password') setProcess('signin')
+      } catch (error) {
+        console.error(error)
+        toast({
+          title: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+    }
+    if (process === 'signup') {
+      try {
+        const res = await fire
+          .auth()
+          .createUserWithEmailAndPassword(formData.email, formData!.password!)
+        await fire
+          .auth()
+          .currentUser?.updateProfile({ displayName: formData!.name })
+        signIn(res.user!.uid!, formData!.name!)
+        toast({
+          title: `Successfully signed in.`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        })
+        history.push('/dashboard')
+      } catch (error) {
+        console.error(error)
+        toast({
+          title: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+    }
+    if (process === 'signin') {
+      try {
+        const res = await fire
+          .auth()
+          .signInWithEmailAndPassword(formData.email, formData!.password!)
+        signIn(res.user!.uid!, res.user!.displayName!)
+        toast({
+          title: `Successfully signed in.`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        })
+        history.push('/dashboard')
+      } catch (error) {
+        console.error(error)
+        toast({
+          title: error.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+    }
   }
-  return null
+
+  const ProcessText = () => {
+    if (process === 'start') return 'Next'
+    if (process === 'signin') return 'Sign In'
+    if (process === 'signup') return 'Sign Up'
+  }
+
+  return (
+    <Stack maxW="container.sm" mx="auto">
+      <Input
+        placeholder="Email"
+        name="email"
+        ref={register({ required: true })}
+      />
+      {process === 'signin' || process === 'start' ? null : (
+        <Input
+          placeholder="Full Name"
+          name="name"
+          ref={register({ required: true })}
+        />
+      )}
+      {process === 'start' ? null : (
+        <InputGroup size="md">
+          <Input
+            type={show ? 'text' : 'password'}
+            placeholder="Enter password"
+            name="password"
+            ref={register({ required: true })}
+          />
+          <InputRightElement width="4.5rem">
+            <Button onClick={handleClick}>{show ? 'Hide' : 'Show'}</Button>
+          </InputRightElement>
+        </InputGroup>
+      )}
+      <Center>
+        <Button w="full" onClick={handleSubmit(onSubmit)}>
+          {ProcessText()}
+        </Button>
+      </Center>
+    </Stack>
+  )
 }
 
 export default SignIn

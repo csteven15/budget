@@ -30,7 +30,7 @@ if [ "$(docker ps -a -f name=$container_name | wc -l)" -eq 2 ]; then
   docker container start $db_container_name
 else
   echo "Creating container $container_name"
-  docker run --name $container_name \
+  docker run -d --name $container_name \
     --network $network \
     -e ME_CONFIG_MONGODB_SERVER=$db_container_name \
     -e ME_CONFIG_BASICAUTH_USERNAME=$MONGODB_USERNAME \

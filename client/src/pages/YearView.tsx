@@ -1,189 +1,137 @@
-import React, { FC, useEffect, useReducer, useState } from 'react'
-import {
-  Typography,
-  createStyles,
-  makeStyles,
-  Button,
-  Theme,
-  Grid,
-  List,
-  ListSubheader,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from '@material-ui/core'
-import { useEntry } from '../context/EntryContext'
-import { MonthArray } from '../common/enums'
-import { useAccount } from '../context/AccountContext'
-import MonthView from './MonthView'
-import {
-  calculatedDataStoreReducer,
-  ICalcualtedMonth,
-  ICalculatedMonthState,
-  setYearAction,
-  updateEntriesAction,
-} from '../store/CalculatedMonthDataStore'
+import { FC } from 'react'
+import { Table, Thead, Tbody, Tr, Th } from '@chakra-ui/react'
 
-const date = new Date()
+import { useAccountYearQuery } from '../hooks/useAccountQuery'
+import { useEntryQueryYear } from '../hooks/useEntryQuery'
 
-const INITIAL_CALCULATED_MONTH: ICalcualtedMonth[] = MonthArray.map((_, i) => ({
-  monthIndex: i,
-  year: date.getFullYear(),
-  monthlyIncome: [],
-  monthlyExpense: [],
-  incomeTotal: 0,
-  expenseTotal: 0,
-  endOfMonthTotal: 0,
-  balance: 0,
-}))
+import { EEntryType, MonthArray } from '../common/enums/index'
+import { IEntry, IAmount, IAccount } from '../common/types/index'
 
-const INITIAL_STATE: ICalculatedMonthState = {
-  calculatedMonthData: INITIAL_CALCULATED_MONTH,
-  totalAccountAppliedToBudget: 0,
-  month: date.getMonth(),
-  year: date.getFullYear(),
+interface TotalType {
+  budgeted: number
+  actual: number
 }
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    header: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      maxHeight: '10vh',
-    },
-    monthViewContainer: {
-      flex: '0 0 100%',
-    },
-    listSection: {
-      position: 'relative',
-      overflow: 'auto',
-      backgroundColor: theme.palette.background.paper,
-    },
-    ul: {
-      backgroundColor: 'inherit',
-      padding: 0,
-    },
-    li: {
-      backgroundColor: 'inherit',
-    },
-    icon: {
-      cursor: 'pointer',
-    },
-  })
-)
+interface MonthInfoProps {
+  header: string
+  budgetedIncome: string
+  actualIncome: string
+  budgetedExpenses: string
+  actualExpenses: string
+  balance: string
+  totalInBank: string
+}
 
-const YearView: FC = () => {
-  const [state, dispatch] = useReducer(
-    calculatedDataStoreReducer,
-    INITIAL_STATE
-  )
-
-  const { entries } = useEntry()
-  const { accounts } = useAccount()
-  const classes = useStyles()
-
-  // on startup
-  useEffect(() => {
-    dispatch(setYearAction(date.getFullYear()))
-  }, [])
-
-  useEffect(() => {
-    dispatch(updateEntriesAction(entries!, accounts!))
-  }, [entries, accounts, state.year])
-
-  const renderRow = (month: string, i: number) => {
-    const [openMonthList, setOpenMonthList] = useState(false)
-    return (
-      <Accordion key={i} TransitionProps={{ unmountOnExit: true }}>
-        <AccordionSummary>
-          <Grid container onClick={() => setOpenMonthList(!openMonthList)}>
-            <Grid item xs={4} md={4}>
-              {month}
-            </Grid>
-            <Grid item xs={2} md={2}>
-              {}
-              {state.calculatedMonthData[i].incomeTotal}
-            </Grid>
-            <Grid item xs={2} md={2}>
-              {state.calculatedMonthData[i].expenseTotal}
-            </Grid>
-            <Grid item xs={2} md={2}>
-              {state.calculatedMonthData[i].balance}
-            </Grid>
-            <Grid item xs={2} md={2}>
-              {state.calculatedMonthData[i].endOfMonthTotal}
-            </Grid>
-          </Grid>
-        </AccordionSummary>
-        <AccordionDetails>
-          <div className={classes.monthViewContainer}>
-            <MonthView
-              renderHeaders={false}
-              propEntries={entries}
-              propAccounts={accounts}
-              month={i}
-            />
-          </div>
-        </AccordionDetails>
-      </Accordion>
-    )
-  }
-
-  const renderMonthData = () =>
-    MonthArray.map((month, i) => renderRow(month, i))
-
-  const renderYearViewData = () => {
-    return (
-      <List className={classes.listSection} subheader={<ul />}>
-        <li className={classes.li}>
-          <ul className={classes.ul}>
-            <ListSubheader>
-              <Grid container>
-                <Grid item xs={4} md={4}>
-                  Month
-                </Grid>
-                <Grid item xs={2} md={2}>
-                  Income
-                </Grid>
-                <Grid item xs={2} md={2}>
-                  Expenses
-                </Grid>
-                <Grid item xs={2} md={2}>
-                  Balance
-                </Grid>
-                <Grid item xs={2} md={2}>
-                  Total In Bank
-                </Grid>
-              </Grid>
-            </ListSubheader>
-            {renderMonthData()}
-          </ul>
-        </li>
-      </List>
-    )
-  }
-
+const MonthInfo: FC<MonthInfoProps> = ({
+  header,
+  budgetedIncome,
+  actualIncome,
+  budgetedExpenses,
+  actualExpenses,
+  balance,
+  totalInBank,
+}) => {
   return (
-    <>
-      <div className={classes.header}>
-        <Button
-          color="secondary"
-          variant="contained"
-          onClick={() => dispatch(setYearAction(state.year - 1))}
-        >
-          Prev Year
-        </Button>
-        <Typography align="center">{state.year}</Typography>
-        <Button
-          color="primary"
-          variant="contained"
-          onClick={() => dispatch(setYearAction(state.year + 1))}
-        >
-          Next Year
-        </Button>
-      </div>
-      {renderYearViewData()}
-    </>
+    <Tr>
+      <Th>{header}</Th>
+      <Th>{budgetedIncome}</Th>
+      <Th>{actualIncome}</Th>
+      <Th>{budgetedExpenses}</Th>
+      <Th>{actualExpenses}</Th>
+      <Th>{balance}</Th>
+      <Th>{totalInBank}</Th>
+    </Tr>
+  )
+}
+
+interface YearViewProps {
+  date: Date
+}
+
+const YearView: FC<YearViewProps> = ({ date }) => {
+  const { data: appliedAccounts } = useAccountYearQuery()
+
+  const { data: entriesForYear } = useEntryQueryYear(date)
+
+  const getTotalsForEachMonth = (entries: IEntry[]) => {
+    const totals: TotalType[] = []
+    for (let i = 0; i < MonthArray.length; i++) {
+      const total: TotalType = { budgeted: 0, actual: 0 }
+      entries?.forEach((entry: IEntry) => {
+        entry?.amounts?.forEach((amount: IAmount) => {
+          if (new Date(amount.date).getMonth() === i) {
+            total.budgeted += entry.budgetedAmount
+            total.actual += amount.amount
+          }
+        })
+      })
+      totals.push(total)
+    }
+    return totals
+  }
+  const getEndOfMonthTotals = (
+    totalInBank: number,
+    income: TotalType[],
+    expense: TotalType[]
+  ) => {
+    const totals: number[] = []
+    let lastMonthTotal = totalInBank
+    for (let i = 0; i < MonthArray.length; i++) {
+      const endOfMonthBankTotal =
+        lastMonthTotal + (income[i].actual - expense[i].actual)
+      totals.push(endOfMonthBankTotal)
+      lastMonthTotal = endOfMonthBankTotal
+    }
+    return totals
+  }
+  const income = entriesForYear?.entries?.filter(
+    (entry: IEntry) => entry.type === EEntryType.Income
+  )
+  const expenses = entriesForYear?.entries?.filter(
+    (entry: IEntry) => entry.type === EEntryType.Expense
+  )
+  const incomeTotals = getTotalsForEachMonth(income)
+  const expenseTotals = getTotalsForEachMonth(expenses)
+  const endOfMonthBankTotals = getEndOfMonthTotals(
+    appliedAccounts?.accounts?.reduce(
+      (total: number, account: IAccount) => (total += account.total),
+      0
+    ),
+    incomeTotals,
+    expenseTotals
+  )
+  return (
+    <Table variant="striped" size="md">
+      <Thead>
+        <MonthInfo
+          header={'Month'}
+          budgetedIncome={'Budgeted Income'}
+          actualIncome={'Actual Income'}
+          budgetedExpenses={'Budgeted Expenses'}
+          actualExpenses={'Actual Expenses'}
+          balance={'Balance'}
+          totalInBank={'Total In Bank'}
+        />
+      </Thead>
+      <Tbody>
+        {MonthArray.map((month: string, i: number) => {
+          return (
+            <MonthInfo
+              key={i}
+              header={month}
+              budgetedIncome={incomeTotals[i].budgeted.toString()}
+              actualIncome={incomeTotals[i].actual.toString()}
+              budgetedExpenses={expenseTotals[i].budgeted.toString()}
+              actualExpenses={expenseTotals[i].actual.toString()}
+              balance={(
+                incomeTotals[i].actual - expenseTotals[i].actual
+              ).toString()}
+              totalInBank={endOfMonthBankTotals[i].toString()}
+            />
+          )
+        })}
+      </Tbody>
+    </Table>
   )
 }
 

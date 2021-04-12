@@ -1,17 +1,15 @@
 version: "3.7"
 
 services:
-  nginx:
-    container_name: nginx
-    depends_on:
-      - client
-      - backend
-    restart: always # routing traffic to entire app
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
+  mongo:
+    image: "mongo"
+    container_name: "mongo"
+    command: mongod --port ${MONGO_PROD_CONTAINER_PORT}
     ports:
-      - "80:80"
+      - ${MONGO_PROD_CONTAINER_PORT}:${MONGO_PROD_CONTAINER_PORT}
+    volumes:
+      - ./db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - mongodb:/data/db
     networks:
       - network
   client:
@@ -34,17 +32,29 @@ services:
       - /app/node_modules # don't override folder inside container
     networks:
       - network
-  mongo:
-    image: "mongo"
-    container_name: "mongo"
-    command: mongod --port ${MONGO_PROD_CONTAINER_PORT}
-    ports:
-      - ${MONGO_PROD_CONTAINER_PORT}:${MONGO_PROD_CONTAINER_PORT}
-    volumes:
-      - ./db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - ./db/mongo-volume:/data/db
+  nginx:
+    container_name: nginx
+    depends_on:
+      - client
+      - backend
+    restart: always # routing traffic to entire app
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
     networks:
       - network
+      - reverse-proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=reverse-proxy"
+      - "traefik.http.routers.budget-secure.entrypoints=websecure"
+      - "traefik.http.routers.budget-secure.rule=Host(`budget.stevenchen.xyz`)"
+      - "traefik.http.routers.budget-secure.service=budget-service"
+      - "traefik.http.services.budget-service.loadbalancer.server.port=80"
 networks:
   network:
     name: ${DOCKER_PROD_NETWORK}
+  reverse-proxy:
+    external: true
+volumes:
+  mongodb:

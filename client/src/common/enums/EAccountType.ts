@@ -1,3 +1,5 @@
+import { TextToValue } from './Generic'
+
 enum EAccountType {
   Checking,
   Savings,
@@ -5,11 +7,11 @@ enum EAccountType {
   Retirement,
 }
 
-const AccountTypeArray = [
-  { value: 0, text: 'Checking' },
-  { value: 1, text: 'Savings' },
-  { value: 2, text: 'Investment' },
-  { value: 3, text: 'Retirement' },
+const EAccountValues: TextToValue[] = [
+  { value: EAccountType.Checking, text: 'Checking' },
+  { value: EAccountType.Savings, text: 'Savings' },
+  { value: EAccountType.Investment, text: 'Investment' },
+  { value: EAccountType.Retirement, text: 'Retirement' },
 ]
 
-export { EAccountType, AccountTypeArray }
+export { EAccountType, EAccountValues }

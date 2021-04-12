@@ -1,5 +1,6 @@
 export interface IUser {
-  uid?: string | null
-  name?: string | null
+  uid?: string
+  name?: string
   isLoggedIn: boolean
+  isLoading: boolean
 }

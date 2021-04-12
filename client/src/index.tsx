@@ -4,17 +4,14 @@ import './index.css'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { AuthProvider } from './context/AuthContext'
-import { EntryProvider } from './context/EntryContext'
-import { AccountProvider } from './context/AccountContext'
+import { ColorModeScript } from '@chakra-ui/react'
+import theme from './Theme'
 
 ReactDOM.render(
   <React.StrictMode>
     <AuthProvider>
-      <AccountProvider>
-        <EntryProvider>
-          <App />
-        </EntryProvider>
-      </AccountProvider>
+      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+      <App />
     </AuthProvider>
   </React.StrictMode>,
   document.getElementById('root')
