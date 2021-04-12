@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import ReactDatePicker from 'react-datepicker'
-import { Text, Box, Flex, IconButton } from '@chakra-ui/react'
+import { Text, Box, Flex, IconButton, useColorMode } from '@chakra-ui/react'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
 
 import { useGenericMutation } from '../../hooks/useGenericMutation'
@@ -28,6 +28,7 @@ const EditableDatePicker: FC<IEditableDatePicker> = ({
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [trackedValue, setTrackedValue] = useState(new Date(defaultValue))
   const [date, setDate] = useState(new Date(defaultValue))
+  const isLight = useColorMode().colorMode === 'light'
 
   const { mutate } = useGenericMutation(mutationSchema)
 
@@ -51,15 +52,18 @@ const EditableDatePicker: FC<IEditableDatePicker> = ({
           {hover ||
           calendarOpen ||
           date.getTime() !== trackedValue.getTime() ? (
-            <ReactDatePicker
-              selected={date}
-              onChange={(date) => {
-                setDate(date as Date)
-              }}
-              showPopperArrow={showPopperArrow}
-              onCalendarOpen={() => setCalendarOpen(true)}
-              onCalendarClose={() => setCalendarOpen(false)}
-            />
+            <div className={isLight ? 'light-theme' : 'dark-theme'}>
+              <ReactDatePicker
+                selected={date}
+                onChange={(date) => {
+                  setDate(date as Date)
+                }}
+                showPopperArrow={showPopperArrow}
+                onCalendarOpen={() => setCalendarOpen(true)}
+                onCalendarClose={() => setCalendarOpen(false)}
+                className="react-datapicker__input-text"
+              />
+            </div>
           ) : (
             <Text>{date.toLocaleDateString()}</Text>
           )}

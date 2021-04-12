@@ -117,13 +117,7 @@ const AccountFormPopoverContent: FC<{ closePopover?: () => void }> = ({
     <PopoverArrow />
     <PopoverCloseButton />
     <PopoverBody>
-      <Container
-        maxW="container.md"
-        boxShadow="base"
-        p="6"
-        rounded="md"
-        bg="white"
-      >
+      <Container maxW="container.md" boxShadow="base" p="6" rounded="md">
         <AccountForm closePopover={closePopover} />
       </Container>
     </PopoverBody>
