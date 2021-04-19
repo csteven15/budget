@@ -6,10 +6,10 @@ set -a
 . ./development.env
 set +a
 
-cmd="docker rm -f $(docker ps -a -q)"
+cmd="docker rmi -f $(docker ps -a -q)"
 echo "$cmd" && $cmd
 
-cmd="docker rm -f $(docker images -q)"
+cmd="docker rmi -f $(docker images -q)"
 echo "$cmd" && $cmd
 
 cmd="docker network rm $DOCKER_DEV_NETWORK"

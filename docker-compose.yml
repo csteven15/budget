@@ -50,6 +50,7 @@ services:
       - "traefik.http.routers.budget-secure.entrypoints=websecure"
       - "traefik.http.routers.budget-secure.rule=Host(`budget.stevenchen.xyz`)"
       - "traefik.http.routers.budget-secure.service=budget-service"
+      - "traefik.http.middlewares.budget-secure.compress=true"
       - "traefik.http.services.budget-service.loadbalancer.server.port=80"
 networks:
   network:
