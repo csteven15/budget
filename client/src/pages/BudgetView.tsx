@@ -16,6 +16,7 @@ import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons'
 
 import MonthView from './MonthView'
 import YearView from './YearView'
+import InteractiveView from './InteractiveView'
 
 import { MonthArray } from '../common/enums'
 
@@ -55,11 +56,12 @@ const DataTabs: FC = () => {
   const [year, setYear] = useState(dateToday.getFullYear())
   const [month, setMonth] = useState(dateToday.getMonth())
   return (
-    <Box width="95%">
+    <Box width="95%" overflowX="scroll">
       <Tabs isManual align="center">
         <TabList>
           <Tab>Month View</Tab>
           <Tab>Year View</Tab>
+          <Tab>Interactive View</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -69,6 +71,10 @@ const DataTabs: FC = () => {
           <TabPanel>
             <DataButtons name={'Year'} value={year} setValueFunc={setYear} />
             <YearView date={new Date(dateToday.setFullYear(year))} />
+          </TabPanel>
+          <TabPanel>
+            <DataButtons name={'Year'} value={year} setValueFunc={setYear} />
+            <InteractiveView date={new Date(dateToday.setFullYear(year))} />
           </TabPanel>
         </TabPanels>
       </Tabs>
