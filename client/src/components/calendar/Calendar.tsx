@@ -4,21 +4,23 @@ import { Box, SimpleGrid, Text } from '@chakra-ui/react'
 import Day from './Day'
 
 import { EEntryType } from '../../common/enums'
-import { IAmountInfo, IEntryInfo } from '../../common/gql/Types'
+import { IAmountInfo, IEntryInfo, DayInfo } from '../../common/gql/Types'
 import { useEntryQueryCalendar } from '../../hooks/useEntryQuery'
 
 const secondsInDay = 86400000
 
 const daysOfWeek = ['Sun.', 'Mon.', 'Tue.', 'Wed.', 'Thur', 'Fri.', 'Sat.']
 
-const getAmountsOnDay = (entries: IEntryInfo[], date: Date): IAmountInfo[] =>
-  entries
-    ?.map((entry: IEntryInfo) =>
-      entry?.amounts?.filter(
-        (amount: IAmountInfo) => amount.date === date.toISOString()
-      )
+const getEntriesOnDay = (entries: IEntryInfo[], date: Date) => {
+  const dayInfo: DayInfo[] = []
+  entries?.map((entry: IEntryInfo) => {
+    const amounts = entry?.amounts?.filter(
+      (amount: IAmountInfo) => amount.date === date.toISOString()
     )
-    .flatMap((amounts) => amounts)
+    dayInfo.push({ amounts: amounts, name: entry?.name })
+  })
+  return dayInfo
+}
 
 interface ICalendarProps {
   month: number
@@ -57,8 +59,8 @@ const Calendar: FC<ICalendarProps> = ({ month, startDate, endDate }) => {
       key={date.toString()}
       month={month}
       date={new Date(date)}
-      incomeAmounts={getAmountsOnDay(incomeEntries, date)}
-      expenseAmounts={getAmountsOnDay(expenseEntries, date)}
+      incomeAmounts={getEntriesOnDay(incomeEntries, date)}
+      expenseAmounts={getEntriesOnDay(expenseEntries, date)}
     />
   ))
 

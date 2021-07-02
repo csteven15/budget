@@ -26,3 +26,8 @@ export interface IAmountInfo {
   date: string
   paid: boolean
 }
+
+export interface DayInfo {
+  amounts: IAmountInfo[]
+  name: string
+}

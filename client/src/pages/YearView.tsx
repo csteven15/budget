@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Table, Thead, Tbody, Tr, Th } from '@chakra-ui/react'
+import { Table, Thead, Tbody, Tr, Td } from '@chakra-ui/react'
 
 import { useAccountYearQuery } from '../hooks/useAccountQuery'
 import { useEntryQueryYear } from '../hooks/useEntryQuery'
@@ -20,6 +20,7 @@ interface MonthInfoProps {
   actualExpenses: string
   balance: string
   totalInBank: string
+  isHeader?: boolean
 }
 
 const MonthInfo: FC<MonthInfoProps> = ({
@@ -30,16 +31,31 @@ const MonthInfo: FC<MonthInfoProps> = ({
   actualExpenses,
   balance,
   totalInBank,
+  isHeader,
 }) => {
   return (
     <Tr>
-      <Th>{header}</Th>
-      <Th>{budgetedIncome}</Th>
-      <Th>{actualIncome}</Th>
-      <Th>{budgetedExpenses}</Th>
-      <Th>{actualExpenses}</Th>
-      <Th>{balance}</Th>
-      <Th>{totalInBank}</Th>
+      {isHeader ? (
+        <>
+          <Td fontWeight="bold">{header}</Td>
+          <Td fontWeight="bold">{budgetedIncome}</Td>
+          <Td fontWeight="bold">{actualIncome}</Td>
+          <Td fontWeight="bold">{budgetedExpenses}</Td>
+          <Td fontWeight="bold">{actualExpenses}</Td>
+          <Td fontWeight="bold">{balance}</Td>
+          <Td fontWeight="bold">{totalInBank}</Td>
+        </>
+      ) : (
+        <>
+          <Td fontWeight="bold">{header}</Td>
+          <Td isNumeric>{'$' + budgetedIncome}</Td>
+          <Td isNumeric>{'$' + actualIncome}</Td>
+          <Td isNumeric>{'$' + budgetedExpenses}</Td>
+          <Td isNumeric>{'$' + actualExpenses}</Td>
+          <Td isNumeric>{'$' + balance}</Td>
+          <Td isNumeric>{'$' + totalInBank}</Td>
+        </>
+      )}
     </Tr>
   )
 }
@@ -50,7 +66,6 @@ interface YearViewProps {
 
 const YearView: FC<YearViewProps> = ({ date }) => {
   const { data: appliedAccounts } = useAccountYearQuery()
-
   const { data: entriesForYear } = useEntryQueryYear(date)
 
   const getTotalsForEachMonth = (entries: IEntry[]) => {
@@ -101,7 +116,7 @@ const YearView: FC<YearViewProps> = ({ date }) => {
     expenseTotals
   )
   return (
-    <Table variant="striped" size="md">
+    <Table variant="striped" size="md" colorScheme="blue">
       <Thead>
         <MonthInfo
           header={'Month'}
@@ -111,6 +126,7 @@ const YearView: FC<YearViewProps> = ({ date }) => {
           actualExpenses={'Actual Expenses'}
           balance={'Balance'}
           totalInBank={'Total In Bank'}
+          isHeader={true}
         />
       </Thead>
       <Tbody>
@@ -119,14 +135,14 @@ const YearView: FC<YearViewProps> = ({ date }) => {
             <MonthInfo
               key={i}
               header={month}
-              budgetedIncome={incomeTotals[i].budgeted.toString()}
-              actualIncome={incomeTotals[i].actual.toString()}
-              budgetedExpenses={expenseTotals[i].budgeted.toString()}
-              actualExpenses={expenseTotals[i].actual.toString()}
-              balance={(
-                incomeTotals[i].actual - expenseTotals[i].actual
-              ).toString()}
-              totalInBank={endOfMonthBankTotals[i].toString()}
+              budgetedIncome={incomeTotals[i].budgeted.toFixed(2).toString()}
+              actualIncome={incomeTotals[i].actual.toFixed(2).toString()}
+              budgetedExpenses={expenseTotals[i].budgeted.toFixed(2).toString()}
+              actualExpenses={expenseTotals[i].actual.toFixed(2).toString()}
+              balance={(incomeTotals[i].actual - expenseTotals[i].actual)
+                .toFixed(2)
+                .toString()}
+              totalInBank={endOfMonthBankTotals[i].toFixed(2).toString()}
             />
           )
         })}
