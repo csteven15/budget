@@ -9,10 +9,10 @@ services:
     volumes:
       - ./db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - mongodb:/data/db
-  client:
-    container_name: client
+  frontend:
+    container_name: frontend
     build:
-      context: ./client
+      context: ./frontend
       dockerfile: Dockerfile
     volumes:
       - /app/node_modules # don't override folder inside container
@@ -28,7 +28,7 @@ services:
   nginx:
     container_name: nginx
     depends_on:
-      - client
+      - frontend
       - backend
     restart: always # routing traffic to entire app
     ports: 
