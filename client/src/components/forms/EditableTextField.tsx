@@ -58,7 +58,7 @@ const EditableTextField: FC<IEditableTextField> = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onError = (errors: any) => {
     errorToast({
-      description: errors[refName].message,
+      // description: errors[refName].message,
       status: 'error',
       duration: 3e3,
       isClosable: true,

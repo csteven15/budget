@@ -40,7 +40,7 @@ const SignIn: FC = () => {
       } catch (error) {
         console.error(error)
         toast({
-          title: error.message,
+          // title: error.message,
           status: 'error',
           duration: 5000,
           isClosable: true,
@@ -66,7 +66,7 @@ const SignIn: FC = () => {
       } catch (error) {
         console.error(error)
         toast({
-          title: error.message,
+          // title: error.message,
           status: 'error',
           duration: 5000,
           isClosable: true,
@@ -89,7 +89,7 @@ const SignIn: FC = () => {
       } catch (error) {
         console.error(error)
         toast({
-          title: error.message,
+          // title: error.message,
           status: 'error',
           duration: 5000,
           isClosable: true,
