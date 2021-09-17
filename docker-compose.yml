@@ -4,14 +4,11 @@ services:
   mongo:
     image: "mongo:latest"
     container_name: "mongo"
-    command: mongod --port ${MONGO_PROD_CONTAINER_PORT}
     ports:
-      - ${MONGO_PROD_CONTAINER_PORT}:${MONGO_PROD_CONTAINER_PORT}
+      - 27017:27017
     volumes:
       - ./db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       - mongodb:/data/db
-    networks:
-      - network
   client:
     container_name: client
     build:
@@ -20,18 +17,14 @@ services:
     volumes:
       - /app/node_modules # don't override folder inside container
     restart: on-failure
-    networks:
-      - network
   backend:
     container_name: backend
     build:
-      context: ./server
+      context: ./backend
       dockerfile: Dockerfile
     restart: on-failure
     volumes:
       - /app/node_modules # don't override folder inside container
-    networks:
-      - network
   nginx:
     container_name: nginx
     depends_on:
@@ -43,10 +36,5 @@ services:
     build:
       context: ./nginx
       dockerfile: Dockerfile
-    networks:
-      - network
-networks:
-  network:
-    name: ${DOCKER_PROD_NETWORK}
 volumes:
   mongodb:
