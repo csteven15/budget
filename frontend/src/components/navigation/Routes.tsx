@@ -20,14 +20,6 @@ const routes: IRoute[] = [
     component: lazy(() => import('../../pages/DashboardView')),
   },
   {
-    path: '/accountview',
-    component: lazy(() => import('../../pages/AccountView')),
-  },
-  {
-    path: '/listview',
-    component: lazy(() => import('../../pages/ListView')),
-  },
-  {
     path: '/budgetview',
     component: lazy(() => import('../../pages/BudgetView')),
   },

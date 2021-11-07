@@ -3,10 +3,9 @@ import ReactDatePicker from 'react-datepicker'
 import { Text, Box, Flex, IconButton, useColorMode } from '@chakra-ui/react'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
 
-import { useGenericMutation } from '../../hooks/useGenericMutation'
-
 import 'react-datepicker/dist/react-datepicker.css'
 import './DatePicker.css'
+import { useMutation } from 'react-query'
 
 interface IEditableDatePicker {
   id: string
@@ -18,8 +17,6 @@ interface IEditableDatePicker {
 }
 
 const EditableDatePicker: FC<IEditableDatePicker> = ({
-  id,
-  refName,
   defaultValue,
   showPopperArrow = false,
   mutationSchema,
@@ -30,16 +27,11 @@ const EditableDatePicker: FC<IEditableDatePicker> = ({
   const [date, setDate] = useState(new Date(defaultValue))
   const isLight = useColorMode().colorMode === 'light'
 
-  const { mutate } = useGenericMutation(mutationSchema)
+  const { mutate } = useMutation(mutationSchema)
 
   const onSubmit = (newDate: Date) => {
     setTrackedValue(newDate)
-    mutate({
-      payload: {
-        _id: id,
-        [refName]: new Date(newDate.setHours(0, 0, 0, 0)),
-      },
-    })
+    mutate()
   }
 
   return (

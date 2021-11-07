@@ -36,9 +36,6 @@ import EditableTextField from '../components/forms/EditableTextField'
 import EditableSelect from '../components/forms/EditableSelect'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
 import EntryForm from '../components/forms/EntryForm'
-import { useEntryQuery } from '../hooks/useEntryQuery'
-import { useDeleteAmountMutation } from '../hooks/useAmountMutation'
-import { useDeleteEntryMutation } from '../hooks/useEntryMutation'
 
 import {
   UPDATE_AMOUNT_MUTATION,
@@ -46,9 +43,10 @@ import {
 } from '../common/gql/Mutations'
 import { EEntryType, EEntryValues } from '../common/enums'
 import { IAmountInfo, IEntryInfo } from '../common/gql/Types'
+import { useMutation, useQuery } from 'react-query'
 
 const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
-  const { mutate } = useDeleteAmountMutation()
+  const { mutate } = useMutation({})
   return (
     <Grid templateColumns="repeat(4, 1fr)" m={2}>
       <Box>
@@ -81,7 +79,7 @@ const AmountInfo: FC<IAmountInfo> = ({ _id, amount, date, paid }) => {
       </Box>
       <Box>
         <IconButton
-          onClick={() => mutate({ _id: _id })}
+          onClick={() => mutate()}
           icon={<DeleteIcon color="red" />}
           aria-label="delete amount"
         />
@@ -107,6 +105,7 @@ const AmountHeader: FC = () => (
   </Grid>
 )
 
+// eslint-disable-next-line
 const EntryInfo: FC<IEntryInfo> = ({
   _id,
   name,
@@ -117,11 +116,11 @@ const EntryInfo: FC<IEntryInfo> = ({
 }) => {
   const localCreatedAt = new Date(createdAt)
   const { isOpen, onToggle } = useDisclosure()
-  const { mutate } = useDeleteEntryMutation()
+  const { mutate } = useMutation({})
 
   const DeleteButton: FC = () => (
     <IconButton
-      onClick={() => mutate({ _id: _id })}
+      onClick={() => mutate()}
       icon={<DeleteIcon color="red" />}
       aria-label="delete entry"
       size="xs"
@@ -219,7 +218,7 @@ const EntryFormPopoverContent: FC<{ closePopover?: () => void }> = ({
 
 const ListView: FC = () => {
   const [popoverOpen, setPopoverOpen] = useState(false)
-  const { data, isLoading } = useEntryQuery()
+  const { data, isLoading } = useQuery({})
 
   const openPopover = () => setPopoverOpen(true)
   const closePopover = () => setPopoverOpen(false)
@@ -227,10 +226,7 @@ const ListView: FC = () => {
   const EntryCards: FC = () => {
     if (isLoading) return <Progress size="sm" isIndeterminate />
     if (data === undefined) return null
-    if (data?.entries?.length === 0) return <Text>No Entries</Text>
-    return data?.entries?.map((entry: IEntryInfo) => (
-      <EntryInfo key={entry._id} {...entry} />
-    ))
+    return null
   }
 
   return (

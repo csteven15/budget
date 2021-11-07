@@ -14,33 +14,25 @@ import {
 } from '@chakra-ui/react'
 
 import { useAuth } from '../../context/AuthContext'
-import { useCreateAccountMutation } from '../../hooks/useAccountMutation'
 
 import { IAccount } from '../../common/types'
 import { EAccountValues } from '../../common/enums'
+import { useMutation } from 'react-query'
 
 interface IAccountFormProps {
   closePopover?: () => void
 }
 
 const AccountForm: FC<IAccountFormProps> = ({ closePopover }) => {
-  const { user } = useAuth()
+  const {} = useAuth()
 
   const { register, errors, handleSubmit } = useForm<IAccount>()
 
-  const { mutate } = useCreateAccountMutation()
+  const { mutate } = useMutation({})
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (formData: any) => {
-    mutate({
-      payload: {
-        userId: user.uid!,
-        name: formData.name,
-        type: parseInt(formData.type, 10),
-        total: parseFloat(formData.total),
-        appliedToBudget: formData.appliedToBudget,
-      },
-    })
+  const onSubmit = async () => {
+    mutate()
     if (closePopover) closePopover()
   }
 

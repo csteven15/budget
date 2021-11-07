@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form'
 
 import DatePicker from './DatePicker'
 import { useAuth } from '../../context/AuthContext'
-import { useCreateEntryMutation } from '../../hooks/useEntryMutation'
 
 import {
   EFrequencyType,
@@ -12,6 +11,7 @@ import {
   EEntryValues,
 } from '../../common/enums/index'
 import { IEntry } from '../../common/types'
+import { useMutation } from 'react-query'
 
 const today = new Date()
 
@@ -20,25 +20,16 @@ interface IEntryFormProps {
 }
 
 const EntryForm: FC<IEntryFormProps> = ({ closePopover }) => {
-  const { user } = useAuth()
+  const {} = useAuth()
 
   const { register, errors, handleSubmit } = useForm<IEntry>()
   const [startDate, setStartDate] = useState(today)
 
-  const { mutate } = useCreateEntryMutation()
+  const { mutate } = useMutation({})
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (formData: any) => {
-    mutate({
-      payload: {
-        userId: user.uid!,
-        name: formData!.name,
-        type: parseInt(formData!.type, 10),
-        budgetedAmount: parseFloat(formData!.budgetedAmount),
-        frequency: parseInt(formData!.frequency, 10),
-        startDate: new Date(startDate.setHours(0, 0, 0, 0)),
-      },
-    })
+  const onSubmit = async () => {
+    mutate()
     if (closePopover) closePopover()
   }
 

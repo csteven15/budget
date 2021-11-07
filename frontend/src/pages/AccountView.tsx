@@ -27,13 +27,13 @@ import AccountForm from '../components/forms/AccountForm'
 import EditableTextField from '../components/forms/EditableTextField'
 import EditableCheckbox from '../components/forms/EditableCheckbox'
 import EditableSelect from '../components/forms/EditableSelect'
-import { useAccountQuery } from '../hooks/useAccountQuery'
-import { useDeleteAccountMutation } from '../hooks/useAccountMutation'
 
 import { EAccountType, EAccountValues } from '../common/enums'
 import { UPDATE_ACCOUNT_MUTATION } from '../common/gql/Mutations'
 import { IAccountInfo } from '../common/gql/Types'
+import { useMutation, useQuery } from 'react-query'
 
+// eslint-disable-next-line
 const AccountInfo: FC<IAccountInfo> = ({
   _id,
   name,
@@ -41,7 +41,7 @@ const AccountInfo: FC<IAccountInfo> = ({
   type,
   appliedToBudget,
 }) => {
-  const { mutate } = useDeleteAccountMutation()
+  const { mutate } = useMutation({})
   const accountBadgeColorScheme = () => {
     if (type === EAccountType.Checking) return 'blue'
     if (type === EAccountType.Investment) return 'green'
@@ -64,7 +64,7 @@ const AccountInfo: FC<IAccountInfo> = ({
             />
             <Spacer />
             <IconButton
-              onClick={() => mutate({ _id: _id })}
+              onClick={() => mutate()}
               icon={<DeleteIcon color="red" />}
               aria-label="delete account"
               size="xs"
@@ -126,7 +126,7 @@ const AccountFormPopoverContent: FC<{ closePopover?: () => void }> = ({
 
 const AccountView: FC = () => {
   const [popoverOpen, setPopoverOpen] = useState(false)
-  const { data, isLoading } = useAccountQuery()
+  const { data, isLoading } = useQuery({})
 
   const openPopover = () => setPopoverOpen(true)
   const closePopover = () => setPopoverOpen(false)
@@ -134,10 +134,7 @@ const AccountView: FC = () => {
   const AccountCards: FC = () => {
     if (isLoading) return <Progress size="sm" isIndeterminate />
     if (data === undefined) return null
-    if (data?.accounts?.length === 0) return <Text>No Accounts</Text>
-    return data?.accounts?.map((account: IAccountInfo) => (
-      <AccountInfo key={account._id} {...account} />
-    ))
+    return null
   }
 
   return (

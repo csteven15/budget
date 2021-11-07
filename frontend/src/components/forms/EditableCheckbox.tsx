@@ -1,7 +1,6 @@
 import { FC } from 'react'
 import { Checkbox } from '@chakra-ui/react'
-
-import { useGenericMutation } from '../../hooks/useGenericMutation'
+import { useMutation } from 'react-query'
 
 interface IEditableCheckbox {
   id: string
@@ -11,21 +10,15 @@ interface IEditableCheckbox {
 }
 
 const EditableCheckbox: FC<IEditableCheckbox> = ({
-  id,
   refName,
   defaultValue,
   mutationSchema,
 }) => {
-  const { mutate } = useGenericMutation(mutationSchema)
+  const { mutate } = useMutation(mutationSchema)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line
   const onSubmit = (data: any) => {
-    mutate({
-      payload: {
-        _id: id,
-        ...data,
-      },
-    })
+    mutate()
   }
 
   return (

@@ -44,10 +44,6 @@ const protectedRoutes: IRoute[] = [
     name: 'Dashboard',
   },
   {
-    path: '/accountview',
-    name: 'Account View',
-  },
-  {
     path: '/budgetview',
     name: 'Budget View',
   },

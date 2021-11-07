@@ -3,9 +3,8 @@ import { theme, IconButton, Text, Box, Flex, Select } from '@chakra-ui/react'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
 import { Controller, useForm } from 'react-hook-form'
 
-import { useGenericMutation } from '../../hooks/useGenericMutation'
-
 import { TextToValue } from '../../common/enums/Generic'
+import { useMutation } from 'react-query'
 
 interface IEditableSelect {
   id: string
@@ -16,7 +15,6 @@ interface IEditableSelect {
 }
 
 const EditableSelect: FC<IEditableSelect> = ({
-  id,
   refName,
   defaultValue,
   mutationSchema,
@@ -24,7 +22,7 @@ const EditableSelect: FC<IEditableSelect> = ({
 }) => {
   const { errors, handleSubmit, control } = useForm()
 
-  const { mutate } = useGenericMutation(mutationSchema)
+  const { mutate } = useMutation(mutationSchema)
 
   const [selectOpen, setSelectOpen] = useState(false)
 
@@ -49,12 +47,7 @@ const EditableSelect: FC<IEditableSelect> = ({
   const onSubmit = (data: any) => {
     setTrackedValue(data[refName])
     setHover(false)
-    mutate({
-      payload: {
-        _id: id,
-        type: parseInt(data[refName]),
-      },
-    })
+    mutate()
   }
 
   return (

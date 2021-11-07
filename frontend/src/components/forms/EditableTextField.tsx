@@ -10,8 +10,7 @@ import {
 } from '@chakra-ui/react'
 import { CloseIcon, CheckIcon } from '@chakra-ui/icons'
 import { Controller, RegisterOptions, useForm } from 'react-hook-form'
-
-import { useGenericMutation } from '../../hooks/useGenericMutation'
+import { useMutation } from 'react-query'
 
 interface IEditableTextField {
   id: string
@@ -23,7 +22,6 @@ interface IEditableTextField {
 }
 
 const EditableTextField: FC<IEditableTextField> = ({
-  id,
   refName,
   defaultValue,
   mutationSchema,
@@ -32,7 +30,7 @@ const EditableTextField: FC<IEditableTextField> = ({
 }) => {
   const { errors, handleSubmit, control, reset } = useForm()
 
-  const { mutate } = useGenericMutation(mutationSchema)
+  const { mutate } = useMutation(mutationSchema)
 
   const [hover, setHover] = useState(false)
 
@@ -45,17 +43,12 @@ const EditableTextField: FC<IEditableTextField> = ({
     if (type === 'number') data[refName] = parseInt(data[refName])
     if (type === 'float') data[refName] = parseFloat(data[refName])
     setTrackedValue(data[refName])
-    mutate({
-      payload: {
-        _id: id,
-        ...data,
-      },
-    })
+    mutate()
 
     reset({ ...data })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line
   const onError = (errors: any) => {
     errorToast({
       // description: errors[refName].message,

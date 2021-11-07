@@ -3,9 +3,8 @@ import { Box, SimpleGrid, Text } from '@chakra-ui/react'
 
 import Day from './Day'
 
-import { EEntryType } from '../../common/enums'
 import { IAmountInfo, IEntryInfo, DayInfo } from '../../common/gql/Types'
-import { useEntryQueryCalendar } from '../../hooks/useEntryQuery'
+import { useQuery } from 'react-query'
 
 const secondsInDay = 86400000
 
@@ -29,7 +28,7 @@ interface ICalendarProps {
 }
 
 const Calendar: FC<ICalendarProps> = ({ month, startDate, endDate }) => {
-  const { isLoading, data } = useEntryQueryCalendar(startDate, endDate)
+  const { isLoading } = useQuery({})
 
   if (isLoading) {
     return <p>loading...</p>
@@ -47,12 +46,8 @@ const Calendar: FC<ICalendarProps> = ({ month, startDate, endDate }) => {
       new Date(dateIndex.setTime(startDate.getTime() + day * secondsInDay))
   )
 
-  const incomeEntries: IEntryInfo[] = data?.entries?.filter(
-    (entry: IEntryInfo) => entry.type === EEntryType.Income
-  )
-  const expenseEntries: IEntryInfo[] = data?.entries?.filter(
-    (entry: IEntryInfo) => entry.type === EEntryType.Expense
-  )
+  const incomeEntries: IEntryInfo[] = []
+  const expenseEntries: IEntryInfo[] = []
 
   const days = dates.map((date) => (
     <Day
