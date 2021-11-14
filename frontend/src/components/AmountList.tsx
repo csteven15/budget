@@ -8,18 +8,23 @@ interface AmountListItemContent {
   nameSetter: React.Dispatch<React.SetStateAction<string>>
   amount: number
   setter: React.Dispatch<React.SetStateAction<number>>
+  type: string
 }
 
 interface AmountListProps {
   type: string
   amountPlaceholder: string
   setTotal: React.Dispatch<React.SetStateAction<number>>
+  appendBudgetData: React.Dispatch<
+    React.SetStateAction<AmountListItemContent[]>
+  >
 }
 
 const AmountList: FC<AmountListProps> = ({
   type,
   amountPlaceholder,
   setTotal,
+  appendBudgetData,
 }) => {
   const [amounts, setAmounts] = useState<AmountListItemContent[]>([])
   const [newAmount, setNewAmount] = useState(0)
@@ -37,10 +42,12 @@ const AmountList: FC<AmountListProps> = ({
       nameSetter: setNewName,
       amount: newAmount,
       setter: setNewAmount,
+      type: type,
     }
     const indexIfFound = amounts.findIndex((data) => data.name === newItem.name)
     if (indexIfFound === -1 && newItem.name !== '') {
       setAmounts((oldAmounts) => [...oldAmounts, newItem])
+      appendBudgetData((budgetData) => [...budgetData, newItem])
     } else {
       updateAmount(indexIfFound, newItem)
     }

@@ -4,11 +4,20 @@ import { Box, Stat, StatLabel, StatNumber } from '@chakra-ui/react'
 interface StatWrapperProps {
   label: string
   value: number
+  initialValue?: number
   multiplier?: number
 }
-const StatWrapper: FC<StatWrapperProps> = ({ label, value, multiplier }) => {
+const StatWrapper: FC<StatWrapperProps> = ({
+  label,
+  initialValue,
+  value,
+  multiplier,
+}) => {
   if (multiplier === undefined) {
     multiplier = 1
+  }
+  if (initialValue === undefined) {
+    initialValue = 0
   }
   return (
     <Box w={{ base: '100%' }}>
@@ -16,7 +25,7 @@ const StatWrapper: FC<StatWrapperProps> = ({ label, value, multiplier }) => {
         <StatLabel fontWeight="bold">{label}</StatLabel>
         <StatNumber>
           {'$' +
-            (value * multiplier).toLocaleString(undefined, {
+            (initialValue + value * multiplier).toLocaleString(undefined, {
               minimumFractionDigits: 2,
             })}
         </StatNumber>

@@ -1,5 +1,11 @@
 import { FC, useState } from 'react'
-import { Input, InputGroup, InputLeftElement } from '@chakra-ui/react'
+import {
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+} from '@chakra-ui/react'
+import { DeleteIcon } from '@chakra-ui/icons'
 
 interface AmountInputProps {
   placeholder: string
@@ -34,6 +40,8 @@ const AmountInput: FC<AmountInputProps> = ({ placeholder, setFunction }) => {
           setPossibleInput(e.target.value)
         }
       />
+      {/* // TODO: tie in delete clicks */}
+      <InputRightElement>{isValid ? <DeleteIcon /> : null}</InputRightElement>
     </InputGroup>
   )
 }
