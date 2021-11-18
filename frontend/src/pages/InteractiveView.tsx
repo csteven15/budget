@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, Dispatch, SetStateAction } from 'react'
 import {
   Button,
   Flex,
@@ -10,15 +10,13 @@ import {
   VStack,
 } from '@chakra-ui/react'
 
-import AmountList from '../components/AmountList'
-import StatWrapper from '../components/StatWrapper'
+import AmountList from '../components/amountlist/AmountList'
+import StatWrapper from '../components/amountlist/StatWrapper'
 
 // TODO: remove duplicate
 interface AmountListItemContent {
   name: string
-  nameSetter: React.Dispatch<React.SetStateAction<string>>
   amount: number
-  setter: React.Dispatch<React.SetStateAction<number>>
   type: string
 }
 
@@ -28,7 +26,7 @@ const InteractiveView: FC = () => {
   const [incomeTotal, setIncomeTotal] = useState(0)
   const [expenseTotal, setExpenseTotal] = useState(0)
 
-  const [budgetData, appendBudgetData] = useState<AmountListItemContent[]>([])
+  const [budgetData, setBudgetData] = useState<Array<AmountListItemContent>>([])
   const [budgetName, setBudgetName] = useState('')
 
   const calculateBalance = () => {
@@ -41,19 +39,18 @@ const InteractiveView: FC = () => {
 
   useEffect(() => {
     calculateBalance()
-  }, [incomeTotal, expenseTotal])
+  }, [budgetData])
 
   const RenderList = (
     type: string,
-    placeholder: string,
-    setter: React.Dispatch<React.SetStateAction<number>>
+    budgetData: Array<AmountListItemContent>,
+    setBudgetData: Dispatch<SetStateAction<Array<AmountListItemContent>>>
   ) => {
     return (
       <AmountList
         type={type}
-        amountPlaceholder={placeholder}
-        setTotal={setter}
-        appendBudgetData={appendBudgetData}
+        budgetData={budgetData}
+        setBudgetData={setBudgetData}
       />
     )
   }
@@ -77,9 +74,9 @@ const InteractiveView: FC = () => {
 
   return (
     <VStack divider={<StackDivider />} spacing={4} align="stretch">
-      {RenderList('Bank Account', 'Account Balance', setTotalInBank)}
-      {RenderList('Income', 'Monthly Amount', setIncomeTotal)}
-      {RenderList('Expense', 'Monthly Amount', setExpenseTotal)}
+      {['Bank Account', 'Income', 'Expense'].map((type) =>
+        RenderList(type, budgetData, setBudgetData)
+      )}
       <>
         <Flex>
           <Input
