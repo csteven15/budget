@@ -71,7 +71,6 @@ const AmountList: FC<AmountListProps> = ({
             type={type}
             addOrUpdateData={addOrUpdateData}
             deleteData={deleteData}
-            mainInput={false}
           />
         ) : null
       )}
@@ -80,7 +79,7 @@ const AmountList: FC<AmountListProps> = ({
         type={type}
         addOrUpdateData={addOrUpdateData}
         deleteData={deleteData}
-        mainInput={true}
+        mainInput
       />
     </>
   )

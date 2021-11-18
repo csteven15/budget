@@ -1,5 +1,12 @@
 import { FC, useState, useEffect } from 'react'
-import { Button, Grid, GridItem, Input } from '@chakra-ui/react'
+import {
+  Button,
+  Grid,
+  GridItem,
+  Input,
+  InputGroup,
+  InputLeftElement,
+} from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
 
 interface AmountListItemProps {
@@ -8,7 +15,7 @@ interface AmountListItemProps {
   amountValue?: string | number | readonly string[] | undefined
   addOrUpdateData: (name: string, amount: number) => void
   deleteData: (name: string) => void
-  mainInput: boolean
+  mainInput?: boolean
 }
 
 const AmountListItem: FC<AmountListItemProps> = ({
@@ -20,19 +27,21 @@ const AmountListItem: FC<AmountListItemProps> = ({
   mainInput,
 }) => {
   const [name, setName] = useState('')
-  const [amount, setAmount] = useState(0)
+  const [amount, setAmount] = useState('')
+  const [isValid, setIsValid] = useState(false)
 
   useEffect(() => {
     if (nameValue) setName(nameValue as string)
-    if (amountValue) setAmount(amountValue as number)
+    if (amountValue) setAmount(amountValue as string)
   }, [nameValue, amountValue])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      addOrUpdateData(name, amount)
-      if (mainInput) {
+    setIsValid(!isNaN(parseInt(amount)) && parseInt(amount) > 0)
+    if (e.key === 'Enter' && isValid) {
+      addOrUpdateData(name, parseInt(amount))
+      if (mainInput !== undefined && mainInput) {
         setName('')
-        setAmount(0)
+        setAmount('')
       }
     }
   }
@@ -49,23 +58,30 @@ const AmountListItem: FC<AmountListItemProps> = ({
           />
         </GridItem>
         <GridItem colSpan={2}>
-          <Input
-            focusBorderColor="lime"
-            placeholder="Amount"
-            value={amount}
-            onChange={(e) => setAmount(parseInt(e.target.value))}
-            onKeyDown={handleKeyDown}
-          />
+          <InputGroup>
+            <InputLeftElement pointerEvents="none">$</InputLeftElement>
+            <Input
+              focusBorderColor="lime"
+              placeholder="Amount"
+              isInvalid={!isValid}
+              errorBorderColor={amount.length > 0 ? 'red.300' : 'none'}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+          </InputGroup>
         </GridItem>
-        <GridItem colSpan={1}>
-          <Button
-            onClick={() => {
-              deleteData(nameValue as string)
-            }}
-          >
-            <DeleteIcon />
-          </Button>
-        </GridItem>
+        {!mainInput ? (
+          <GridItem colSpan={1}>
+            <Button
+              onClick={() => {
+                deleteData(nameValue as string)
+              }}
+            >
+              <DeleteIcon />
+            </Button>
+          </GridItem>
+        ) : null}
       </Grid>
     </>
   )

@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, Dispatch, SetStateAction } from 'react'
+import { FC, useState, useEffect } from 'react'
 import {
   Button,
   Flex,
@@ -29,31 +29,21 @@ const InteractiveView: FC = () => {
   const [budgetData, setBudgetData] = useState<Array<AmountListItemContent>>([])
   const [budgetName, setBudgetName] = useState('')
 
-  const calculateBalance = () => {
-    if (isNaN(incomeTotal) || isNaN(expenseTotal)) {
-      // add toast
-      return
-    }
-    setNetIncome(incomeTotal - expenseTotal)
+  const findSumFor = (type: string) => {
+    return budgetData
+      .filter((data) => data.type == type)
+      .reduce((sum, current) => sum + current.amount, 0)
   }
 
   useEffect(() => {
-    calculateBalance()
+    setIncomeTotal(findSumFor('Income'))
+    setExpenseTotal(findSumFor('Expense'))
+    setTotalInBank(findSumFor('Bank Account'))
   }, [budgetData])
 
-  const RenderList = (
-    type: string,
-    budgetData: Array<AmountListItemContent>,
-    setBudgetData: Dispatch<SetStateAction<Array<AmountListItemContent>>>
-  ) => {
-    return (
-      <AmountList
-        type={type}
-        budgetData={budgetData}
-        setBudgetData={setBudgetData}
-      />
-    )
-  }
+  useEffect(() => {
+    setNetIncome(incomeTotal - expenseTotal)
+  }, [incomeTotal, expenseTotal])
 
   const RenderTotalStat = (label: string, mutliplier?: number) => {
     return (
@@ -74,9 +64,16 @@ const InteractiveView: FC = () => {
 
   return (
     <VStack divider={<StackDivider />} spacing={4} align="stretch">
-      {['Bank Account', 'Income', 'Expense'].map((type) =>
-        RenderList(type, budgetData, setBudgetData)
-      )}
+      {['Bank Account', 'Income', 'Expense'].map((type, key) => {
+        return (
+          <AmountList
+            key={key}
+            type={type}
+            budgetData={budgetData}
+            setBudgetData={setBudgetData}
+          />
+        )
+      })}
       <>
         <Flex>
           <Input
@@ -86,7 +83,7 @@ const InteractiveView: FC = () => {
               setBudgetName(e.target.value)
             }
           />
-          {/* // TODO: save off json data and budget name to database */}
+          {/* // TODO: save off json data and budget name to cache */}
           <Button
             onClick={() => {
               setBudgetName(budgetName)
