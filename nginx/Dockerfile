@@ -1,5 +1,5 @@
 # base image
-FROM nginx
+FROM nginx:latest
 
 EXPOSE 80
 
