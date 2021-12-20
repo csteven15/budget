@@ -55,7 +55,7 @@ const DataTabs: FC = () => {
   const [month, setMonth] = useState(dateToday.getMonth())
   return (
     <Box width="95%" overflowX="scroll">
-      <Tabs isManual align="center" defaultIndex={1}>
+      <Tabs isManual align="center" defaultIndex={1} colorScheme="teal">
         <TabList>
           <Tab>Month View</Tab>
           <Tab>Interactive View</Tab>

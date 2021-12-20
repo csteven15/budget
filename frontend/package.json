@@ -59,6 +59,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.25.1",
     "prettier": "^2.4.0",
+    "react-minimal-pie-chart": "^8.2.0",
     "yarn-upgrade-all": "^0.5.4"
   }
 }

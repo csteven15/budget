@@ -7,53 +7,48 @@ interface AmountListItemContent {
   name: string
   amount: number
   type: string
+  applied: boolean
+  frequency?: string
 }
 
 interface AmountListProps {
   type: string
   budgetData: Array<AmountListItemContent>
   setBudgetData: Dispatch<SetStateAction<Array<AmountListItemContent>>>
+  recurringList?: boolean
 }
 
 const AmountList: FC<AmountListProps> = ({
   type,
   budgetData,
   setBudgetData,
+  recurringList,
 }) => {
   const deleteData = (name: string) => {
     const filteredBudgetData = budgetData.filter((data) => data.name !== name)
     setBudgetData(filteredBudgetData)
   }
 
-  const updateData = (name: string, amount: number) => {
-    const updatedBudgetData = budgetData.filter((data) => data.name !== name)
-    updatedBudgetData.push({
-      type,
-      name,
-      amount,
-    })
+  const updateData = (newData: AmountListItemContent) => {
+    const updatedBudgetData = budgetData.filter(
+      (data) => data.name !== newData.name
+    )
+    updatedBudgetData.push(newData)
     setBudgetData(updatedBudgetData)
   }
 
-  const addData = (name: string, amount: number) => {
-    setBudgetData((data: Array<AmountListItemContent>) => [
-      ...data,
-      {
-        type,
-        name,
-        amount,
-      },
-    ])
+  const addData = (newData: AmountListItemContent) => {
+    setBudgetData((data: Array<AmountListItemContent>) => [...data, newData])
   }
 
-  const addOrUpdateData = (name: string, amount: number) => {
+  const addOrUpdateData = (newData: AmountListItemContent) => {
     const dataExists = budgetData.some(
-      (data) => data.name === name && data.type === type
+      (data) => data.name === newData.name && data.type === newData.type
     )
     if (dataExists) {
-      updateData(name, amount)
+      updateData(newData)
     } else {
-      addData(name, amount)
+      addData(newData)
     }
   }
 
@@ -66,20 +61,20 @@ const AmountList: FC<AmountListProps> = ({
         data.type === type ? (
           <AmountListItem
             key={key}
-            nameValue={data.name}
-            amountValue={data.amount}
+            currentItemContent={data}
             type={type}
             addOrUpdateData={addOrUpdateData}
             deleteData={deleteData}
+            recurringList={recurringList}
           />
         ) : null
       )}
-
       <AmountListItem
         type={type}
         addOrUpdateData={addOrUpdateData}
         deleteData={deleteData}
         mainInput
+        recurringList={recurringList}
       />
     </>
   )
