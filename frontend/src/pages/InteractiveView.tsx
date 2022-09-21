@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useRef } from 'react'
 import {
   Button,
   Drawer,
@@ -8,7 +8,8 @@ import {
   DrawerBody,
   DrawerHeader,
   DrawerFooter,
-  Flex,
+  Grid,
+  GridItem,
   Input,
   Stack,
   StackProps,
@@ -16,12 +17,19 @@ import {
   Text,
   VStack,
   useDisclosure,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogBody,
+  AlertDialogFooter,
 } from '@chakra-ui/react'
 import { PieChart } from 'react-minimal-pie-chart'
 
 import AmountList from '../components/amountlist/AmountList'
 import StatWrapper from '../components/amountlist/StatWrapper'
 import useAggregatedLocalStorage from '../common/hooks/useAggregatedLocalStorage'
+import { AmountListItemContent } from '../components/amountlist/AmountListItemContent'
 
 const getRandomColor = () =>
   '#' + (0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6)
@@ -36,15 +44,6 @@ const stackProps: StackProps = {
   spacing: 4,
   direction: { base: 'column', lg: 'row' },
   align: 'center',
-}
-
-// TODO: remove duplicate
-interface AmountListItemContent {
-  name: string
-  amount: number
-  type: string
-  applied: boolean
-  frequency?: string
 }
 
 const getSumFor = (type: string, data: AmountListItemContent[]) => {
@@ -83,6 +82,7 @@ const localStorageMainKey = 'InteractiveView'
 const defaultBudgetName = 'My Budget'
 
 const InteractiveView: FC = () => {
+  const [firstRender, setFirstRender] = useState(true)
   const [totalInBank, setTotalInBank] = useState(0)
   const [netIncome, setNetIncome] = useState(0)
   const [incomeTotal, setIncomeTotal] = useState(0)
@@ -92,13 +92,24 @@ const InteractiveView: FC = () => {
   const [budgetData, setBudgetData] = useState<Array<AmountListItemContent>>([])
   const [budgetName, setBudgetName] = useState(defaultBudgetName)
 
+  const {
+    isOpen: alertIsOpen,
+    onOpen: onAlertOpen,
+    onClose: onAlertClose,
+  } = useDisclosure()
+  const cancelRef = useRef<any>()
+
+  const {
+    isOpen: loadDrawerIsOpen,
+    onOpen: onLoadDrawerOpen,
+    onClose: onLoadDrawerClose,
+  } = useDisclosure()
+
   const [storedBudgets, setStoredBudgets, setBudgetInStorage] =
     useAggregatedLocalStorage<BudgetStoreType>(
       localStorageMainKey,
       (data: BudgetStoreType) => data.name
     )
-
-  const { isOpen, onOpen, onClose } = useDisclosure()
 
   useEffect(() => {
     const defaultStoredBudget = storedBudgets.find(
@@ -111,6 +122,11 @@ const InteractiveView: FC = () => {
   }, [])
 
   useEffect(() => {
+    if (firstRender) {
+      setFirstRender(false)
+      return
+    }
+
     budgetData.sort((a, b) => 0 - (a.amount > b.amount ? 1 : -1))
 
     setIncomeTotal(getSumFor('Income', budgetData))
@@ -138,24 +154,55 @@ const InteractiveView: FC = () => {
 
   return (
     <VStack divider={<StackDivider />} spacing={4} align="stretch">
-      <>
-        <Flex>
+      <Grid templateColumns="repeat(5, 1fr)" gap={1}>
+        <GridItem colSpan={4}>
           <Input
             placeholder="Enter Budget Name"
             value={budgetName}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setBudgetName(e.target.value)
             }
-            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
-              e.key === 'Enter' && budgetName !== defaultBudgetName
-                ? setBudgetData([])
-                : null
-            }
+            onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === 'Enter' && budgetName !== defaultBudgetName) {
+                onAlertOpen()
+              }
+            }}
           />
-          <Button colorScheme="teal" onClick={onOpen}>
+          <AlertDialog
+            onClose={onAlertClose}
+            isOpen={alertIsOpen}
+            leastDestructiveRef={cancelRef}
+          >
+            <AlertDialogOverlay />
+            <AlertDialogContent>
+              <AlertDialogHeader>Create New Budget?</AlertDialogHeader>
+              <AlertDialogBody></AlertDialogBody>
+              <AlertDialogFooter>
+                <Button ref={cancelRef} onClick={onAlertClose}>
+                  No
+                </Button>
+                <Button
+                  colorScheme="teal"
+                  ml={3}
+                  onClick={() => {
+                    setBudgetData([])
+                  }}
+                >
+                  Yes
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </GridItem>
+        <GridItem colSpan={1}>
+          <Button colorScheme="teal" onClick={onLoadDrawerOpen}>
             Load
           </Button>
-          <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+          <Drawer
+            isOpen={loadDrawerIsOpen}
+            placement="right"
+            onClose={onLoadDrawerClose}
+          >
             <DrawerOverlay />
             <DrawerContent>
               <DrawerCloseButton />
@@ -177,7 +224,7 @@ const InteractiveView: FC = () => {
                 </VStack>
               </DrawerBody>
               <DrawerFooter>
-                <Button variant="outline" mr={3} onClick={onClose}>
+                <Button variant="outline" mr={3} onClick={onLoadDrawerClose}>
                   Cancel
                 </Button>
                 <Button colorScheme="red" onClick={() => setStoredBudgets([])}>
@@ -186,8 +233,8 @@ const InteractiveView: FC = () => {
               </DrawerFooter>
             </DrawerContent>
           </Drawer>
-        </Flex>
-      </>
+        </GridItem>
+      </Grid>
       {['Bank Account', 'Income', 'Expense'].map((type, key) => {
         return (
           <AmountList

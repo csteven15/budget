@@ -1,40 +1,42 @@
 version: "3.7"
 
 services:
-  mongo:
-    image: "mongo:latest"
-    container_name: "mongo"
-    ports:
-      - 27017:27017
-    volumes:
-      - ./db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-      - mongodb:/data/db
+  # mongo:
+  #   image: "mongo:latest"
+  #   container_name: "mongo"
+  #   ports:
+  #     - 27017:27017
+  #   volumes:
+  #     - ./db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+  #     - mongodb:/data/db
   frontend:
     container_name: frontend
+    ports:
+      - 3000:3000
     build:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
       - /app/node_modules # don't override folder inside container
     restart: on-failure
-  backend:
-    container_name: backend
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    restart: on-failure
-    volumes:
-      - /app/node_modules # don't override folder inside container
-  nginx:
-    container_name: nginx
-    depends_on:
-      - frontend
-      - backend
-    restart: always # routing traffic to entire app
-    ports: 
-      - 80:80
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-volumes:
-  mongodb:
+  # backend:
+  #   container_name: backend
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   restart: on-failure
+  #   volumes:
+  #     - /app/node_modules # don't override folder inside container
+  # nginx:
+  #   container_name: nginx
+  #   depends_on:
+  #     - frontend
+  #     # - backend
+  #   restart: always # routing traffic to entire app
+  #   ports:
+  #     - 80:80
+  #   build:
+  #     context: ./nginx
+  #     dockerfile: Dockerfile
+# volumes:
+#   mongodb:

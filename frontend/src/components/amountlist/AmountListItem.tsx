@@ -10,14 +10,7 @@ import {
   Switch,
 } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
-
-interface AmountListItemContent {
-  name: string
-  amount: number
-  type: string
-  applied: boolean
-  frequency?: string
-}
+import { AmountListItemContent } from './AmountListItemContent'
 
 const defaultFrequency = 'monthly'
 
@@ -107,7 +100,6 @@ const AmountListItem: FC<AmountListItemProps> = ({
         {recurringList ? (
           <GridItem colSpan={1}>
             <Select
-              placeholder="Frequency"
               value={tempFrequency}
               onChange={(e) => {
                 addOrUpdateDataIfValid({
@@ -119,9 +111,12 @@ const AmountListItem: FC<AmountListItemProps> = ({
                 })
               }}
             >
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Biweekly</option>
               <option value="monthly">Monthly</option>
-              <option value="semi-yearly">Every 6 Months</option>
-              <option value="yearly">Once a Year</option>
+              <option value="semiannual">Semiannual</option>
+              <option value="annual">Annual</option>
+              <option value="once">Once</option>
             </Select>
           </GridItem>
         ) : null}

@@ -1,29 +1,46 @@
 import { FC } from 'react'
-import { Badge, Box, Flex, Text, useColorModeValue } from '@chakra-ui/react'
-
-import { DayInfo, IAmountInfo } from '../../common/gql/Types'
-import EditableTextField from '../forms/EditableTextField'
-import {
-  UPDATE_AMOUNT_MUTATION,
-  UPDATE_ENTRY_MUTATION,
-} from '../../common/gql/Mutations'
+import { Badge, Box, Text, useColorModeValue, VStack } from '@chakra-ui/react'
 
 interface IDayProps {
   date: Date
   month: number
-  incomeAmounts: DayInfo[]
-  expenseAmounts: DayInfo[]
+  incomeTotal: number
+  expenseTotal: number
+  runningBalance: number
+  onClick: (date: Date) => void
 }
 
-const Day: FC<IDayProps> = ({ date, month, incomeAmounts, expenseAmounts }) => {
+const isToday = (someDate: Date) => {
+  const today = new Date()
+  return (
+    someDate.getDate() == today.getDate() &&
+    someDate.getMonth() == today.getMonth() &&
+    someDate.getFullYear() == today.getFullYear()
+  )
+}
+
+const Day: FC<IDayProps> = ({
+  date,
+  month,
+  incomeTotal,
+  expenseTotal,
+  runningBalance,
+  onClick,
+}) => {
   const monthColor = useColorModeValue('white', 'gray.800')
   const nonMonthColor = useColorModeValue('whitesmoke', 'gray.900')
+  const getBackgroundColorForDay = (dateOfDay: Date) => {
+    if (isToday(dateOfDay)) return useColorModeValue('teal.200', 'teal')
+    return dateOfDay.getMonth() === month ? monthColor : nonMonthColor
+  }
+
   return (
     <Box
       borderWidth="1px"
       minW="50px"
       h="125px"
-      backgroundColor={date.getMonth() === month ? monthColor : nonMonthColor}
+      backgroundColor={getBackgroundColorForDay(date)}
+      onClick={() => onClick(date)}
     >
       <Text
         textAlign={['center', 'right', 'right', 'right']}
@@ -31,68 +48,15 @@ const Day: FC<IDayProps> = ({ date, month, incomeAmounts, expenseAmounts }) => {
       >
         {date.getDate()}
       </Text>
-      {incomeAmounts?.map((dayInfo: DayInfo) =>
-        dayInfo.amounts.map((amountInfo: IAmountInfo) => (
-          <Box key={amountInfo._id}>
-            <Badge colorScheme="green">
-              <Flex align="center">
-                <Box textTransform="none">
-                  <EditableTextField
-                    refName="name"
-                    id={amountInfo._id}
-                    defaultValue={dayInfo.name}
-                    mutationSchema={UPDATE_ENTRY_MUTATION}
-                    type="string"
-                    required
-                  />
-                </Box>
-                <Text>{' - $'}</Text>
-                <Box>
-                  <EditableTextField
-                    refName="amount"
-                    id={amountInfo._id}
-                    defaultValue={amountInfo.amount.toFixed(2)}
-                    mutationSchema={UPDATE_AMOUNT_MUTATION}
-                    type="float"
-                    required
-                  />
-                </Box>
-              </Flex>
-            </Badge>
-          </Box>
-        ))
-      )}
-      {expenseAmounts?.map((dayInfo: DayInfo) =>
-        dayInfo.amounts.map((amountInfo: IAmountInfo) => (
-          <Box key={amountInfo._id}>
-            <Badge colorScheme="red">
-              <Flex align="center">
-                <Box textTransform="none">
-                  <EditableTextField
-                    refName="name"
-                    id={amountInfo._id}
-                    defaultValue={dayInfo.name}
-                    mutationSchema={UPDATE_ENTRY_MUTATION}
-                    type="string"
-                    required
-                  />
-                </Box>
-                <Text>{' - $'}</Text>
-                <Box>
-                  <EditableTextField
-                    refName="amount"
-                    id={amountInfo._id}
-                    defaultValue={amountInfo.amount.toFixed(2)}
-                    mutationSchema={UPDATE_AMOUNT_MUTATION}
-                    type="float"
-                    required
-                  />
-                </Box>
-              </Flex>
-            </Badge>
-          </Box>
-        ))
-      )}
+      <VStack>
+        {incomeTotal > 0 ? (
+          <Badge colorScheme="green">{'+$' + incomeTotal}</Badge>
+        ) : null}
+        {expenseTotal > 0 ? (
+          <Badge colorScheme="red">{'-$' + expenseTotal}</Badge>
+        ) : null}
+        {/* <Badge colorScheme="teal">{'$' + runningBalance}</Badge> */}
+      </VStack>
     </Box>
   )
 }

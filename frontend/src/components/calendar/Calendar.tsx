@@ -1,39 +1,35 @@
 import { FC } from 'react'
 import { Box, SimpleGrid, Text } from '@chakra-ui/react'
-
 import Day from './Day'
-
-import { IAmountInfo, IEntryInfo, DayInfo } from '../../common/gql/Types'
-import { useQuery } from 'react-query'
+import { DayAmountInfo } from '../../common/types/DayAmountInfo'
 
 const secondsInDay = 86400000
 
 const daysOfWeek = ['Sun.', 'Mon.', 'Tue.', 'Wed.', 'Thur', 'Fri.', 'Sat.']
 
-const getEntriesOnDay = (entries: IEntryInfo[], date: Date) => {
-  const dayInfo: DayInfo[] = []
-  entries?.map((entry: IEntryInfo) => {
-    const amounts = entry?.amounts?.filter(
-      (amount: IAmountInfo) => amount.date === date.toISOString()
-    )
-    dayInfo.push({ amounts: amounts, name: entry?.name })
-  })
-  return dayInfo
+const dateIsSame = (someDate: Date, otherDate: Date) => {
+  return (
+    someDate.getDate() == otherDate.getDate() &&
+    someDate.getMonth() == otherDate.getMonth() &&
+    someDate.getFullYear() == otherDate.getFullYear()
+  )
 }
 
 interface ICalendarProps {
   month: number
   startDate: Date
   endDate: Date
+  onDayClick: (date: Date) => void
+  dayAmounts: DayAmountInfo[]
 }
 
-const Calendar: FC<ICalendarProps> = ({ month, startDate, endDate }) => {
-  const { isLoading } = useQuery({})
-
-  if (isLoading) {
-    return <p>loading...</p>
-  }
-
+const Calendar: FC<ICalendarProps> = ({
+  month,
+  startDate,
+  endDate,
+  onDayClick,
+  dayAmounts,
+}) => {
   const getNumberOfDays = (startDate: Date, endDate: Date) =>
     Math.floor((endDate.getTime() - startDate.getTime()) / secondsInDay)
 
@@ -46,16 +42,28 @@ const Calendar: FC<ICalendarProps> = ({ month, startDate, endDate }) => {
       new Date(dateIndex.setTime(startDate.getTime() + day * secondsInDay))
   )
 
-  const incomeEntries: IEntryInfo[] = []
-  const expenseEntries: IEntryInfo[] = []
+  const getDayInfoFor = (date: Date) => {
+    const possibleAmountInfo = dayAmounts.find((info) =>
+      dateIsSame(new Date(info.date), new Date(date))
+    )
+    const defaultInfo: DayAmountInfo = {
+      date: date,
+      income: [0],
+      expenses: [0],
+      runningBalance: 0,
+    }
+    return possibleAmountInfo === undefined ? defaultInfo : possibleAmountInfo
+  }
 
   const days = dates.map((date) => (
     <Day
       key={date.toString()}
       month={month}
       date={new Date(date)}
-      incomeAmounts={getEntriesOnDay(incomeEntries, date)}
-      expenseAmounts={getEntriesOnDay(expenseEntries, date)}
+      incomeTotal={getDayInfoFor(date).income.reduce((a, b) => a + b, 0)}
+      expenseTotal={getDayInfoFor(date).expenses.reduce((a, b) => a + b, 0)}
+      runningBalance={getDayInfoFor(date).runningBalance}
+      onClick={onDayClick}
     />
   ))
 
