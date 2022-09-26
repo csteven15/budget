@@ -30,6 +30,7 @@ import AmountList from '../components/amountlist/AmountList'
 import StatWrapper from '../components/amountlist/StatWrapper'
 import useAggregatedLocalStorage from '../common/hooks/useAggregatedLocalStorage'
 import { AmountListItemContent } from '../components/amountlist/AmountListItemContent'
+import React from 'react'
 
 const getRandomColor = () =>
   '#' + (0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6)
@@ -97,7 +98,7 @@ const InteractiveView: FC = () => {
     onOpen: onAlertOpen,
     onClose: onAlertClose,
   } = useDisclosure()
-  const cancelRef = useRef<any>()
+  const cancelRef = useRef<HTMLButtonElement>(null)
 
   const {
     isOpen: loadDrawerIsOpen,
@@ -186,6 +187,7 @@ const InteractiveView: FC = () => {
                   ml={3}
                   onClick={() => {
                     setBudgetData([])
+                    onAlertClose()
                   }}
                 >
                   Yes

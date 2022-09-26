@@ -109,6 +109,7 @@ const DataTabs: FC = () => {
     openDayClickModal()
   }
 
+  // eslint-disable-next-line
   const [storedBudgets, setStoredBudgets, setBudgetInStorage] =
     useAggregatedLocalStorage<DateTrackedBudgetStoreType>(
       localStorageKey,

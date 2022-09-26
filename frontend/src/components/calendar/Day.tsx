@@ -55,7 +55,7 @@ const Day: FC<IDayProps> = ({
         {expenseTotal > 0 ? (
           <Badge colorScheme="red">{'-$' + expenseTotal}</Badge>
         ) : null}
-        {/* <Badge colorScheme="teal">{'$' + runningBalance}</Badge> */}
+        <Badge colorScheme="teal">{'$' + runningBalance}</Badge>
       </VStack>
     </Box>
   )
