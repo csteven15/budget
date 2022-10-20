@@ -16,6 +16,7 @@ import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons'
 
 import MonthView from './MonthView'
 import InteractiveView from './InteractiveView'
+import RuleView from './RuleView'
 
 import { MonthArray } from '../common/enums'
 
@@ -55,10 +56,11 @@ const DataTabs: FC = () => {
   const [month, setMonth] = useState(dateToday.getMonth())
   return (
     <Box width="95%" overflowX="scroll">
-      <Tabs isManual align="center" defaultIndex={1} colorScheme="teal">
+      <Tabs isManual align="center" defaultIndex={2} colorScheme="teal">
         <TabList>
           <Tab>Month View</Tab>
           <Tab>Interactive View</Tab>
+          <Tab>Rule View</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -67,6 +69,9 @@ const DataTabs: FC = () => {
           </TabPanel>
           <TabPanel>
             <InteractiveView />
+          </TabPanel>
+          <TabPanel>
+            <RuleView />
           </TabPanel>
         </TabPanels>
       </Tabs>
